@@ -1,0 +1,121 @@
+{% extends "base.html" %} 
+
+{% block main %}
+
+<div id="player_background" class="d-flex align-items-center">
+    <div class="container table_container">
+        <input type="text" class="live-search-box" placeholder="search players"/>
+        <div class="tab-form players">
+            <div class="tab-header players">
+                <div class="active">Men</div>
+                <div>Women</div>
+            </div>
+            <div class="tab-body players">
+                <div class="men active">
+                    <table id="player_table" class="table table-dark table-hover text-white align-middle text-center">
+                        <thead>
+                            <tr class="table_header">
+                                <th scope="col" colspan="1">PLAYER</th>
+                                <th scope="col" colspan="2">NAME</th>
+                                <th scope="col" colspan="1">RANKING</th>
+                                <th scope="col" colspan="1">MOVEMENT</th>
+                                <th scope="col" colspan="1">COMPS PLAYED</th>
+                                <th scope="col" colspan="1">POINTS</th>
+                                <th scope="col" colspan="2">COUNTRY</th>
+                                <th scope="col" colspan="2">PROFILE</th>
+                                {% if session['first_name'] %}
+                                <th scope="col" colspan="2">FAVORITE</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for player_index in range(players|length) %}
+                            <tr class="p-3 live-search-list">
+                                {% if players[player_index].gender == 'men' %}
+                                <td colspan="1"><img class="player_headshot" src="/static/images/men_headshots/{{players[player_index].name}}.png"></td>
+                                <td colspan="2">{{players[player_index].name}}</td>
+                                <td colspan="1">{{players[player_index].ranking}}</td>
+
+                                    {% if players[player_index].movement < 0 %}
+                                    <td colspan="1" class="text-danger">{{players[player_index].movement}}</td> 
+                                    {% elif players[player_index].movement > 0 %}
+                                    <td colspan="1" class="text-success">{{players[player_index].movement}}</td>
+                                    {% else %}
+                                    <td colspan="1">{{players[player_index].movement}}</td>
+                                    {% endif %}
+
+                                <td colspan="1">{{players[player_index].competitions_played}}</td>
+                                <td colspan="1">{{players[player_index].points}}</td>
+                                <td colspan="2">{{(players[player_index].country|string)[2:-3]}}</td>
+                                <td colspan="2"><a href="/player/{{players[player_index].id}}" class="text-decoration-none">Profile</a></td>
+                                    {% if session['first_name'] %}
+                                        {% if user_favorites[player_index] == players[player_index].ranking %}
+                                        <td colspan="2"><a href="/user/delete/favorite/{{players[player_index].id}}/v1"><i class="bi bi-star-fill favorited_star"></i></a></td>
+                                        {% else %}
+                                        <td colspan="2"><a href="/user/favorite/{{players[player_index].id}}/v1"><i class="bi bi-star-fill favorite_star"></i></a></td>
+                                        {% endif %}  
+                                    {% endif %}
+                            </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="women">
+                    <table id="player_table" class="table table-dark table-hover text-white align-middle text-center">
+                        <thead>
+                            <tr class="table_header">
+                                <th scope="col" colspan="1">PLAYER</th>
+                                <th scope="col" colspan="2">NAME</th>
+                                <th scope="col" colspan="1">RANKING</th>
+                                <th scope="col" colspan="1">MOVEMENT</th>
+                                <th scope="col" colspan="1">COMPS PLAYED</th>
+                                <th scope="col" colspan="1">POINTS</th>
+                                <th scope="col" colspan="2">COUNTRY</th>
+                                <th scope="col" colspan="2">PROFILE</th>
+                                {% if session['first_name'] %}
+                                <th scope="col" colspan="2">FAVORITE</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for player_index in range(players|length) %}
+                            <tr class="p-3 live-search-list">
+                                {% if players[player_index].gender == 'women' %}
+                                <td colspan="1"><img class="player_headshot" src="/static/images/women_headshots/{{players[player_index].name}}.png"></td>
+                                <td colspan="2">{{players[player_index].name}}</td>
+                                <td colspan="1">{{players[player_index].ranking}}</td>
+                                
+                                {% if players[player_index].movement < 0 %}
+                                    <td colspan="1" class="text-danger">{{players[player_index].movement}}</td> 
+                                    {% elif players[player_index].movement > 0 %}
+                                    <td colspan="1" class="text-success">{{players[player_index].movement}}</td>
+                                    {% else %}
+                                    <td colspan="1">{{players[player_index].movement}}</td>
+                                {% endif %}
+
+                                <td colspan="1">{{players[player_index].competitions_played}}</td>
+                                <td colspan="1">{{players[player_index].points}}</td>
+                                <td colspan="2">{{(players[player_index].country|string)[2:-3]}}</td>
+                                <td colspan="2"><a href="/player/{{players[player_index].id}}" class="text-decoration-none">Profile</a></td>
+
+                                    {% if session['first_name'] %}
+                                        {% if user_favorites[player_index] == players[player_index].ranking %}
+                                        <td colspan="2"><a href="/user/delete/favorite/{{players[player_index].id}}/v1"><i class="bi bi-star-fill favorited_star"></i></a></td>
+                                        {% else %}
+                                        <td colspan="2"><a href="/user/favorite/{{players[player_index].id}}/v1"><i class="bi bi-star-fill favorite_star"></i></a></td>
+                                        {% endif %} 
+                                    {% endif %}
+
+                            </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div> 
+</div>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends "base.html" %} 
+
+{% block main %}
+<div id="login_background">
+  <div id="login" class="container-fluid d-flex justify-content-center align-items-center">
+    <div class="tab-form login_page">
+      <div class="tab-header login_page">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% if messages[0][0] == 'login' %}
+            <div class="active">Login</div>
+            <div>Signup</div>
+            {% else %}
+            <div>Login</div>
+            <div class="active">Signup</div>
+            {% endif %}
+          {% else %}
+          <div class="active">Login</div>
+          <div>Signup</div>
+          {% endif %}
+      </div>
+
+      <div class="tab-body login_page">
+      {% if messages %}
+        {% if messages[0][0] == 'login' %}
+        <div class="login active">
+        {% else %}
+        <div class="login">
+        {% endif %}
+      {% else %}
+        <div class="login active">
+      {% endif %}
+          <form action="/login" method="POST">
+            <div class="form-input">
+              <input type="text" id="email" name="email" placeholder="Email">
+              {% if messages %}
+                {% for category, message in messages %}
+                  {% if category == 'login' %}
+                  <span class="form-text flash_message">{{message}}</span>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            </div>
+            <div class="form-input">
+              <input type="password" id="password" name="password" placeholder="Password">
+            </div>
+            <button class="btn btn-success" type="submit">Log In</button>
+          </form>
+        </div>
+        
+        {% if messages %}
+          {% if messages[0][0] == 'login' %}
+          <div class="signup">
+          {% else %}
+          <div class="signup active">
+          {% endif %}
+        {% else %}
+          <div class="signup">
+        {% endif %}
+            <form action="/user/register" method="POST">
+              <div class="form-input">
+                <input type="text" id="first_name" name="first_name" placeholder="First name">
+                {% if messages %}
+                  {% for category, message in messages %}
+                    {% if category == 'first_name' %}
+                    <span class="form-text flash_message">{{message}}</span>
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              </div>
+              <div class="form-input">
+                <input type="text" id="lst_name" name="last_name" placeholder="Last name">
+                {% if messages %}
+                  {% for category, message in messages %}
+                    {% if category == 'last_name' %}
+                    <span class="form-text flash_message">{{message}}</span>
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              </div>
+              <div class="form-input">
+                <input type="text" id="email" name="email" placeholder="Email">
+                {% if messages %}
+                  {% for category, message in messages %}
+                    {% if category == 'email' %}
+                    <span class="form-text flash_message">{{message}}</span>
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              </div>
+              <div class="form-input">
+                <input type="password" id="password" name="password" placeholder="Password">
+                {% if messages %}
+                  {% for category, message in messages %}
+                    {% if category == 'password' %}
+                    <span class="form-text flash_message">{{message}}</span>
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              </div>
+              <div class="form-input">
+                <input type="password" id="confirm" name="confirm" placeholder="Confirm password">
+                {% if messages %}
+                  {% for category, message in messages %}
+                    {% if category == 'confirm' %}
+                    <span class="form-text flash_message">{{message}}</span>
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              </div>
+              <button class="btn btn-success" type="submit">Register</button>
+            </form>
+            {% endwith %}
+          </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

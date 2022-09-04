@@ -1,0 +1,127 @@
+{% extends "base.html" %} 
+
+{% block main %}
+
+<div id="container-fluid" class="position-relative">
+    <div id="playerCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-interval="3000">
+        <div id="innerPlayer" class="carousel-inner">
+            {% for shot_index in range(player_photos.action_shots|length) %}
+                {% if shot_index == 0 %}  
+                <div class="carousel-item active" style="background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1)) 70%, url('/static/images/actionshots/{{player_photos.action_shots[shot_index].path}}.jpeg'); background-size: cover"></div>
+                {% else %}
+                <div class="carousel-item" style="background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1)) 70%, url('/static/images/actionshots/{{player_photos.action_shots[shot_index].path}}.jpeg'); background-size: cover"></div>
+                {% endif %}
+            {% endfor %}  
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#playerCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#playerCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+    <div id ="name" class="position-absolute text-white">
+        {% set name_list = player.name.split(',') %}
+        <span id="first_name" class="ps-5">{{name_list[1]}}</span> <span id="last_name">{{name_list[0].upper()}}</span> <span class="display-6">{{(player.country|string)[2:-3]}}</span>
+        <div id="about_div" class="d-flex justify-content-start gap-5 text-start p-5">
+            <div>
+                <p>World Ranking</p>
+                <p class="about_bold">#{{player.ranking}}</p>
+            </div>
+            <div>
+                <p class="mb-3">Handedness</p>
+                <p class="about_bold">{{(player.handedness|string)[0]|upper}}{{(player.handedness|string)[1:]}}</p>
+            </div>
+            <div>
+                <p>Record</p>
+                <p class="about_bold">{{player.win_total}}.{{player.match_total - player.win_total}}</p>
+            </div>
+            <div>
+                <p>Birthyear</p>
+                <p class="about_bold">{{(player.date_of_birth|string)[:4]}}</p>
+            </div>
+            <div>
+                <p>Favorited by</p>
+                <p class="about_bold">{{player_favorites.users|length}}</p>
+            </div>
+            <div>
+                <p class="mb-2">Favorite</p>
+                {% if session['user_id'] %}
+                    {% if favorite_value['is_favorited'] == '0' %}
+                    <a href="/user/delete/favorite/{{player.id}}/v2"><i class="bi bi-star-fill favorited_star"></i></a> 
+                    {% else %}
+                    <a href="/user/favorite/{{player.id}}/v2"><i class="bi bi-star-fill favorite_star"></i></a>
+                    {% endif %}
+                {% else %}
+                <a href="/user/favorite/{{player.id}}/v2"><i class="bi bi-star-fill favorite_star"></i></a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="container-fluid d-flex flex-column justify-content-center align-items-center royal_blue">
+    <div class="scroll_reveal">
+        <div class="row">
+            <div class="col-12 text-center p-5">
+                {% set name_list = player.name.split(',') %}
+                <h3 class="display-3 text-white">Match History</h1>
+                <div class="row">
+                    {% for summary_index in range(summary.summaries|length) %}
+                    <div class="col-3 mb-3">
+                        <div class="card h-100 p-2 d-flex flex-column justify-content-center">
+                        
+                            <p class="text-warning card_font">{{summary.summaries[summary_index].sport_event.sport_event_context.competition.name}}</p>
+                            {% if summary.summaries[summary_index].sport_event.sport_event_context.round %}
+                                {% if summary.summaries[summary_index].sport_event.sport_event_context.round.name %}
+                                    {% if summary.summaries[summary_index].sport_event.sport_event_context.round.name[:5] == 'round'%}
+                                    <p class="card_font">Round of {{summary.summaries[summary_index].sport_event.sport_event_context.round.name[9:]}}</p>
+                                    {% else %}
+                                    <p class="card_font">{{summary.summaries[summary_index].sport_event.sport_event_context.round.name[0]|upper}}{{summary.summaries[summary_index].sport_event.sport_event_context.round.name[1:]}}</p>
+                                    {% endif %}
+                                {% else %}
+                                <p class="card_font">*No Round Provided*</p>
+                                {% endif %}
+                            {% endif %}
+
+                            <p class="card_font">{{summary.summaries[summary_index].sport_event.start_time[:10]}}</p>
+                           
+                            <p class="card_font text-dark">{{summary.summaries[summary_index].sport_event.competitors[0].name}}
+                                {% if summary.summaries[summary_index].sport_event_status.winner_id == summary.summaries[summary_index].sport_event.competitors[0].id %}
+                                <i class="bi bi-check-circle-fill text-primary card_check"></i>
+                                {% endif %}
+                            </p>
+
+                            <div class="row px-5">
+                                {% for set_index in range(summary.summaries[summary_index].sport_event_status.period_scores|length) %}
+                                <div class="col border border-1 border-dark bg-white text-dark">
+                                    {{summary.summaries[summary_index].sport_event_status.period_scores[set_index]['home_score']}}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="row">&emsp;</div>
+                            <div class="row px-5">
+                                {% for set_index in range(summary.summaries[summary_index].sport_event_status.period_scores|length) %}
+                                <div class="col border border-1 border-dark bg-white text-dark">
+                                    {{summary.summaries[summary_index].sport_event_status.period_scores[set_index]['away_score']}}
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <p class="card_font text-dark mt-3">{{summary.summaries[summary_index].sport_event.competitors[1].name}}
+                                {% if summary.summaries[summary_index].sport_event_status.winner_id == summary.summaries[summary_index].sport_event.competitors[1].id %}
+                                <i class="bi bi-check-circle-fill text-primary card_check"></i>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+</section>
+
+{% endblock %}

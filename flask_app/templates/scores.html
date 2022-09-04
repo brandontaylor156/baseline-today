@@ -1,0 +1,220 @@
+{% extends "base.html" %} 
+
+{% block main %}
+
+<div id="player_background" class="d-flex align-items-center text-white">
+  <div class="container table_container">
+    <input type="text" class="live-search-box" placeholder="search scores"/>
+    <div class="tab-form scores">
+      <div class="tab-header scores">
+        <div class="active">Live</div>
+        <div>Completed</div>
+        <div>Upcoming</div>
+      </div>
+
+      <div class="tab-body scores">
+        <div class="live_score active">
+          <table class="table table-dark table-hover text-white align-middle text-center">
+            <thead>
+              <tr class="table_header">
+                <th>EVENT</th>
+                <th>LOCATION</th>
+                <th>PLAYERS</th>
+                <th>RESULTS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for summary in live_data.summaries %}
+                {% if summary.sport_event_status.status == 'live' and summary.sport_event.sport_event_context.competition.type == 'singles'%}
+                <tr class="p-3 live-search-list">
+                  <td>
+                    <p>{{summary.sport_event.sport_event_context.competition.name}}</p>
+
+                    {% if summary.sport_event.sport_event_context.round %}
+                      {% if summary.sport_event.sport_event_context.round.name[:5] == 'round' %}
+                      <p>Round of {{summary.sport_event.sport_event_context.round.name[9:]}}</p>
+                      {% elif summary.sport_event.sport_event_context.round.name|string == 'Qualification_round_1' %}
+                      <p>Qualification Round {{summary.sport_event.sport_event_context.round.name[:0]}}</p>
+                      {% else %}
+                      <p>{{summary.sport_event.sport_event_context.round.name[0]|upper}}{{summary.sport_event.sport_event_context.round.name[1:]}}</p>
+                      {% endif %}
+                    {% else %}
+                    <p>*Not Provided*</p>
+                    {% endif %}
+                  </td>  
+
+                  <td>
+                    {% if summary.sport_event.venue %}
+                    <p>{{summary.sport_event.venue.city_name}}, {{summary.sport_event.venue.country_name}}</p>
+                    {% else %}
+                    <p>*Not Provided*</p>
+                    {% endif %}
+                  </td>
+
+                  <td>
+                    <p>{{summary.sport_event.competitors[0].name}}</p>
+                    <p>{{summary.sport_event.competitors[1].name}}</p>
+                  </td>
+
+                  <td class="text-center">
+                    <p>{% for set in summary.sport_event_status.period_scores %}
+                    <span class='set_score'>{{set.home_score}}</span>
+                    {% endfor %}</p>
+                   
+                    <p>{% for set in summary.sport_event_status.period_scores %}
+                    <span class='set_score'>{{set.away_score}}</span>
+                    {% endfor %}</p>
+                    
+                    {% if summary.sport_event_status.match_status == 'match_about_to_start' %}
+                    <p>Match Starting</p>
+                    {% endif %}
+                  </td>
+                </tr>
+                
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="ended_score">
+          <table class="table table-dark table-hover text-white align-middle text-center">
+            <thead>
+              <tr class="table_header">
+                <th>EVENT</th>
+                <th>LOCATION</th>
+                <th>PLAYERS</th>
+                <th>RESULTS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for summary in today_data.summaries %}
+                {% if summary.sport_event.start_time[:10]|string == date_today|string and summary.sport_event.sport_event_context.competition.type == 'singles' and summary.sport_event_status.status == 'closed'%}
+                <tr class="p-3 live-search-list">
+                  <td>
+                    <p>{{summary.sport_event.sport_event_context.competition.name}}</p>
+
+                    {% if summary.sport_event.sport_event_context.round %}        
+                      {% if summary.sport_event.sport_event_context.round.name[:5] == 'round' %}
+                      <p>Round of {{summary.sport_event.sport_event_context.round.name[9:]}}</p>
+                      {% elif summary.sport_event.sport_event_context.round.name[:-1] == 'Qualification_round_' %}
+                      <p>Qualification Round {{summary.sport_event.sport_event_context.round.name[-1:]}}</p>
+                      {% else %}
+                      <p>{{summary.sport_event.sport_event_context.round.name[0]|upper}}{{summary.sport_event.sport_event_context.round.name[1:]}}</p>
+                      {% endif %}
+                    {% else %}
+                    <p>*Not Provided*</p>
+                    {% endif %}
+                  </td>  
+
+                  <td>
+                    {% if summary.sport_event.venue %}
+                    <p>{{summary.sport_event.venue.city_name}}, {{summary.sport_event.venue.country_name}}</p>
+                    {% else %}
+                    <p>*Not Provided*</p>
+                    {% endif %}
+                  </td>
+
+                  <td>
+                    <p>{{summary.sport_event.competitors[0].name}}</p>
+                    <p>{{summary.sport_event.competitors[1].name}}</p>
+                  </td>
+
+                  <td class="text-center">
+                    <p>{% for set in summary.sport_event_status.period_scores %}
+                    <span class='set_score'>{{set.home_score}}</span>
+                    {% endfor %}
+                    {% if summary.sport_event_status.winner_id == summary.sport_event.competitors[0].id %}
+                    <span class='set_score'><i class="bi bi-check text-success"></i></span>
+                    {% elif summary.sport_event_status.winner_id == summary.sport_event.competitors[1].id %}
+                    <span class='set_score'><i class="bi bi-check invisible"></i></span>
+                    {% endif %}</p>
+
+                    <p>{% for set in summary.sport_event_status.period_scores %}
+                    <span class='set_score'>{{set.away_score}}</span>
+                    {% endfor %}
+                    {% if summary.sport_event_status.winner_id == summary.sport_event.competitors[1].id %}
+                    <span class='set_score'><i class="bi bi-check text-success"></i></span>
+                    {% elif summary.sport_event_status.winner_id == summary.sport_event.competitors[0].id %}
+                    <span class='set_score'><i class="bi bi-check invisible"></i></span>
+                    {% endif %}</p>
+
+                    {% if summary.sport_event_status.status == 'cancelled' %}
+                    <p>Cancelled</p>
+                    {% elif summary.sport_event_status.status == 'interrupted' %}
+                    <p>Interrupted</p>
+                    {% endif %}
+                  </td>
+                </tr>
+                
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="upcoming_score">
+          <table class="table table-dark table-hover text-white align-middle text-center">
+            <thead>
+              <tr class="table_header">
+                <th>EVENT</th>
+                <th>LOCATION</th>
+                <th>PLAYERS</th>
+                <th>START TIME</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for summary in live_data.summaries %}
+                {% if summary.sport_event_status.status == 'not_started' and summary.sport_event.sport_event_context.competition.type == 'singles'%}
+                <tr class="p-3 live-search-list">
+                  <td>
+                    <p>{{summary.sport_event.sport_event_context.competition.name}}</p>  
+                    
+                    {% if summary.sport_event.sport_event_context.round %}   
+                      {% if summary.sport_event.sport_event_context.round.name[:5] == 'round' %}
+                      <p>Round of {{summary.sport_event.sport_event_context.round.name[9:]}}</p>
+                      {% else %}
+                      <p>{{summary.sport_event.sport_event_context.round.name[0]|upper}}{{summary.sport_event.sport_event_context.round.name[1:]}}</p>
+                      {% endif %}
+                    {% else %}
+                    <p>*Not Provided*</p>
+                    {% endif %}
+                  </td>
+
+                  <td>
+                    {% if summary.sport_event.venue %}
+                    <p>{{summary.sport_event.venue.city_name}}, {{summary.sport_event.venue.country_name}}</p>
+                    {% else %}
+                    <p>*Not Provided*</p>
+                    {% endif %}
+                  </td>
+
+                  <td>
+                    <p>{{summary.sport_event.competitors[0].name}}</p>
+                    <p>{{summary.sport_event.competitors[1].name}}</p>
+                  </td>
+
+                  <td>
+                    <p>{{summary.sport_event.start_time[5:7]}}/{{summary.sport_event.start_time[8:10]}}</p>
+
+                    {% if summary.sport_event.start_time[11:13]|int < 12 %}
+                    <p>{{summary.sport_event.start_time[11:16]}} AM</p>
+                    {% elif summary.sport_event.start_time[11:13]|int == 12 %}
+                    <p>{{summary.sport_event.start_time[11:16]}} PM</p>
+                    {% else %}
+                    <p>{{summary.sport_event.start_time[11:13]|int-12}}{{summary.sport_event.start_time[13:16]}} PM</p>
+                    {% endif %}
+                  </td>
+                </tr>      
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %} 
+
+{% block main %}
+
+<section class="container-fluid d-flex flex-column align-items-center pt-5 wimby">
+    <div class="fade_in vw-100 text-center text-white">
+        <h1 class="display-6">Hi, {{session['first_name']}}</h1>
+        <div class="row pt-3">
+            <div class="col-6">
+                <h4 class="display-4">Your Favorites</h3>
+                    {% if user.players %}
+                        {% if user.players[0].id|string != 'None'%}
+                            {% for player in user.players %}
+                                <p class="your_favorites"><a href="/player/{{player.id}}" class="text-decoration-none text-white">{{player.name}}</a>&emsp;<a href="/user/delete/favorite/{{player.id}}/v3"><i class="bi bi-trash-fill text-danger mb-1 lh-1"></i></a></p>
+                            {% endfor %}
+                        {% endif %}
+                    {% endif %}
+                <!-- <table class="table table-dark table-hover text-white align-middle text-center">
+
+                </table> -->
+            </div>
+            <div class="col-6">
+                <h4 class="display-4">Update Account</h3>
+                <div class="row">
+                    <div class="col-12 p-5">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        <form action="/user/update" method="post" class="d-flex flex-column gap-3">
+                            <input type="hidden" name="user_id">
+                            <div class="row">
+                                <div class="col d-flex flex-column gap-3">
+                                    <div class="form-group input-group-lg">
+                                        <input type="text" class="form-control input-group-lg" name="first_name" placeholder="First Name">
+                                        {% if messages %}
+                                        {% for category, message in messages %}
+                                            {% if category == 'first_name' %}
+                                            <span class="form-text text-danger">{{message}}</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% endif %}
+                                    </div>
+                        
+                                    <div class="form-group input-group-lg">
+                                        <input type="text" class="form-control" name="last_name" placeholder="Last Name">
+                                        {% if messages %}
+                                        {% for category, message in messages %}
+                                            {% if category == 'last_name' %}
+                                            <span class="form-text text-danger">{{message}}</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group input-group-lg">
+                                        <input type="text" class="form-control input-group-lg" name="email" placeholder="Email">
+                                        {% if messages %}
+                                        {% for category, message in messages %}
+                                            {% if category == 'email' %}
+                                            <span class="form-text text-danger">{{message}}</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="container d-flex justify-content-end">
+                                <button type="submit" class="btn btn-success btn-lg mt-4">Update</button>
+                                </div>
+                            {% endwith %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
