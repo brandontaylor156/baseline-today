@@ -2,6 +2,8 @@
 
 *A full-stack forum for professional tennis created with Python Flask, Bootstrap 5 and SportRadar API*
 
+##<a href="https://www.youtube.com/watch?v=-epCZqByyrY&ab_channel=BrandonTaylor">YouTube Demo</a>
+
 ![Demo Nadal](nadal.png)
 
 ## Features
@@ -12,6 +14,6 @@
 - Individual player reports, including player match histories
 - Ability for logged in users to 'favorite' players to keep up with them
 
-## Demo
+## Scores Demo
 
 ![Demo Scores](scores.gif)
