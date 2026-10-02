@@ -4,8 +4,10 @@ import { notFound } from "next/navigation";
 
 import { MatchCard } from "@/components/match-card";
 import { MatchupRow } from "@/components/matchup-row";
+import { TitleChances } from "@/components/title-chances";
 import { WikiCredit } from "@/components/wiki-credit";
 import { getUpcoming } from "@/lib/data/predictions";
+import { getTitleOdds } from "@/lib/data/title-odds";
 import { dateRange, displayName, getTournament } from "@/lib/data/tournaments";
 import { TOUR_LABEL } from "@/lib/format";
 
@@ -32,7 +34,10 @@ export async function generateMetadata({ params }: PageProps<"/tournaments/[id]"
 export default async function TournamentPage({ params }: PageProps<"/tournaments/[id]">) {
   const t = await load(params);
   if (!t) notFound();
-  const { matchups } = await getUpcoming(new Date(), { cached: true, tournamentId: t.id });
+  const [{ matchups }, titleOdds] = await Promise.all([
+    getUpcoming(new Date(), { cached: true, tournamentId: t.id }),
+    t.champion ? null : getTitleOdds(t.id),
+  ]);
 
   const facts = [TOUR_LABEL[t.tour], t.category, t.location ? displayName(t.location.split(",")[0]) : null, t.surface, t.drawSize ? `${t.drawSize}-player draw` : null].filter(Boolean);
 
@@ -63,6 +68,8 @@ export default async function TournamentPage({ params }: PageProps<"/tournaments
           </span>
         </div>
       )}
+
+      {titleOdds && <TitleChances odds={titleOdds} />}
 
       {matchups.length > 0 && (
         <section aria-labelledby="next-heading" className="space-y-2">

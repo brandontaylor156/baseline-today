@@ -40,6 +40,9 @@ search and favorites with Google sign-in. A ground-up rebuild of my 2022 Flask t
   by pre-match model chance, and per-player splits by surface, tiebreaks, deciding sets and form.
 - **Model ratings:** the Elo table for active players (all courts or by surface), who the model
   rates well above or below their ranking, and a calibration table showing how often favorites won.
+- **Title chances:** for every tournament in progress, each remaining player's chance to reach the
+  semis, the final and win it, computed exactly from the bracket layout read off the draw page, the
+  results so far and the model's chance for every possible match. The favorite shows on the homepage.
 - **Up next:** model win chances for scheduled matches on each tournament page and for your
   favorites on "My players".
 - **Season timeline:** each player's tournaments this season: round reached, who stopped them, W-L.

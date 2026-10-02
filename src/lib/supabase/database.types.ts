@@ -601,6 +601,7 @@ export type Database = {
       }
       wiki_draws: {
         Row: {
+          bracket: Json | null
           checked_at: string | null
           discovered_at: string | null
           last_rev_at: string | null
@@ -612,6 +613,7 @@ export type Database = {
           tournament_id: number
         }
         Insert: {
+          bracket?: Json | null
           checked_at?: string | null
           discovered_at?: string | null
           last_rev_at?: string | null
@@ -623,6 +625,7 @@ export type Database = {
           tournament_id: number
         }
         Update: {
+          bracket?: Json | null
           checked_at?: string | null
           discovered_at?: string | null
           last_rev_at?: string | null

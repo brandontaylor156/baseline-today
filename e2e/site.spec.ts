@@ -288,3 +288,14 @@ test("robots and sitemap", async ({ request }) => {
   expect(xml).toContain("/players/");
   expect(xml).toContain("/tournaments/");
 });
+
+test("title chances on a tournament in progress", async ({ page }) => {
+  await page.goto("/");
+  const card = page.locator("a", { hasText: "Favorite:" }).first();
+  test.skip((await card.count()) === 0, "no tournament in progress with a readable draw");
+  await card.click();
+  await expect(page).toHaveURL(/\/tournaments\/\d+$/);
+  await expect(page.getByRole("heading", { name: "Title chances" })).toBeVisible();
+  const first = page.locator("#title-heading ~ div tbody tr").first();
+  await expect(first).toContainText("%");
+});

@@ -3,7 +3,7 @@ import "server-only";
 import type { Tour } from "@/lib/provider/types";
 import type { AdminClient } from "@/lib/supabase/admin";
 import type { Json, Tables } from "@/lib/supabase/database.types";
-import { isPlausibleResult, parseDraw } from "@/lib/wiki/draw-parse";
+import { isPlausibleResult, parseDraw, parseDrawLines } from "@/lib/wiki/draw-parse";
 import {
   latestRevisionIds,
   latestRevisions,
@@ -127,6 +127,16 @@ async function discoverIn(lang: WikiLang, db: AdminClient, t: Tournament, index:
   return best;
 }
 
+/** The page's bracket layout with our player ids, for title odds ({ size: 0 } if unreadable). */
+function bracketOf(rev: PageRevision, index: Map<string, number>): Json {
+  const draw = parseDrawLines(rev.content);
+  if (!draw) return { size: 0, lines: [] };
+  return {
+    size: draw.size,
+    lines: draw.lines.map((l) => ({ p: l.position, name: l.name, id: findPlayer(index, l.name), country: l.country, seed: l.seed })),
+  };
+}
+
 /** Stores a page's finished results, applying the plausibility and stability safeguards. */
 async function applyDraw(db: AdminClient, t: Tournament, rev: PageRevision, index: Map<string, number>, now: Date) {
   const sourceUrl = pageUrl(rev.title, rev.lang);
@@ -171,7 +181,7 @@ async function applyDraw(db: AdminClient, t: Tournament, rev: PageRevision, inde
 
   const { error } = await db
     .from("wiki_draws")
-    .update({ last_revid: rev.revid, last_rev_at: rev.timestamp, checked_at: now.toISOString() })
+    .update({ last_revid: rev.revid, last_rev_at: rev.timestamp, checked_at: now.toISOString(), bracket: bracketOf(rev, index) })
     .eq("tournament_id", t.id);
   fail("save draw revision", error);
   return { results: rows.length, hidden: gone.length };
@@ -251,7 +261,8 @@ async function processTournaments(db: AdminClient, list: Tournament[], now: Date
     const revIds = await latestRevisionIds(inLang.map((t) => pageOf(t).title), lang);
     const changedInLang = inLang.filter((t) => {
       const latest = revIds.get(pageOf(t).title);
-      return latest && latest.revid !== drawFor.get(t.id)!.last_revid;
+      // Draws stored before brackets were kept are read once more to fill the bracket in.
+      return latest && (latest.revid !== drawFor.get(t.id)!.last_revid || drawFor.get(t.id)!.bracket === null);
     });
     const contents = await latestRevisions(changedInLang.map((t) => pageOf(t).title), lang);
     for (const t of changedInLang) {

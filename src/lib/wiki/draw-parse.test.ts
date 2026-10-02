@@ -3,7 +3,9 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-import { drawSection, isPlausibleResult, parseDraw, parseScore, type WikiMatch } from "./draw-parse";
+import { meetingRound } from "../title-odds";
+
+import { drawSection, isPlausibleResult, parseDraw, parseDrawLines, parseScore, type WikiMatch } from "./draw-parse";
 import { nameKeys, normalizeName } from "./names";
 
 const fixture = (name: string) => readFileSync(new URL(`../../../test/fixtures/wiki/${name}.wikitext`, import.meta.url), "utf8");
@@ -142,5 +144,50 @@ describe("names", () => {
 
   it("offers the reversed order for two-word names", () => {
     expect(nameKeys("Zhang Shuai")).toEqual(["zhang shuai", "shuai zhang"]);
+  });
+});
+
+describe("parseDrawLines", () => {
+  // Round number counted from the first round, from the page's label and the draw size.
+  const roundNumber = (label: string, rounds: number) => {
+    const fromEnd: Record<string, number> = { Final: 0, Semifinals: 1, Quarterfinals: 2 };
+    if (label in fromEnd) return rounds - fromEnd[label];
+    return ["First round", "Second round", "Third round", "Fourth round"].indexOf(label) + 1;
+  };
+
+  it.each([
+    ["2026-china-open--womens-singles", 128],
+    ["2026-us-open--mens-singles", 128],
+    ["2026-japan-open-tennis-championships--singles", 32],
+    ["2026-jingshan-tennis-open--womens-singles", 32],
+    ["it-parma-ladies-open-2026-singolare", 32],
+  ])("%s: every match is between players who meet in that round", (name, size) => {
+    const text = fixture(name);
+    const draw = parseDrawLines(text)!;
+    expect(draw.size).toBe(size);
+    const pos = new Map(draw.lines.map((l) => [normalizeName(l.name), l.position]));
+    const matches = parseDraw(text, normalizeName);
+    const rounds = Math.log2(size);
+    let checked = 0;
+    for (const m of matches) {
+      const a = pos.get(normalizeName(m.p1.name));
+      const b = pos.get(normalizeName(m.p2.name));
+      expect(a, m.p1.name).toBeDefined();
+      expect(b, m.p2.name).toBeDefined();
+      expect(meetingRound(a!, b!), `${m.round}: ${m.p1.name} v ${m.p2.name}`).toBe(roundNumber(m.round, rounds));
+      checked++;
+    }
+    expect(checked).toBeGreaterThan(10);
+  });
+
+  it("puts a seeded player with a bye at the top of their block", () => {
+    const draw = parseDrawLines(fixture("2026-china-open--womens-singles"))!;
+    expect(draw.lines[0].position).toBe(0);
+    expect(draw.lines[0].seed).toBe("1");
+    expect(draw.lines.length).toBeLessThanOrEqual(96);
+  });
+
+  it("rejects pages without a bracket", () => {
+    expect(parseDrawLines(["== Draw ==", "No bracket yet."].join("\n"))).toBeNull();
   });
 });

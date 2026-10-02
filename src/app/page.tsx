@@ -7,6 +7,7 @@ import { PlayerAvatar } from "@/components/player-avatar";
 import { WikiCredit } from "@/components/wiki-credit";
 import { getRecentResults } from "@/lib/data/results";
 import { getSeasonMatches } from "@/lib/data/season";
+import { getTitleOdds } from "@/lib/data/title-odds";
 import { getRankingDates, getRankings, type RankingRow } from "@/lib/data/tennis";
 import { calendarSections, dateRange, displayName, getSeasonTournaments } from "@/lib/data/tournaments";
 import { formatPoints, TOUR_LABEL } from "@/lib/format";
@@ -61,6 +62,9 @@ export default async function Home() {
   const rankings = { atp: rest[0] as RankingRow[], wta: rest[1] as RankingRow[] };
   const seasonMatches = [...(rest[2] as Awaited<ReturnType<typeof getSeasonMatches>>), ...(rest[3] as Awaited<ReturnType<typeof getSeasonMatches>>)];
   const { now: thisWeek } = calendarSections(tournaments, today);
+  const favorites = new Map(
+    await Promise.all(thisWeek.map(async (t) => [t.id, t.champion ? null : ((await getTitleOdds(t.id))?.players[0] ?? null)] as const)),
+  );
   const weekUpsets = upsets(seasonMatches.filter((m) => m.date >= weekAgo), 0.3, 5);
   const latest = recent.groups.flatMap((g) => g.results.slice(0, 2)).slice(0, 4);
   const sources = recent.groups.flatMap((g) => g.sources).filter((s, i, all) => all.findIndex((x) => x.url === s.url) === i);
@@ -87,6 +91,12 @@ export default async function Home() {
                     {TOUR_LABEL[t.tour]} · {t.category} · {dateRange(t.startDate, t.endDate)}
                   </span>
                   {t.champion && <span className="mt-1 block truncate text-xs">🏆 {t.champion.name}</span>}
+                  {favorites.get(t.id) && (
+                    <span className="mt-1 flex gap-1 text-xs">
+                      <span className="min-w-0 truncate">Favorite: {favorites.get(t.id)!.name}</span>
+                      <span className="shrink-0 font-semibold tabular-nums text-accent">{Math.round(favorites.get(t.id)!.title * 100)}%</span>
+                    </span>
+                  )}
                 </Link>
               </li>
             ))}

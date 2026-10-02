@@ -100,7 +100,8 @@ interface Slot {
   scores: Score[];
 }
 
-export function parseBracket(body: string): WikiMatch[] {
+/** Round labels and slots of one bracket template. */
+function readTemplate(body: string) {
   const labels: Record<string, string> = {};
   const slots: Record<string, Record<number, Slot>> = {};
 
@@ -127,7 +128,11 @@ export function parseBracket(body: string): WikiMatch[] {
       s.scores[Number(setStr) - 1] = parseScore(value);
     }
   }
+  return { labels, slots };
+}
 
+export function parseBracket(body: string): WikiMatch[] {
+  const { labels, slots } = readTemplate(body);
   const matches: WikiMatch[] = [];
   for (const [rd, bySlot] of Object.entries(slots)) {
     for (const [slotStr, a] of Object.entries(bySlot)) {
@@ -230,6 +235,68 @@ export function parseDraw(wikitext: string, normalize: (s: string) => string): W
     }
   }
   return [...byId.values()];
+}
+
+export interface DrawLine {
+  /** 0-based place in the draw: players in the same block of 2^r places meet in round r + 1. */
+  position: number;
+  name: string;
+  country: string | null;
+  seed: string | null;
+}
+
+/**
+ * Where every player sits in the draw, for title odds. Pages split the draw into same-sized section
+ * brackets (in draw order) plus a finals bracket; the sections are the brackets that start with the
+ * earliest round. A player's place comes from the earliest round they appear in (byes skip round 1).
+ * Returns null when the layout isn't a clean power-of-two draw.
+ */
+export function parseDrawLines(wikitext: string): { size: number; lines: DrawLine[] } | null {
+  const templates = bracketBodies(drawSection(wikitext)).map(readTemplate);
+  if (templates.length === 0) return null;
+  const rdIndex = (rd: string) => Number(rd.slice(2));
+  const firstRank = (t: (typeof templates)[number]) => roundOrder(englishRound(t.labels.RD1 ?? ""));
+  const earliest = Math.min(...templates.map(firstRank));
+  const sections = templates.filter((t) => firstRank(t) === earliest);
+  const rounds = (t: (typeof templates)[number]) => Math.max(...[...Object.keys(t.labels), ...Object.keys(t.slots)].map(rdIndex));
+  const capacity = 2 ** rounds(sections[0]);
+  if (!sections.every((t) => 2 ** rounds(t) === capacity)) return null;
+  const size = capacity * sections.length;
+  if (!Number.isInteger(Math.log2(size)) || size < 4 || size > 256) return null;
+
+  const lines: DrawLine[] = [];
+  sections.forEach((t, k) => {
+    // Round by round: a later-round name only fills a block nobody occupies yet (a bye), so
+    // winners linked differently in a later round never count twice.
+    for (const rd of Object.keys(t.slots).sort((a, b) => rdIndex(a) - rdIndex(b))) {
+      const width = 2 ** (rdIndex(rd) - 1);
+      for (const [slotStr, s] of Object.entries(t.slots[rd])) {
+        const name = s.team ? cleanName(s.team) : null;
+        if (!name) continue;
+        const position = k * capacity + (Number(slotStr) - 1) * width;
+        if (lines.some((l) => l.position >= position && l.position < position + width)) continue;
+        lines.push({ position, name, country: s.country ?? null, seed: s.seed ?? null });
+      }
+    }
+  });
+  lines.sort((a, b) => a.position - b.position);
+  // The same player in two places means the layout was misread.
+  if (new Set(lines.map((l) => l.name)).size !== lines.length || lines.length < 2) return null;
+  return { size, lines };
+}
+
+/** Earlier rounds sort first (unknown labels count as earliest). */
+function roundOrder(label: string): number {
+  const order: [RegExp, number][] = [
+    [/^final(s)?$/i, 9],
+    [/semi/i, 8],
+    [/quarter/i, 7],
+    [/fourth|round of 16/i, 6],
+    [/third|round of 32/i, 5],
+    [/second|round of 64/i, 4],
+  ];
+  for (const [re, rank] of order) if (re.test(label.trim())) return rank;
+  return 3;
 }
 
 /**
