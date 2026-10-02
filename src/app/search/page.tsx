@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { Flag } from "@/components/flag";
 import { searchPlayers } from "@/lib/data/tennis";
 import { TOUR_LABEL } from "@/lib/format";
 
@@ -26,7 +27,10 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
           {results.map((r) => (
             <li key={r.id}>
               <Link href={`/players/${r.id}`} className="flex items-center justify-between px-4 py-3 hover:bg-surface-muted">
-                <span className="font-medium">{r.fullName}</span>
+                <span className="flex items-center gap-2 font-medium">
+                  <Flag code={r.countryCode} />
+                  {r.fullName}
+                </span>
                 <span className="text-sm text-muted tabular-nums">
                   {TOUR_LABEL[r.tour]}
                   {r.currentRank ? ` #${r.currentRank}` : ""}

@@ -6,6 +6,7 @@ import { formatPoints, TOUR_LABEL, TOUR_NAME } from "@/lib/format";
 import { TOURS, type Tour } from "@/lib/provider/types";
 
 import { DateSelect } from "./date-select";
+import { Flag } from "./flag";
 import { Movement } from "./movement";
 import { PlayerAvatar } from "./player-avatar";
 
@@ -77,7 +78,12 @@ export async function RankingsView({ tour, date }: { tour: Tour; date?: string }
                       <PlayerAvatar name={r.player.fullName} image={r.player.image} />
                       <span className="min-w-0">
                         <span className="block truncate font-medium">{r.player.fullName}</span>
-                        {r.player.countryCode && <span className="block text-xs text-muted">{r.player.countryCode}</span>}
+                        {r.player.countryCode && (
+                          <span className="flex items-center gap-1.5 text-xs text-muted">
+                            <Flag code={r.player.countryCode} />
+                            {r.player.countryCode}
+                          </span>
+                        )}
                       </span>
                     </Link>
                   </td>

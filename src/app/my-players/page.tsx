@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { Flag } from "@/components/flag";
 import { Movement } from "@/components/movement";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { SignInPrompt } from "@/components/sign-in-prompt";
@@ -74,7 +75,8 @@ export default async function MyPlayersPage() {
                 />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-medium">{player.full_name}</span>
-                  <span className="block text-xs text-muted">
+                  <span className="flex items-center gap-1.5 text-xs text-muted">
+                    <Flag code={player.country_code} />
                     {TOUR_LABEL[tour]}
                     {player.country_code ? ` · ${player.country_code}` : ""}
                   </span>

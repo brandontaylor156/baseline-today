@@ -124,6 +124,25 @@ export const getPlayer = cache(async (id: number): Promise<PlayerDetail | null> 
   };
 });
 
+export interface Credit extends PlayerImage {
+  playerId: number;
+  playerName: string;
+}
+
+export const getCredits = cache(async (): Promise<Credit[]> => {
+  const db = createPublicClient();
+  const rows = check(
+    await db
+      .from("player_images")
+      .select("image_url, source_url, author, license, license_url, players!inner(id, full_name)")
+      .order("player_id"),
+    "credits",
+  );
+  return rows
+    .map((r) => ({ ...toImage(r)!, playerId: r.players.id, playerName: r.players.full_name }))
+    .sort((a, b) => a.playerName.localeCompare(b.playerName));
+});
+
 export interface SearchResult {
   id: number;
   tour: Tour;

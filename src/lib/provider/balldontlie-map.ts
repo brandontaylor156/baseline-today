@@ -33,7 +33,7 @@ export interface BdlPage<T> {
 }
 
 function clean(value: string | null | undefined): string | null {
-  const trimmed = value?.trim();
+  const trimmed = value?.replace(/\s+/g, " ").trim();
   return trimmed ? trimmed : null;
 }
 

@@ -50,7 +50,7 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
 
       <header className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-end sm:text-left">
         <figure className="flex flex-col items-center gap-1">
-          <PlayerAvatar name={player.fullName} image={player.image} size="lg" />
+          <PlayerAvatar name={player.fullName} image={player.image} countryCode={player.countryCode} size="lg" />
           {player.image && (
             <figcaption className="max-w-36 text-[10px] leading-tight text-muted">
               <a href={player.image.sourceUrl} className="hover:underline">

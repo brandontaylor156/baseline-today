@@ -41,6 +41,10 @@ describe("mapPlayer", () => {
     });
   });
 
+  it("collapses stray whitespace in names", () => {
+    expect(mapPlayer("wta", { ...sabalenkaSparse, full_name: "Jaqueline  Cristian " }).fullName).toBe("Jaqueline Cristian");
+  });
+
   it("builds a name when full_name is missing", () => {
     expect(mapPlayer("atp", { ...sabalenkaSparse, full_name: " " }).fullName).toBe("Aryna Sabalenka");
     expect(

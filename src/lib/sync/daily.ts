@@ -4,6 +4,7 @@ import { TOURS, type TennisProvider, type Tour } from "@/lib/provider/types";
 import type { AdminClient } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
 
+import { runPhotoSync, type PhotoSyncSummary } from "./photos";
 import { playerRow, profileRow, staleBefore } from "./rows";
 
 const LOCK_KEY = "daily";
@@ -12,6 +13,8 @@ const RANKING_LIMIT = 100;
 /** Profiles older than this are refreshed; one players call covers up to 100, so this is cheap. */
 const PROFILE_MAX_AGE_DAYS = 7;
 const PROFILE_BATCH = 100;
+/** Wikimedia lookups per day; ~200 players are each rechecked about monthly. */
+const PHOTO_BATCH = 40;
 
 export interface TourSummary {
   tour: Tour;
@@ -22,7 +25,7 @@ export interface TourSummary {
 }
 
 export type DailySyncResult =
-  | { status: "ok"; tours: TourSummary[]; ms: number }
+  | { status: "ok"; tours: TourSummary[]; photos: PhotoSyncSummary | { error: string }; ms: number }
   | { status: "skipped"; reason: string }
   | { status: "error"; error: string; tours: TourSummary[]; ms: number };
 
@@ -109,7 +112,11 @@ export async function runDailySync(db: AdminClient, provider: TennisProvider, no
 
   try {
     for (const tour of TOURS) tours.push(await syncTour(db, provider, tour, now));
-    result = { status: "ok", tours, ms: Date.now() - started };
+    // Photos are best effort: a Wikimedia outage must not fail the rankings sync.
+    const photos = await runPhotoSync(db, PHOTO_BATCH, now).catch((err: unknown) => ({
+      error: err instanceof Error ? err.message : String(err),
+    }));
+    result = { status: "ok", tours, photos, ms: Date.now() - started };
   } catch (err) {
     result = { status: "error", error: err instanceof Error ? err.message : String(err), tours, ms: Date.now() - started };
   }
