@@ -131,7 +131,11 @@ async function discoverIn(lang: WikiLang, db: AdminClient, t: Tournament, index:
 async function applyDraw(db: AdminClient, t: Tournament, rev: PageRevision, index: Map<string, number>, now: Date) {
   const sourceUrl = pageUrl(rev.title, rev.lang);
   const pageStable = Date.parse(rev.timestamp) <= now.getTime() - STABLE_MINUTES * 60 * 1000;
-  const parsed = parseDraw(rev.content, normalizeName).filter((m) => m.winner !== null && isPlausibleResult(m, bestOf(t)));
+  // Finished matches that pass the plausibility check, plus upcoming pairings (both players known,
+  // no score yet). Pairings with partial scores are in progress and skipped.
+  const parsed = parseDraw(rev.content, normalizeName).filter((m) =>
+    m.winner !== null ? isPlausibleResult(m, bestOf(t)) : m.sets.length === 0 && m.detail === null,
+  );
 
   const { data: existing, error: exErr } = await db
     .from("matches")

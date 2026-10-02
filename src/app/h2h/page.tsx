@@ -6,6 +6,7 @@ import { PlayerAvatar } from "@/components/player-avatar";
 import { PlayerResults } from "@/components/player-results";
 import { WikiCredit } from "@/components/wiki-credit";
 import { getHeadToHead } from "@/lib/data/h2h";
+import { predictPair } from "@/lib/data/predictions";
 import { getPlayer, type PlayerDetail } from "@/lib/data/tennis";
 import { TOUR_LABEL } from "@/lib/format";
 
@@ -37,7 +38,14 @@ export default async function H2HPage({ searchParams }: PageProps<"/h2h">) {
   const bId = id(q.b);
   const [a, b] = await Promise.all([aId ? getPlayer(aId) : null, bId ? getPlayer(bId) : null]);
   const sameTour = a && b && a.tour === b.tour;
-  const h2h = a && b && sameTour && a.id !== b.id ? await getHeadToHead(a.id, b.id) : null;
+  const valid = a && b && sameTour && a.id !== b.id;
+  const [h2h, ...model] = valid
+    ? await Promise.all([
+        getHeadToHead(a.id, b.id),
+        ...(["Hard", "Clay", "Grass"] as const).map((s) => predictPair(a.tour, a.id, b.id, s)),
+      ])
+    : [null];
+  const predictions = (model as ({ p: number; minMatches: number } | null)[]).map((p, i) => ({ surface: ["Hard", "Clay", "Grass"][i], p }));
 
   return (
     <div className="space-y-6">
@@ -71,6 +79,35 @@ export default async function H2HPage({ searchParams }: PageProps<"/h2h">) {
               </dl>
             )}
           </section>
+
+          {predictions.some((x) => x.p) && (
+            <section aria-labelledby="model-heading" className="rounded-xl border border-border bg-surface p-4 sm:p-5">
+              <h2 id="model-heading" className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
+                If they played today
+              </h2>
+              <dl className="space-y-2.5">
+                {predictions.map(({ surface, p }) =>
+                  p ? (
+                    <div key={surface} className="grid grid-cols-[4rem_2.5rem_1fr_2.5rem] items-center gap-2 text-sm tabular-nums">
+                      <dt className="text-muted">{surface}</dt>
+                      <dd className="text-right font-semibold">{Math.round(p.p * 100)}%</dd>
+                      <dd aria-hidden className="flex h-2 overflow-hidden rounded-full bg-surface-muted">
+                        <span className="bg-chart-line" style={{ width: `${p.p * 100}%` }} />
+                      </dd>
+                      <dd className="font-semibold">{Math.round((1 - p.p) * 100)}%</dd>
+                    </div>
+                  ) : null,
+                )}
+              </dl>
+              <p className="mt-3 text-xs text-muted">
+                Model win probability for {a.fullName} (left) and {b.fullName} (right), from surface-aware Elo ratings.{" "}
+                <Link href="/odds" className="underline underline-offset-2">
+                  How the model works
+                </Link>
+                .
+              </p>
+            </section>
+          )}
 
           <section aria-labelledby="meetings-heading" className="rounded-xl border border-border bg-surface p-4 sm:p-5">
             <h2 id="meetings-heading" className="mb-1 text-sm font-semibold uppercase tracking-wide text-muted">

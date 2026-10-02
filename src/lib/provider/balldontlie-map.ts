@@ -4,6 +4,7 @@
 import type {
   MatchStatus,
   ProviderMatch,
+  ProviderOdds,
   ProviderPlayer,
   ProviderRanking,
   ProviderTournament,
@@ -78,6 +79,15 @@ export interface BdlMatch {
   is_live: boolean | null;
   scheduled_time: string | null;
   not_before_text: string | null;
+}
+
+export interface BdlOdds {
+  id: number;
+  match_id: number;
+  vendor: string | null;
+  player1_odds: number | null;
+  player2_odds: number | null;
+  updated_at: string | null;
 }
 
 export interface BdlPage<T> {
@@ -217,6 +227,13 @@ export function mapMatch(tour: Tour, m: BdlMatch): ProviderMatch {
     notBeforeText: clean(m.not_before_text),
     duration: clean(m.duration),
   };
+}
+
+export function mapOdds(o: BdlOdds): ProviderOdds | null {
+  const vendor = clean(o.vendor);
+  if (!vendor) return null;
+  const odds = (v: number | null) => (typeof v === "number" && Number.isFinite(v) && Math.abs(v) >= 100 ? v : null);
+  return { matchProviderId: o.match_id, vendor: vendor.toLowerCase(), p1: odds(o.player1_odds), p2: odds(o.player2_odds), updatedAt: clean(o.updated_at) };
 }
 
 /**

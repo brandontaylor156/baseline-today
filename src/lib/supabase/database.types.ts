@@ -55,6 +55,7 @@ export type Database = {
           player2_game_score: string | null
           player2_id: number | null
           player2_name: string | null
+          pre_match_p1: number | null
           provider: string
           provider_id: number
           result_detail: string | null
@@ -88,6 +89,7 @@ export type Database = {
           player2_game_score?: string | null
           player2_id?: number | null
           player2_name?: string | null
+          pre_match_p1?: number | null
           provider?: string
           provider_id: number
           result_detail?: string | null
@@ -121,6 +123,7 @@ export type Database = {
           player2_game_score?: string | null
           player2_id?: number | null
           player2_name?: string | null
+          pre_match_p1?: number | null
           provider?: string
           provider_id?: number
           result_detail?: string | null
@@ -171,6 +174,38 @@ export type Database = {
           },
         ]
       }
+      odds: {
+        Row: {
+          match_id: number
+          player1_odds: number | null
+          player2_odds: number | null
+          updated_at: string | null
+          vendor: string
+        }
+        Insert: {
+          match_id: number
+          player1_odds?: number | null
+          player2_odds?: number | null
+          updated_at?: string | null
+          vendor: string
+        }
+        Update: {
+          match_id?: number
+          player1_odds?: number | null
+          player2_odds?: number | null
+          updated_at?: string | null
+          vendor?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "odds_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_images: {
         Row: {
           author: string
@@ -204,6 +239,62 @@ export type Database = {
             foreignKeyName: "player_images_player_id_fkey"
             columns: ["player_id"]
             isOneToOne: true
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_ratings: {
+        Row: {
+          clay_matches: number
+          elo: number
+          elo_clay: number
+          elo_grass: number
+          elo_hard: number
+          grass_matches: number
+          hard_matches: number
+          matches: number
+          name: string | null
+          player_id: number | null
+          player_key: string
+          tour: string
+          updated_at: string
+        }
+        Insert: {
+          clay_matches?: number
+          elo: number
+          elo_clay: number
+          elo_grass: number
+          elo_hard: number
+          grass_matches?: number
+          hard_matches?: number
+          matches: number
+          name?: string | null
+          player_id?: number | null
+          player_key: string
+          tour: string
+          updated_at?: string
+        }
+        Update: {
+          clay_matches?: number
+          elo?: number
+          elo_clay?: number
+          elo_grass?: number
+          elo_hard?: number
+          grass_matches?: number
+          hard_matches?: number
+          matches?: number
+          name?: string | null
+          player_id?: number | null
+          player_key?: string
+          tour?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_ratings_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
             referencedRelation: "players"
             referencedColumns: ["id"]
           },
@@ -538,6 +629,7 @@ export type Database = {
           tour: string
         }[]
       }
+      set_pre_match_probs: { Args: { p_rows: Json }; Returns: number }
       try_acquire_sync_lock: {
         Args: { p_key: string; p_ttl_seconds: number }
         Returns: boolean

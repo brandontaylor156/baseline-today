@@ -75,7 +75,8 @@ export function wikiMatchRow(
     player2_country: m.p2.country,
     winner_side: m.winner,
     winner_id: m.winner === 1 ? p1 : m.winner === 2 ? p2 : null,
-    status: "final",
+    // Pairings without a result yet are upcoming matches (no time: draws don't list schedules).
+    status: m.winner === null ? "scheduled" : "final",
     result_detail: m.detail,
     is_live: false,
     score: scoreText(m),

@@ -5,6 +5,7 @@ import type { AdminClient } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
 
 import { syncTournaments } from "./matches";
+import { computeModel } from "./model";
 import { runPhotoSync, type PhotoSyncSummary } from "./photos";
 import { playerRow, profileRow, staleBefore } from "./rows";
 
@@ -27,7 +28,7 @@ export interface TourSummary {
 }
 
 export type DailySyncResult =
-  | { status: "ok"; tours: TourSummary[]; photos: PhotoSyncSummary | { error: string }; ms: number }
+  | { status: "ok"; tours: TourSummary[]; photos: PhotoSyncSummary | { error: string }; model: { ok: true } | { error: string }; ms: number }
   | { status: "skipped"; reason: string }
   | { status: "error"; error: string; tours: TourSummary[]; ms: number };
 
@@ -128,7 +129,11 @@ export async function runDailySync(db: AdminClient, provider: TennisProvider, no
     const photos = await runPhotoSync(db, PHOTO_BATCH, now).catch((err: unknown) => ({
       error: err instanceof Error ? err.message : String(err),
     }));
-    result = { status: "ok", tours, photos, ms: Date.now() - started };
+    // Elo ratings and pre-match probabilities from every stored result; best effort too.
+    const model = await computeModel(db, now)
+      .then(() => ({ ok: true as const }))
+      .catch((err: unknown) => ({ error: err instanceof Error ? err.message : String(err) }));
+    result = { status: "ok", tours, photos, model, ms: Date.now() - started };
   } catch (err) {
     result = { status: "error", error: err instanceof Error ? err.message : String(err), tours, ms: Date.now() - started };
   }

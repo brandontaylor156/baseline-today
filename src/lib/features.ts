@@ -9,3 +9,8 @@ export function liveScoresEnabled(): boolean {
 export function trialSamplingEnabled(): boolean {
   return process.env.TRIAL_SAMPLING === "1";
 }
+
+/** Bookmaker odds (BALLDONTLIE GOAT tier, also available during its 48-hour trial). */
+export function oddsEnabled(): boolean {
+  return process.env.ODDS_ENABLED === "1";
+}

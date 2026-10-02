@@ -203,3 +203,11 @@ test.describe("player extras", () => {
     await expect(page.getByRole("heading", { name: /Meetings/ })).toBeVisible();
   });
 });
+
+test("odds page shows predictions with the betting disclaimer", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Odds" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Odds and predictions" })).toBeVisible();
+  await expect(page.getByRole("note")).toContainText("Estimates, not betting advice");
+  await expect(page.getByRole("note")).toContainText("18+");
+});

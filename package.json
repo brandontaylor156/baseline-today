@@ -17,7 +17,9 @@
     "sync:results": "tsx --env-file=.env.local --conditions=react-server scripts/sync-results.mts",
     "sync:rankings-history": "tsx --env-file=.env.local --conditions=react-server scripts/sync-rankings-history.mts",
     "sync:tournaments": "tsx --env-file=.env.local --conditions=react-server scripts/sync-tournaments.mts",
-    "audit:draws": "tsx --env-file=.env.local --conditions=react-server scripts/audit-draw-levels.mts"
+    "audit:draws": "tsx --env-file=.env.local --conditions=react-server scripts/audit-draw-levels.mts",
+    "model:backtest": "tsx --env-file=.env.local --conditions=react-server scripts/model-backtest.mts",
+    "sync:model": "tsx --env-file=.env.local --conditions=react-server scripts/sync-model.mts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

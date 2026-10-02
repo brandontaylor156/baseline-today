@@ -3,15 +3,17 @@ import "server-only";
 import {
   mapLatestRankings,
   mapMatch,
+  mapOdds,
   mapPlayer,
   mapTournament,
   type BdlMatch,
+  type BdlOdds,
   type BdlPage,
   type BdlPlayer,
   type BdlRanking,
   type BdlTournament,
 } from "./balldontlie-map";
-import type { ProviderMatch, ProviderPlayer, ProviderRanking, ProviderTournament, TennisProvider, Tour } from "./types";
+import type { ProviderMatch, ProviderOdds, ProviderPlayer, ProviderRanking, ProviderTournament, TennisProvider, Tour } from "./types";
 
 const BASE_URL = "https://api.balldontlie.io";
 const MAX_PER_PAGE = 100;
@@ -104,6 +106,14 @@ export const balldontlie: TennisProvider = {
     for (const id of tournamentProviderIds) params.append("tournament_ids[]", String(id));
     const rows = await requestAll<BdlMatch>(tour, "matches", params);
     return rows.map((m) => mapMatch(tour, m));
+  },
+
+  async getOdds(tour: Tour, tournamentProviderIds: number[]): Promise<ProviderOdds[]> {
+    if (tournamentProviderIds.length === 0) return [];
+    const params = new URLSearchParams();
+    for (const id of tournamentProviderIds) params.append("tournament_ids[]", String(id));
+    const rows = await requestAll<BdlOdds>(tour, "odds", params);
+    return rows.map(mapOdds).filter((o): o is ProviderOdds => o !== null);
   },
 
   async getLiveMatches(tour: Tour): Promise<ProviderMatch[]> {

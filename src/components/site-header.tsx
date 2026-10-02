@@ -25,6 +25,9 @@ export function SiteHeader() {
           <Link href="/tournaments" className="rounded-md px-2 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground sm:px-2.5">
             Events
           </Link>
+          <Link href="/odds" className="rounded-md px-2 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground sm:px-2.5">
+            Odds
+          </Link>
           <Link href="/rankings/atp" className="rounded-md px-2 py-1.5 sm:px-2.5 text-muted hover:bg-surface-muted hover:text-foreground">
             ATP
           </Link>

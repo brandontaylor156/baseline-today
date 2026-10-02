@@ -1,6 +1,6 @@
 import "server-only";
 
-import { trialSamplingEnabled as trialSampling } from "@/lib/features";
+import { oddsEnabled, trialSamplingEnabled as trialSampling } from "@/lib/features";
 import { ProviderError } from "@/lib/provider/balldontlie";
 import type { ProviderMatch, ProviderPlayer, TennisProvider, Tour } from "@/lib/provider/types";
 import type { AdminClient } from "@/lib/supabase/admin";
@@ -107,6 +107,32 @@ async function saveMatches(db: AdminClient, tour: Tour, provider: string, matche
   fail("save matches", saved.error);
 }
 
+/**
+ * Stores bookmaker odds for the tournaments in play (top paid tier only). Best effort: an odds
+ * failure (e.g. 401 on a plan without odds) never fails the match refresh.
+ */
+async function saveOdds(db: AdminClient, provider: TennisProvider, tour: Tour, tournamentIds: number[]) {
+  try {
+    const odds = await provider.getOdds(tour, tournamentIds);
+    if (odds.length === 0) return;
+    const { data: ids, error } = await db
+      .from("matches")
+      .select("id, provider_id")
+      .eq("provider", provider.name)
+      .eq("tour", tour)
+      .in("provider_id", [...new Set(odds.map((o) => o.matchProviderId))]);
+    fail("odds match ids", error);
+    const matchId = new Map((ids ?? []).map((m) => [m.provider_id, m.id]));
+    const rows = [...new Map(odds.map((o) => [`${o.matchProviderId}|${o.vendor}`, o])).values()].flatMap((o) => {
+      const id = matchId.get(o.matchProviderId);
+      return id === undefined ? [] : [{ match_id: id, vendor: o.vendor, player1_odds: o.p1, player2_odds: o.p2, updated_at: o.updatedAt }];
+    });
+    if (rows.length) fail("save odds", (await db.from("odds").upsert(rows, { onConflict: "match_id,vendor" })).error);
+  } catch (err) {
+    console.error(`odds ${tour}: ${err instanceof Error ? err.message : err}`);
+  }
+}
+
 async function recordTrialPoll(
   db: AdminClient,
   tour: Tour,
@@ -184,6 +210,7 @@ export async function refreshTour(db: AdminClient, provider: TennisProvider, tou
 
   try {
     let matches: ProviderMatch[];
+    let activeIds: number[] = [];
     if (kind === "schedule") {
       const { from, to } = activeWindow(now);
       const { data: active, error } = await db
@@ -194,13 +221,15 @@ export async function refreshTour(db: AdminClient, provider: TennisProvider, tou
         .lte("start_date", to)
         .gte("end_date", from);
       fail("find active tournaments", error);
-      matches = await provider.getMatches(tour, (active ?? []).map((t) => t.provider_id));
+      activeIds = (active ?? []).map((t) => t.provider_id);
+      matches = await provider.getMatches(tour, activeIds);
     } else {
       matches = await provider.getLiveMatches(tour);
     }
     const live = matches.filter((m) => m.isLive);
 
     await saveMatches(db, tour, provider.name, matches, now);
+    if (kind === "schedule" && oddsEnabled()) await saveOdds(db, provider, tour, activeIds);
 
     // Matches that dropped out of the live feed have finished or paused: clear their live flag
     // and make the next refresh a full schedule refresh so their final state arrives quickly.

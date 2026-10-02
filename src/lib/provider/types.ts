@@ -85,6 +85,15 @@ export interface ProviderMatch {
   duration: string | null;
 }
 
+export interface ProviderOdds {
+  matchProviderId: number;
+  vendor: string;
+  /** American moneyline odds, e.g. -150 / +130. */
+  p1: number | null;
+  p2: number | null;
+  updatedAt: string | null;
+}
+
 export interface TennisProvider {
   readonly name: string;
   /**
@@ -100,4 +109,6 @@ export interface TennisProvider {
   getMatches(tour: Tour, tournamentProviderIds: number[]): Promise<ProviderMatch[]>;
   /** Matches in progress right now (paid tier). */
   getLiveMatches(tour: Tour): Promise<ProviderMatch[]>;
+  /** Bookmaker moneyline odds for the given tournaments (top paid tier). */
+  getOdds(tour: Tour, tournamentProviderIds: number[]): Promise<ProviderOdds[]>;
 }

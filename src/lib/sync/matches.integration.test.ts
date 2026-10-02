@@ -93,6 +93,7 @@ function fakeProvider() {
     getRankings: async () => [],
     getPlayers: async () => [],
     getTournaments: async () => [tournament],
+    getOdds: async () => [],
     getMatches: async () => {
       state.calls++;
       if (state.fail) throw state.fail;

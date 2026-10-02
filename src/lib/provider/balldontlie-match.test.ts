@@ -118,3 +118,14 @@ describe("mapStatus", () => {
     expect(mapStatus(null, null)).toBe("unknown");
   });
 });
+
+describe("mapOdds", () => {
+  it("maps the documented odds row and drops impossible prices", async () => {
+    const { mapOdds } = await import("./balldontlie-map");
+    expect(
+      mapOdds({ id: 78250352, match_id: 134142, vendor: "DraftKings", player1_odds: 3000, player2_odds: -100000, updated_at: "2026-01-12T23:40:23.936Z" }),
+    ).toEqual({ matchProviderId: 134142, vendor: "draftkings", p1: 3000, p2: -100000, updatedAt: "2026-01-12T23:40:23.936Z" });
+    expect(mapOdds({ id: 1, match_id: 2, vendor: "x", player1_odds: 50, player2_odds: null, updated_at: null })).toMatchObject({ p1: null, p2: null });
+    expect(mapOdds({ id: 1, match_id: 2, vendor: null, player1_odds: 100, player2_odds: 100, updated_at: null })).toBeNull();
+  });
+});
