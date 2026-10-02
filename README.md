@@ -3,7 +3,7 @@
 ATP and WTA singles rankings, player profiles with credited photos, accent-insensitive search, and
 favorites with Google sign-in. A ground-up rebuild of my 2022 Flask tennis forum.
 
-**Live:** _coming with the first deploy_ · [![CI](https://github.com/brandontaylor156/baseline-today/actions/workflows/ci.yml/badge.svg)](https://github.com/brandontaylor156/baseline-today/actions/workflows/ci.yml)
+**Live:** [baseline-today.vercel.app](https://baseline-today.vercel.app) · [![CI](https://github.com/brandontaylor156/baseline-today/actions/workflows/ci.yml/badge.svg)](https://github.com/brandontaylor156/baseline-today/actions/workflows/ci.yml)
 
 <p>
   <img src="docs/screenshots/rankings-desktop.png" alt="ATP rankings on desktop" width="62%">
@@ -70,7 +70,7 @@ npm run dev
 | Command | |
 | --- | --- |
 | `npm run typecheck` · `lint` · `test` · `build` | the same checks as CI |
-| `npm run test:e2e` | Playwright against `npm run build` output |
+| `npm run test:e2e` | Playwright against `npm run build` output (set `E2E_BASE_URL` to test a deployment) |
 | `npm run sync:daily` | run the daily sync locally |
 | `npm run sync:photos -- 200` | backfill Wikimedia photos |
 
