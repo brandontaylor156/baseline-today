@@ -8,7 +8,9 @@ import { PlayerResults } from "@/components/player-results";
 import { PlayerStatsSection } from "@/components/player-stats";
 import { PlayerTimeline } from "@/components/player-timeline";
 import { RankChart } from "@/components/rank-chart";
+import { RatingChart } from "@/components/rating-chart";
 import { WikiCredit } from "@/components/wiki-credit";
+import { getRatingHistory } from "@/lib/data/ratings";
 import { getPlayerResults } from "@/lib/data/results";
 import { getSeasonMatches } from "@/lib/data/season";
 import { getPlayerStats } from "@/lib/data/stats";
@@ -48,11 +50,12 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
   if (!player) notFound();
 
   const year = new Date().getUTCFullYear();
-  const [results, tourDates, stats, seasonMatches] = await Promise.all([
+  const [results, tourDates, stats, seasonMatches, ratingHistory] = await Promise.all([
     getPlayerResults(player.id),
     getRankingDates(player.tour),
     getPlayerStats(player.id, year),
     getSeasonMatches(player.tour, year),
+    getRatingHistory(player.id),
   ]);
   const latest = player.history.at(-1);
   const best = bestRank(player.history);
@@ -129,6 +132,22 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
           </h2>
           <p className="mb-3 text-xs text-muted">Weekly {TOUR_LABEL[player.tour]} rank while in the top 100</p>
           <RankChart history={player.history} tourDates={tourDates} tourLabel={TOUR_LABEL[player.tour]} />
+        </section>
+      )}
+
+      {ratingHistory.length > 1 && (
+        <section aria-labelledby="rating-heading" className="rounded-xl border border-border bg-surface p-4 sm:p-5">
+          <h2 id="rating-heading" className="text-sm font-semibold uppercase tracking-wide text-muted">
+            Model rating
+          </h2>
+          <p className="mb-3 text-xs text-muted">
+            Weekly Elo rating from tracked results; higher is stronger. Everyone starts at 1500 in January 2024, so early 2024 is a
+            warm-up.{" "}
+            <Link href={`/ratings?tour=${player.tour}`} className="underline underline-offset-2">
+              All ratings
+            </Link>
+          </p>
+          <RatingChart history={ratingHistory} />
         </section>
       )}
 

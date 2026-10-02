@@ -8,6 +8,7 @@ import { WikiCredit } from "@/components/wiki-credit";
 import { getRecentResults } from "@/lib/data/results";
 import { getSeasonMatches } from "@/lib/data/season";
 import { getTitleOdds } from "@/lib/data/title-odds";
+import { getTrackRecord } from "@/lib/data/track-record";
 import { getRankingDates, getRankings, type RankingRow } from "@/lib/data/tennis";
 import { calendarSections, dateRange, displayName, getSeasonTournaments } from "@/lib/data/tournaments";
 import { formatPoints, TOUR_LABEL } from "@/lib/format";
@@ -62,6 +63,7 @@ export default async function Home() {
   const rankings = { atp: rest[0] as RankingRow[], wta: rest[1] as RankingRow[] };
   const seasonMatches = [...(rest[2] as Awaited<ReturnType<typeof getSeasonMatches>>), ...(rest[3] as Awaited<ReturnType<typeof getSeasonMatches>>)];
   const { now: thisWeek } = calendarSections(tournaments, today);
+  const record = await getTrackRecord();
   const favorites = new Map(
     await Promise.all(thisWeek.map(async (t) => [t.id, t.champion ? null : ((await getTitleOdds(t.id))?.players[0] ?? null)] as const)),
   );
@@ -75,6 +77,14 @@ export default async function Home() {
         <p className="text-sm font-medium text-accent">This week in tennis</p>
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Baseline Today</h1>
         <p className="mt-1 text-sm text-muted">ATP and WTA rankings, results, upsets and predictions, updated through the day.</p>
+        {record.total > 0 && (
+          <p className="mt-2 text-sm">
+            Our model this week:{" "}
+            <Link href="/ratings" className="font-semibold text-accent hover:underline">
+              {record.correct}–{record.total - record.correct} ({Math.round((record.correct / record.total) * 100)}%)
+            </Link>
+          </p>
+        )}
       </header>
 
       {thisWeek.length > 0 && (

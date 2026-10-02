@@ -42,3 +42,14 @@ export const getRatedPlayers = cache(async (tour: Tour): Promise<RatedPlayer[]> 
     rank: r.player_id !== null ? (rankOf.get(r.player_id) ?? null) : null,
   }));
 });
+
+/** A player's weekly model rating, oldest first. */
+export const getRatingHistory = cache(async (playerId: number): Promise<{ week: string; elo: number }[]> => {
+  const { data, error } = await createPublicClient()
+    .from("player_rating_history")
+    .select("week, elo")
+    .eq("player_id", playerId)
+    .order("week");
+  if (error) throw new Error(`rating history: ${error.message}`);
+  return data ?? [];
+});

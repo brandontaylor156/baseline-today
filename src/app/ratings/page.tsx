@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Flag } from "@/components/flag";
+import { TrackRecordSection } from "@/components/track-record";
 import { getModelInfo } from "@/lib/data/predictions";
 import { getRatedPlayers } from "@/lib/data/ratings";
+import { getTrackRecord } from "@/lib/data/track-record";
 import { isTour, TOUR_LABEL } from "@/lib/format";
 import { TOURS } from "@/lib/provider/types";
 import { disagreements, MIN_MATCHES, MIN_SURFACE_MATCHES, RATING_VIEWS, rankRatings, type RatedRow, type RatingView } from "@/lib/ratings";
@@ -72,7 +74,7 @@ export default async function RatingsPage({ searchParams }: PageProps<"/ratings"
   const q = await searchParams;
   const tour = typeof q.tour === "string" && isTour(q.tour) ? q.tour : "atp";
   const view = RATING_VIEWS.find((v) => v === q.surface) ?? "overall";
-  const [players, info] = await Promise.all([getRatedPlayers(tour), getModelInfo()]);
+  const [players, info, record] = await Promise.all([getRatedPlayers(tour), getModelInfo(), getTrackRecord()]);
   const rows = rankRatings(players, view);
   const { underrated, overrated } = disagreements(rankRatings(players, "overall"));
   const backtest = info.backtest[tour];
@@ -100,6 +102,8 @@ export default async function RatingsPage({ searchParams }: PageProps<"/ratings"
           ))}
         </nav>
       </div>
+
+      <TrackRecordSection record={record} />
 
       <div className="grid gap-3 sm:grid-cols-2">
         <Callout title="Better than their ranking" note="In the model’s top 30, ranked at least 10 places lower." rows={underrated} />

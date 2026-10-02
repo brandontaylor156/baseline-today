@@ -180,7 +180,7 @@ test.describe("player extras", () => {
     await page.goto("/rankings/atp");
     await page.locator("tbody tr").first().getByRole("link").click();
     await expect(page.getByRole("heading", { name: "Ranking history" })).toBeVisible();
-    await page.getByText("Show as table").click();
+    await page.getByText("Show as table").first().click();
     await expect(page.locator("table caption", { hasText: "rank by week" })).toBeAttached();
   });
 
@@ -269,13 +269,17 @@ test("model ratings: table, surface switch and accuracy", async ({ page }) => {
   await expect(page).toHaveURL(/surface=clay/);
   await expect(page.getByRole("heading", { name: /Top 50 · Clay/ })).toBeVisible();
   await expect(page.getByRole("heading", { name: "How accurate is it?" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "This week’s track record" })).toBeVisible();
 });
 
-test("player page shows this season's tournaments", async ({ page }) => {
+test("player page shows this season's tournaments and the model rating", async ({ page }) => {
   await page.goto("/rankings/atp");
   await page.locator("tbody tr").first().getByRole("link").click();
   const year = new Date().getUTCFullYear();
   await expect(page.getByRole("heading", { name: `${year} tournaments` })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Model rating" })).toBeVisible();
+  await page.getByText("Show as table").nth(1).click();
+  await expect(page.locator("table caption", { hasText: "Model rating by week" })).toBeAttached();
 });
 
 test("robots and sitemap", async ({ request }) => {

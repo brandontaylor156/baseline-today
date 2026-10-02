@@ -49,6 +49,8 @@ search and favorites with Google sign-in. A ground-up rebuild of my 2022 Flask t
 - **Pick'em:** pick winners of upcoming matches (Google sign-in); weekly and season leaderboards
   that compare each player with the model on the same matches. Picks are private and lock once a
   result is posted (RLS); only players who choose a leaderboard name appear publicly.
+- **Rating history and track record:** each player's weekly model rating as a chart; the model's
+  record this week, its wins against the ranking and its biggest misses (ratings page, homepage).
 - **Up next:** model win chances for scheduled matches on each tournament page and for your
   favorites on "My players".
 - **Season timeline:** each player's tournaments this season: round reached, who stopped them, W-L.

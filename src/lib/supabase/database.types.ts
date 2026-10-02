@@ -276,6 +276,35 @@ export type Database = {
           },
         ]
       }
+      player_rating_history: {
+        Row: {
+          elo: number
+          player_id: number
+          tour: string
+          week: string
+        }
+        Insert: {
+          elo: number
+          player_id: number
+          tour: string
+          week: string
+        }
+        Update: {
+          elo?: number
+          player_id?: number
+          tour?: string
+          week?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_rating_history_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_ratings: {
         Row: {
           clay_matches: number

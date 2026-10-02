@@ -62,7 +62,11 @@ export interface Prediction {
  * Runs Elo over matches in chronological order. Returns final ratings and, for every match, the
  * pre-match prediction (used for backtesting and for "upsets at the time").
  */
-export function runElo(matches: EloMatch[]): { ratings: Map<string, Rating>; predictions: Prediction[] } {
+export function runElo(
+  matches: EloMatch[],
+  /** Called after each match with both players' updated ratings (for rating history). */
+  onMatch?: (m: EloMatch, a: Rating, b: Rating) => void,
+): { ratings: Map<string, Rating>; predictions: Prediction[] } {
   const ratings = new Map<string, Rating>();
   const get = (k: string) => {
     let r = ratings.get(k);
@@ -94,6 +98,7 @@ export function runElo(matches: EloMatch[]): { ratings: Map<string, Rating>; pre
       a.surfaceMatches[sf]++;
       b.surfaceMatches[sf]++;
     }
+    onMatch?.(m, a, b);
   }
   return { ratings, predictions };
 }

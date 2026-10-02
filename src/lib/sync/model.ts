@@ -7,6 +7,14 @@ import type { Json } from "@/lib/supabase/database.types";
 
 const BATCH = 1000;
 
+/** Monday of the week containing a YYYY-MM-DD date (null for placeholder dates). */
+export function mondayOf(date: string): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date.startsWith("0000")) return null;
+  const d = new Date(`${date}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+  return d.toISOString().slice(0, 10);
+}
+
 /**
  * Recomputes the Elo model from every stored result: player ratings, a calibration factor per tour
  * (fitted on the previous season, so displayed probabilities match how often favourites win), and
@@ -35,7 +43,19 @@ export async function computeModel(db: AdminClient, now = new Date()) {
 
   for (const tour of ["atp", "wta"] as const) {
     const tourResults = results.filter((m) => m.tour === tour);
-    const { ratings, predictions } = runElo(tourResults);
+    // Rating after each player's last match of a week, for linked players.
+    const weekly = new Map<string, { player_id: number; week: string; elo: number }>();
+    const record = (key: string, week: string, elo: number) => {
+      if (!key.startsWith("id:")) return;
+      const player_id = Number(key.slice(3));
+      weekly.set(`${player_id}|${week}`, { player_id, week, elo: Math.round(elo * 10) / 10 });
+    };
+    const { ratings, predictions } = runElo(tourResults, (m, a, b) => {
+      const week = mondayOf(m.order.slice(0, 10));
+      if (!week) return;
+      record(m.key1, week, a.overall);
+      record(m.key2, week, b.overall);
+    });
     const fitOn = predictions.filter((p) => seasonByOrder.get(p.match.order) === season - 1);
     const c = fitOn.length >= 200 ? fitCalibration(fitOn) : 1;
     calibration[tour] = Number(c.toFixed(4));
@@ -75,6 +95,11 @@ export async function computeModel(db: AdminClient, now = new Date()) {
     for (let i = 0; i < probs.length; i += BATCH) {
       const { error } = await db.rpc("set_pre_match_probs", { p_rows: probs.slice(i, i + BATCH) as unknown as Json });
       if (error) throw new Error(`save probabilities: ${error.message}`);
+    }
+    const history = [...weekly.values()].map((h) => ({ ...h, tour }));
+    for (let i = 0; i < history.length; i += BATCH) {
+      const { error } = await db.from("player_rating_history").upsert(history.slice(i, i + BATCH), { onConflict: "player_id,week" });
+      if (error) throw new Error(`save rating history: ${error.message}`);
     }
     summary[tour] = { players: rows.length, matches: probs.length };
   }
