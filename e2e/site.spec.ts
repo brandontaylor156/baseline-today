@@ -140,3 +140,16 @@ test("live scores stay hidden until switched on", async ({ page, request }) => {
   expect((await request.get("/api/live/refresh")).status()).toBe(404);
   expect((await request.get("/api/trial/espn")).status()).toBe(404);
 });
+
+test("results page lists finished matches with Wikipedia credit", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Results" }).click();
+  await expect(page).toHaveURL(/\/results$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Results" })).toBeVisible();
+  await expect(page.getByText("Not live.", { exact: false })).toBeVisible();
+  const credit = page.getByRole("link", { name: "CC BY-SA 4.0" }).first();
+  if ((await page.locator("article").count()) > 0) {
+    await expect(credit).toHaveAttribute("href", /creativecommons\.org\/licenses\/by-sa\/4\.0/);
+    await expect(page.locator('a[href*="en.wikipedia.org/wiki/"]').first()).toBeVisible();
+  }
+});

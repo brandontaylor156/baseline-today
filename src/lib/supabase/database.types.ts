@@ -42,14 +42,19 @@ export type Database = {
       }
       matches: {
         Row: {
+          confirmed: boolean
           duration: string | null
           id: number
           is_live: boolean
           not_before_text: string | null
+          player1_country: string | null
           player1_game_score: string | null
           player1_id: number | null
+          player1_name: string | null
+          player2_country: string | null
           player2_game_score: string | null
           player2_id: number | null
+          player2_name: string | null
           provider: string
           provider_id: number
           result_detail: string | null
@@ -60,21 +65,29 @@ export type Database = {
           season: number | null
           server: string | null
           set_scores: Json
+          source_key: string | null
+          source_url: string | null
           status: string
           tour: string
           tournament_id: number
           updated_at: string
           winner_id: number | null
+          winner_side: number | null
         }
         Insert: {
+          confirmed?: boolean
           duration?: string | null
           id?: never
           is_live?: boolean
           not_before_text?: string | null
+          player1_country?: string | null
           player1_game_score?: string | null
           player1_id?: number | null
+          player1_name?: string | null
+          player2_country?: string | null
           player2_game_score?: string | null
           player2_id?: number | null
+          player2_name?: string | null
           provider?: string
           provider_id: number
           result_detail?: string | null
@@ -85,21 +98,29 @@ export type Database = {
           season?: number | null
           server?: string | null
           set_scores?: Json
+          source_key?: string | null
+          source_url?: string | null
           status?: string
           tour: string
           tournament_id: number
           updated_at?: string
           winner_id?: number | null
+          winner_side?: number | null
         }
         Update: {
+          confirmed?: boolean
           duration?: string | null
           id?: never
           is_live?: boolean
           not_before_text?: string | null
+          player1_country?: string | null
           player1_game_score?: string | null
           player1_id?: number | null
+          player1_name?: string | null
+          player2_country?: string | null
           player2_game_score?: string | null
           player2_id?: number | null
+          player2_name?: string | null
           provider?: string
           provider_id?: number
           result_detail?: string | null
@@ -110,11 +131,14 @@ export type Database = {
           season?: number | null
           server?: string | null
           set_scores?: Json
+          source_key?: string | null
+          source_url?: string | null
           status?: string
           tour?: string
           tournament_id?: number
           updated_at?: string
           winner_id?: number | null
+          winner_side?: number | null
         }
         Relationships: [
           {
@@ -450,6 +474,50 @@ export type Database = {
           tour?: string
         }
         Relationships: []
+      }
+      wiki_draws: {
+        Row: {
+          checked_at: string | null
+          discovered_at: string | null
+          last_rev_at: string | null
+          last_revid: number | null
+          note: string | null
+          page_title: string | null
+          page_url: string | null
+          status: string
+          tournament_id: number
+        }
+        Insert: {
+          checked_at?: string | null
+          discovered_at?: string | null
+          last_rev_at?: string | null
+          last_revid?: number | null
+          note?: string | null
+          page_title?: string | null
+          page_url?: string | null
+          status?: string
+          tournament_id: number
+        }
+        Update: {
+          checked_at?: string | null
+          discovered_at?: string | null
+          last_rev_at?: string | null
+          last_revid?: number | null
+          note?: string | null
+          page_title?: string | null
+          page_url?: string | null
+          status?: string
+          tournament_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wiki_draws_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: true
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

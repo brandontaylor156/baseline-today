@@ -13,7 +13,8 @@
     "sync:photos": "tsx --env-file=.env.local --conditions=react-server scripts/sync-photos.mts",
     "test:e2e": "playwright test",
     "test:integration": "vitest run --mode integration",
-    "trial:report": "tsx --env-file=.env.local --conditions=react-server scripts/trial-report.mts"
+    "trial:report": "tsx --env-file=.env.local --conditions=react-server scripts/trial-report.mts",
+    "sync:results": "tsx --env-file=.env.local --conditions=react-server scripts/sync-results.mts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

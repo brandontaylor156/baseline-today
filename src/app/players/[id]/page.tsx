@@ -4,6 +4,9 @@ import { notFound } from "next/navigation";
 
 import { FavoriteButton } from "@/components/favorite-button";
 import { PlayerAvatar } from "@/components/player-avatar";
+import { PlayerResults } from "@/components/player-results";
+import { WikiCredit } from "@/components/wiki-credit";
+import { getPlayerResults } from "@/lib/data/results";
 import { getPlayer } from "@/lib/data/tennis";
 import { bestRank, formatDate, formatHeight, formatPlays, formatPoints, formatWeight, TOUR_LABEL } from "@/lib/format";
 
@@ -29,6 +32,7 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
   const player = await load(params);
   if (!player) notFound();
 
+  const results = await getPlayerResults(player.id);
   const latest = player.history.at(-1);
   const best = bestRank(player.history);
   // The provider's birthplace is often just the country; don't repeat it.
@@ -76,13 +80,18 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
         </div>
       </header>
 
-      <dl className="grid grid-cols-3 gap-3">
+      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Current rank" value={latest ? `#${latest.rank}` : "Unranked"} />
         <Stat label="Points" value={formatPoints(latest?.points ?? null)} />
         <Stat
           label="Best tracked rank"
           value={best ? `#${best.rank}` : "–"}
           hint={best ? `first reached ${formatDate(best.date)}` : undefined}
+        />
+        <Stat
+          label={`${results.season} record`}
+          value={results.wins + results.losses > 0 ? `${results.wins}–${results.losses}` : "–"}
+          hint="tour-level, from tracked draws"
         />
       </dl>
 
@@ -102,9 +111,19 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
         </dl>
       </section>
 
+      {results.recent.length > 0 && (
+        <section aria-labelledby="results-heading" className="rounded-xl border border-border bg-surface p-4 sm:p-5">
+          <h2 id="results-heading" className="mb-1 text-sm font-semibold uppercase tracking-wide text-muted">
+            Recent results
+          </h2>
+          <PlayerResults playerId={player.id} results={results.recent} />
+          <WikiCredit sources={results.sources} className="mt-3" />
+        </section>
+      )}
+
       <p className="text-xs text-muted">
-        Match results and season record arrive with live scores. Best tracked rank counts only the snapshots stored since
-        this site began recording.
+        Best tracked rank counts only the ranking snapshots stored since this site began recording. Season record counts
+        finished main-draw matches at the ATP and WTA events tracked here (walkovers excluded).
       </p>
     </article>
   );

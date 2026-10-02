@@ -11,8 +11,8 @@ function serverSide(m: ScoreMatch): 1 | 2 | null {
   const s = m.server.toLowerCase();
   if (s === "1" || s === "player1") return 1;
   if (s === "2" || s === "player2") return 2;
-  if (m.player1 && (s === String(m.player1.id) || m.player1.name.toLowerCase() === s)) return 1;
-  if (m.player2 && (s === String(m.player2.id) || m.player2.name.toLowerCase() === s)) return 2;
+  if (m.player1 && ((m.player1.id !== null && s === String(m.player1.id)) || m.player1.name.toLowerCase() === s)) return 1;
+  if (m.player2 && ((m.player2.id !== null && s === String(m.player2.id)) || m.player2.name.toLowerCase() === s)) return 2;
   return null;
 }
 
@@ -27,10 +27,12 @@ function Row({ m, side }: { m: ScoreMatch; side: 1 | 2 }) {
     <div className={`flex items-center gap-2 ${lost ? "text-muted" : ""}`}>
       <span className="flex min-w-0 flex-1 items-center gap-2">
         <Flag code={player?.countryCode ?? null} reserve />
-        {player ? (
+        {player?.id != null ? (
           <Link href={`/players/${player.id}`} className={`truncate hover:underline ${won ? "font-semibold" : ""}`}>
             {player.name}
           </Link>
+        ) : player ? (
+          <span className={`truncate ${won ? "font-semibold" : ""}`}>{player.name}</span>
         ) : (
           <span className="truncate text-muted">TBD</span>
         )}

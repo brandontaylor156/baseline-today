@@ -3,7 +3,8 @@
 import type { MatchStatus, SetScore, Tour } from "@/lib/provider/types";
 
 export interface ScoreSide {
-  id: number;
+  /** Our player id, or null for players we have no profile for (shown without a link). */
+  id: number | null;
   name: string;
   countryCode: string | null;
 }

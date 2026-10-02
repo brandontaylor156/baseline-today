@@ -29,6 +29,25 @@ export default async function CreditsPage() {
         </p>
       </header>
 
+      <section aria-labelledby="results-heading" className="space-y-2">
+        <h2 id="results-heading" className="text-lg font-semibold">
+          Match results
+        </h2>
+        <p className="text-sm text-muted">
+          Finished match results come from the singles draw pages of the English{" "}
+          <a href="https://en.wikipedia.org/" className="underline underline-offset-2">
+            Wikipedia
+          </a>
+          , written by its volunteer editors and available under the{" "}
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/" className="underline underline-offset-2">
+            Creative Commons Attribution-ShareAlike 4.0
+          </a>{" "}
+          license. Every list of results links to the draw pages it was taken from. The results data shown on this site is
+          shared under the same license. Results are read through the Wikipedia API and shown once a page has been
+          unchanged for 10 minutes.
+        </p>
+      </section>
+
       <section aria-labelledby="photos-heading" className="space-y-3">
         <h2 id="photos-heading" className="text-lg font-semibold">
           Player photos

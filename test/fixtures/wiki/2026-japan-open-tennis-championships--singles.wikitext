@@ -1,0 +1,630 @@
+<!-- Please do not remove or change this AfD message until the discussion has been closed. -->
+{{Article for deletion/dated|page=2026 Japan Open Tennis Championships – Doubles|timestamp=20260928073309|year=2026|month=September|day=28|substed=yes|help=off|outcome=merging|target=2026 Japan Open Tennis Championships}}
+<!-- Once discussion is closed, please place on talk page: {{Old AfD multi|page=2026 Japan Open Tennis Championships – Doubles|date=28 September 2026|result='''keep'''}} -->
+<!-- End of AfD message, feel free to edit beyond this point -->
+
+{{Tennis events|2026|Japan Open Tennis Championships|
+| defchamp    = {{flagicon|ESP}} [[Carlos Alcaraz]]
+| runner   = 
+| score    = 
+| type     = singles doubles
+| draw     = 32 (4{{abbr|Q|Qualifiers}} / 3{{abbr|WC|Wild Cards}})
+| seeds    = 8
+| before_name = Japan Open Tennis Championships
+| main_name = Japan Open (tennis) {{!}} Japan Open
+}}
+
+{{further|2026 Japan Open Tennis Championships}}
+
+[[Carlos Alcaraz]] is the defending champion.<ref>{{cite web|url=https://www.bbc.co.uk/sport/tennis/articles/c89d5n3wz2no|title=Alcaraz wins eighth title of season in Tokyo|publisher=BBC Sport|accessdate=30 September 2025}}</ref><ref>{{cite web|url=https://www.atptour.com/en/news/alcaraz-fritz-tokyo-2025-final|title= Alcaraz exacts quick Fritz revenge, captures Tokyo title on debut |date= 30 September 2025|website=ATPTour}}</ref>
+
+This tournament marked the final professional appearance of [[2014 US Open – Men's singles|2014 US Open]] finalist, [[Tennis at the 2016 Summer Olympics – Men's singles|2016 Olympic bronze medalist]], and former world No. 4 [[Kei Nishikori]].<ref>{{cite web |author1=Kyodo News |title=Tennis: Nishikori vows to give all at career-ending Japan Open |url=https://english.kyodonews.net/articles/-/86329 |website=Japan Wire by Kyodo News |access-date=28 September 2026 |date=25 September 2026}}</ref> He lost in the first round to [[Frances Tiafoe]].<ref> {{cite web|url=https://www.bbc.com/sport/tennis/articles/cwe8e81n3egeo|title='I kept fighting right to the end' - emotional Nishikori retires |date=1 October 2026}}</ref>
+
+==Seeds==
+{{columns-list|colwidth=30em|
+#{{flagicon|ESP}} '''[[Carlos Alcaraz]]'''
+#{{flagicon|USA}} '''[[Frances Tiafoe]]'''
+#{{flagicon|USA}} [[Taylor Fritz]] ''(first round)''
+#{{flagicon|ESP}} [[Rafael Jódar]] ''(first round)''
+#{{flagicon|USA}} [[Brandon Nakashima]] ''(first round)''
+#{{flagicon|NOR}} [[Casper Ruud]] ''(first round)''
+#{{flagicon|USA}} [[Tommy Paul (tennis)|Tommy Paul]] ''(first round)''
+#{{flagicon|MON}} '''[[Valentin Vacherot]]'''
+}}
+
+==Draw==
+{{draw key}}
+
+===Finals===
+{{4TeamBracket-Tennis3
+| RD1=Semifinals
+| RD2=Final
+
+| team-width=175
+
+| RD1-seed1=&nbsp;
+| RD1-team1=
+| RD1-score1-1=
+| RD1-score1-2=
+| RD1-score1-3=
+| RD1-seed2=
+| RD1-team2=
+| RD1-score2-1=
+| RD1-score2-2=
+| RD1-score2-3=
+
+| RD1-seed3=&nbsp;
+| RD1-team3=
+| RD1-score3-1=
+| RD1-score3-2=
+| RD1-score3-3=
+| RD1-seed4=
+| RD1-team4=
+| RD1-score4-1=
+| RD1-score4-2=
+| RD1-score4-3=
+
+| RD2-seed1=&nbsp;
+| RD2-team1=
+| RD2-score1-1=
+| RD2-score1-2=
+| RD2-score1-3=
+| RD2-seed2=
+| RD2-team2=
+| RD2-score2-1=
+| RD2-score2-2=
+| RD2-score2-3=
+}}
+
+===Top half===
+{{16TeamBracket-Compact-Tennis3
+| RD1=First round
+| RD2=Second round
+| RD3=Quarterfinals
+| RD4=Semifinals
+
+| RD1-seed01=1
+| RD1-team01='''{{flagicon|ESP}} [[Carlos Alcaraz|C Alcaraz]]'''
+| RD1-score01-1='''7<sup>7</sup>'''
+| RD1-score01-2=4
+| RD1-score01-3='''6'''
+| RD1-seed02=
+| RD1-team02={{flagicon|USA}} [[Alex Michelsen|A Michelsen]]
+| RD1-score02-1=6<sup>1</sup>
+| RD1-score02-2='''6'''
+| RD1-score02-3=1
+
+| RD1-seed03=
+| RD1-team03='''{{flagicon|ITA}} [[Matteo Arnaldi|M Arnaldi]]'''
+| RD1-score03-1=2
+| RD1-score03-2='''6'''
+| RD1-score03-3='''6'''
+| RD1-seed04=WC
+| RD1-team04={{flagicon|JPN}} [[Rei Sakamoto|R Sakamoto]]
+| RD1-score04-1='''6'''
+| RD1-score04-2=4
+| RD1-score04-3=4
+
+| RD1-seed05=
+| RD1-team05='''{{flagicon|CAN}} [[Denis Shapovalov|D Shapovalov]]'''
+| RD1-score05-1='''7'''
+| RD1-score05-2='''6'''
+| RD1-score05-3=
+| RD1-seed06=WC
+| RD1-team06={{flagicon|JPN}} [[Sho Shimabukuro|S Shimabukuro]]
+| RD1-score06-1=5
+| RD1-score06-2=1
+| RD1-score06-3=
+
+| RD1-seed07=
+| RD1-team07='''{{flagicon|CHI}} [[Alejandro Tabilo|A Tabilo]]'''
+| RD1-score07-1='''6'''
+| RD1-score07-2='''6'''
+| RD1-score07-3=
+| RD1-seed08=7
+| RD1-team08={{flagicon|USA}} [[Tommy Paul (tennis)|T Paul]]
+| RD1-score08-1=1
+| RD1-score08-2=2
+| RD1-score08-3=
+
+| RD1-seed09=3
+| RD1-team09={{flagicon|USA}} [[Taylor Fritz|T Fritz]]
+| RD1-score09-1='''7<sup>9</sup>'''
+| RD1-score09-2=4
+| RD1-score09-3=3
+| RD1-seed10=Q
+| RD1-team10='''{{flagicon|ESP}} [[Jaume Munar|J Munar]]'''
+| RD1-score10-1=6<sup>7</sup>
+| RD1-score10-2='''6'''
+| RD1-score10-3='''6'''
+
+| RD1-seed11=LL
+| RD1-team11='''{{flagicon|POR}} [[Jaime Faria|J Faria]]'''
+| RD1-score11-1='''6'''
+| RD1-score11-2=3
+| RD1-score11-3='''6'''
+| RD1-seed12=
+| RD1-team12={{flagicon|GBR}} [[Arthur Fery|A Fery]]
+| RD1-score12-1=4
+| RD1-score12-2='''6'''
+| RD1-score12-3=4
+
+| RD1-seed13=
+| RD1-team13={{flagicon|DEN}} [[Holger Rune|H Rune]]
+| RD1-score13-1=3
+| RD1-score13-2=1
+| RD1-score13-3=
+| RD1-seed14=SE
+| RD1-team14='''{{flagicon|FRA}} [[Kyrian Jacquet|K Jacquet]]'''
+| RD1-score14-1='''6'''
+| RD1-score14-2='''6'''
+| RD1-score14-3=
+
+| RD1-seed15=
+| RD1-team15='''{{flagicon|ITA}} [[Luciano Darderi|L Darderi]]'''
+| RD1-score15-1='''7<sup>7</sup>'''
+| RD1-score15-2='''6'''
+| RD1-score15-3=
+| RD1-seed16=6
+| RD1-team16={{flagicon|NOR}} [[Casper Ruud|C Ruud]]
+| RD1-score16-1=6<sup>3</sup>
+| RD1-score16-2=3
+| RD1-score16-3=
+
+| RD2-seed01=1
+| RD2-team01={{flagicon|ESP}} [[Carlos Alcaraz|C Alcaraz]]
+| RD2-score01-1=
+| RD2-score01-2=
+| RD2-score01-3=
+| RD2-seed02=
+| RD2-team02={{flagicon|ITA}} [[Matteo Arnaldi|M Arnaldi]]
+| RD2-score02-1=
+| RD2-score02-2=
+| RD2-score02-3=
+
+| RD2-seed03=
+| RD2-team03={{flagicon|CAN}} [[Denis Shapovalov|D Shapovalov]]
+| RD2-score03-1=
+| RD2-score03-2=
+| RD2-score03-3=
+| RD2-seed04=
+| RD2-team04={{flagicon|CHI}} [[Alejandro Tabilo|A Tabilo]]
+| RD2-score04-1=
+| RD2-score04-2=
+| RD2-score04-3=
+
+| RD2-seed05=Q
+| RD2-team05='''{{flagicon|ESP}} [[Jaume Munar|J Munar]]'''
+| RD2-score05-1='''6'''
+| RD2-score05-2='''6'''
+| RD2-score05-3=
+| RD2-seed06=LL
+| RD2-team06={{flagicon|POR}} [[Jaime Faria|J Faria]]
+| RD2-score06-1=1
+| RD2-score06-2=1
+| RD2-score06-3=
+
+| RD2-seed07=SE
+| RD2-team07={{flagicon|FRA}} [[Kyrian Jacquet|K Jacquet]]
+| RD2-score07-1=
+| RD2-score07-2=
+| RD2-score07-3=
+| RD2-seed08=
+| RD2-team08={{flagicon|ITA}} [[Luciano Darderi|L Darderi]]
+| RD2-score08-1=
+| RD2-score08-2=
+| RD2-score08-3=
+
+| RD3-seed01=
+| RD3-team01=
+| RD3-score01-1=
+| RD3-score01-2=
+| RD3-score01-3=
+| RD3-seed02=
+| RD3-team02=
+| RD3-score02-1=
+| RD3-score02-2=
+| RD3-score02-3=
+
+| RD3-seed03=Q
+| RD3-team03={{flagicon|ESP}} [[Jaume Munar|J Munar]]
+| RD3-score03-1=
+| RD3-score03-2=
+| RD3-score03-3=
+| RD3-seed04=
+| RD3-team04=
+| RD3-score04-1=
+| RD3-score04-2=
+| RD3-score04-3=
+
+| RD4-seed01=
+| RD4-team01=
+| RD4-score01-1=
+| RD4-score01-2=
+| RD4-score01-3=
+| RD4-seed02=
+| RD4-team02=
+| RD4-score02-1=
+| RD4-score02-2=
+| RD4-score02-3=
+}}
+
+===Bottom half===
+{{16TeamBracket-Compact-Tennis3
+| RD1=First round
+| RD2=Second round
+| RD3=Quarterfinals
+| RD4=Semifinals
+
+| RD1-seed01=5
+| RD1-team01={{flagicon|USA}} [[Brandon Nakashima|B Nakashima]]
+| RD1-score01-1=3
+| RD1-score01-2=2
+| RD1-score01-3=
+| RD1-seed02=
+| RD1-team02='''{{flagicon|FRA}} [[Ugo Humbert|U Humbert]]'''
+| RD1-score02-1='''6'''
+| RD1-score02-2='''6'''
+| RD1-score02-3=
+
+| RD1-seed03=
+| RD1-team03='''{{flagicon|CZE}} [[Jiří Lehečka|J Lehečka]]'''
+| RD1-score03-1='''6'''
+| RD1-score03-2=6<sup>3</sup>
+| RD1-score03-3='''6'''
+| RD1-seed04=
+| RD1-team04={{flagicon|BEL}} [[Zizou Bergs|Z Bergs]]
+| RD1-score04-1=3
+| RD1-score04-2='''7<sup>7</sup>'''
+| RD1-score04-3=3
+
+| RD1-seed05=
+| RD1-team05={{flagicon|ESP}} [[Alejandro Davidovich Fokina|A Davidovich Fokina]]
+| RD1-score05-1='''6'''
+| RD1-score05-2=6<sup>1</sup>
+| RD1-score05-3=4
+| RD1-seed06=
+| RD1-team06='''{{flagicon|ITA}} [[Matteo Berrettini|M Berrettini]]'''
+| RD1-score06-1=1
+| RD1-score06-2='''7<sup>7</sup>'''
+| RD1-score06-3='''6'''
+
+| RD1-seed07=Q
+| RD1-team07='''{{flagicon|PAR}} [[Adolfo Daniel Vallejo|AD Vallejo]]'''
+| RD1-score07-1='''6'''
+| RD1-score07-2='''6'''
+| RD1-score07-3=
+| RD1-seed08=4
+| RD1-team08={{flagicon|ESP}} [[Rafael Jódar|R Jódar]]
+| RD1-score08-1=1
+| RD1-score08-2=3
+| RD1-score08-3=
+
+| RD1-seed09=8
+| RD1-team09='''{{flagicon|MON}} [[Valentin Vacherot|V Vacherot]]'''
+| RD1-score09-1='''7<sup>7</sup>'''
+| RD1-score09-2='''7<sup>7</sup>'''
+| RD1-score09-3=
+| RD1-seed10=
+| RD1-team10={{flagicon|BEL}} [[Alexander Blockx|A Blockx]]
+| RD1-score10-1=6<sup>2</sup>
+| RD1-score10-2=6<sup>4</sup>
+| RD1-score10-3=
+
+| RD1-seed11=
+| RD1-team11={{flagicon|ARG}} [[Tomás Martín Etcheverry|TM Etcheverry]]
+| RD1-score11-1='''6'''
+| RD1-score11-2=3
+| RD1-score11-3=4
+| RD1-seed12=Q
+| RD1-team12='''{{flagicon|GRE}} [[Stefanos Tsitsipas|S Tsitsipas]]'''
+| RD1-score12-1=4
+| RD1-score12-2='''6'''
+| RD1-score12-3='''6'''
+
+| RD1-seed13=Q
+| RD1-team13='''{{flagicon|FRA}} [[Arthur Fils|A Fils]]'''
+| RD1-score13-1='''6'''
+| RD1-score13-2='''6'''
+| RD1-score13-3=
+| RD1-seed14=
+| RD1-team14={{flagicon|FRA}} [[Luca Van Assche|L Van Assche]]
+| RD1-score14-1=3
+| RD1-score14-2=2
+| RD1-score14-3=
+
+| RD1-seed15=WC
+| RD1-team15={{flagicon|JPN}} [[Kei Nishikori|K Nishikori]]
+| RD1-score15-1=4
+| RD1-score15-2=4
+| RD1-score15-3=
+| RD1-seed16=2
+| RD1-team16='''{{flagicon|USA}} [[Frances Tiafoe|F Tiafoe]]'''
+| RD1-score16-1='''6'''
+| RD1-score16-2='''6'''
+| RD1-score16-3=
+
+| RD2-seed01=
+| RD2-team01={{flagicon|FRA}} [[Ugo Humbert|U Humbert]]
+| RD2-score01-1=
+| RD2-score01-2=
+| RD2-score01-3=
+| RD2-seed02=
+| RD2-team02={{flagicon|CZE}} [[Jiří Lehečka|J Lehečka]]
+| RD2-score02-1=
+| RD2-score02-2=
+| RD2-score02-3=
+
+| RD2-seed03=
+| RD2-team03={{flagicon|ITA}} [[Matteo Berrettini|M Berrettini]]
+| RD2-score03-1=
+| RD2-score03-2=
+| RD2-score03-3=
+| RD2-seed04=Q
+| RD2-team04={{flagicon|PAR}} [[Adolfo Daniel Vallejo|AD Vallejo]]
+| RD2-score04-1=
+| RD2-score04-2=
+| RD2-score04-3=
+
+| RD2-seed05=8
+| RD2-team05='''{{flagicon|MON}} [[Valentin Vacherot|V Vacherot]]'''
+| RD2-score05-1=4
+| RD2-score05-2='''7<sup>7</sup>'''
+| RD2-score05-3='''6'''
+| RD2-seed06=Q
+| RD2-team06={{flagicon|GRE}} [[Stefanos Tsitsipas|S Tsitsipas]]
+| RD2-score06-1='''6'''
+| RD2-score06-2=6<sup>5</sup>
+| RD2-score06-3=4
+
+| RD2-seed07=Q
+| RD2-team07={{flagicon|FRA}} [[Arthur Fils|A Fils]]
+| RD2-score07-1=
+| RD2-score07-2=
+| RD2-score07-3=
+| RD2-seed08=2
+| RD2-team08={{flagicon|USA}} [[Frances Tiafoe|F Tiafoe]]
+| RD2-score08-1=
+| RD2-score08-2=
+| RD2-score08-3=
+
+| RD3-seed01=
+| RD3-team01=
+| RD3-score01-1=
+| RD3-score01-2=
+| RD3-score01-3=
+| RD3-seed02=
+| RD3-team02=
+| RD3-score02-1=
+| RD3-score02-2=
+| RD3-score02-3=
+
+| RD3-seed03=8
+| RD3-team03={{flagicon|MON}} [[Valentin Vacherot|V Vacherot]]
+| RD3-score03-1=
+| RD3-score03-2=
+| RD3-score03-3=
+| RD3-seed04=
+| RD3-team04=
+| RD3-score04-1=
+| RD3-score04-2=
+| RD3-score04-3=
+
+| RD4-seed01=
+| RD4-team01=
+| RD4-score01-1=
+| RD4-score01-2=
+| RD4-score01-3=
+| RD4-seed02=
+| RD4-team02=
+| RD4-score02-1=
+| RD4-score02-2=
+| RD4-score02-3=
+}}
+
+==Qualifying==
+===Seeds===
+{{columns-list|colwidth=30em|
+# {{flagicon|FRA}} '''[[Arthur Fils]] (qualified)'''
+# {{flagicon|GRE}} '''[[Stefanos Tsitsipas]] (qualified)'''
+# {{flagicon|PAR}} '''[[Adolfo Daniel Vallejo]] (qualified)'''
+# {{flagicon|ESP}} '''[[Jaume Munar]] (qualified)'''
+# {{flagicon|POR}} [[Jaime Faria]] ''(qualifying competition, '''''lucky loser''''')''
+# {{flagicon|POL}} [[Kamil Majchrzak]] ''(qualifying competition)''
+# {{flagicon|ARG}} [[Camilo Ugo Carabelli]] ''(first round)''
+# {{flagicon|USA}} [[Aleksandar Kovacevic (tennis)|Aleksandar Kovacevic]] ''(qualifying competition)''
+}}
+
+===Qualifiers===
+{{columns-list|colwidth=30em|
+# {{flagicon|FRA}} '''[[Arthur Fils]]'''
+# {{flagicon|GRE}} '''[[Stefanos Tsitsipas]]'''
+# {{flagicon|PAR}} '''[[Adolfo Daniel Vallejo]]'''
+# {{flagicon|ESP}} '''[[Jaume Munar]]'''
+}}
+
+===Lucky loser===
+#{{flagicon|POR}} '''[[Jaime Faria]]'''
+
+===Qualifying draw===
+
+====First qualifier====
+{{4TeamBracket-Tennis3
+| RD1=First round
+| RD2=Qualifying competition
+
+|team-width=175
+
+| RD1-seed1=1
+| RD1-team1='''{{flagicon|FRA}} [[Arthur Fils]]'''
+| RD1-score1-1=2
+| RD1-score1-2='''6'''
+| RD1-score1-3='''6'''
+| RD1-seed2=
+| RD1-team2={{flagicon|USA}} [[Martin Damm (born 2003)|Martin Damm]]
+| RD1-score2-1='''6'''
+| RD1-score2-2=1
+| RD1-score2-3=1
+
+| RD1-seed3=&nbsp;
+| RD1-team3={{flagicon|ITA}} [[Lorenzo Sonego]]
+| RD1-score3-1=5
+| RD1-score3-2=2
+| RD1-score3-3=
+| RD1-seed4=6
+| RD1-team4='''{{flagicon|POL}} [[Kamil Majchrzak]]'''
+| RD1-score4-1='''7'''
+| RD1-score4-2='''6'''
+| RD1-score4-3=
+
+| RD2-seed1=1
+| RD2-team1='''{{flagicon|FRA}} [[Arthur Fils]]'''
+| RD2-score1-1='''6'''
+| RD2-score1-2=3
+| RD2-score1-3='''6'''
+| RD2-seed2=6
+| RD2-team2={{flagicon|POL}} [[Kamil Majchrzak]]
+| RD2-score2-1=2
+| RD2-score2-2='''6'''
+| RD2-score2-3=1
+}}
+
+====Second qualifier====
+{{4TeamBracket-Tennis3
+| RD1=First round
+| RD2=Qualifying competition
+
+|team-width=175
+
+| RD1-seed1=<small>2/Alt</small>
+| RD1-team1='''{{flagicon|GRE}} [[Stefanos Tsitsipas]]'''
+| RD1-score1-1='''7'''
+| RD1-score1-2='''6'''
+| RD1-score1-3=
+| RD1-seed2=WC
+| RD1-team2={{flagicon|JPN}} [[Yoshihito Nishioka]]
+| RD1-score2-1=5
+| RD1-score2-2=2
+| RD1-score2-3=
+
+| RD1-seed3=&nbsp;
+| RD1-team3='''{{flagicon|AUS}} [[Rinky Hijikata]]'''
+| RD1-score3-1='''6'''
+| RD1-score3-2='''6'''
+| RD1-score3-3=
+| RD1-seed4=7
+| RD1-team4={{flagicon|ARG}} [[Camilo Ugo Carabelli]]
+| RD1-score4-1=2
+| RD1-score4-2=3
+| RD1-score4-3=
+
+| RD2-seed1=<small>2/Alt</small>
+| RD2-team1='''{{flagicon|GRE}} [[Stefanos Tsitsipas]]'''
+| RD2-score1-1='''6'''
+| RD2-score1-2='''6'''
+| RD2-score1-3=
+| RD2-seed2=
+| RD2-team2={{flagicon|AUS}} [[Rinky Hijikata]]
+| RD2-score2-1=4
+| RD2-score2-2=3
+| RD2-score2-3=
+}}
+
+====Third qualifier====
+{{4TeamBracket-Tennis3
+| RD1=First round
+| RD2=Qualifying competition
+
+|team-width=175
+
+| RD1-seed1=3
+| RD1-team1='''{{flagicon|PAR}} [[Adolfo Daniel Vallejo]]'''
+| RD1-score1-1='''6'''
+| RD1-score1-2='''6'''
+| RD1-score1-3=
+| RD1-seed2=WC
+| RD1-team2={{flagicon|JPN}} [[Taro Daniel]]
+| RD1-score2-1=3
+| RD1-score2-2=2
+| RD1-score2-3=
+
+| RD1-seed3=WC
+| RD1-team3={{flagicon|JPN}} [[Shintaro Mochizuki]]
+| RD1-score3-1=2
+| RD1-score3-2=4
+| RD1-score3-3=
+| RD1-seed4=5
+| RD1-team4='''{{flagicon|POR}} [[Jaime Faria]]'''
+| RD1-score4-1='''6'''
+| RD1-score4-2='''6'''
+| RD1-score4-3=
+
+| RD2-seed1=3
+| RD2-team1='''{{flagicon|PAR}} [[Adolfo Daniel Vallejo]]'''
+| RD2-score1-1='''6'''
+| RD2-score1-2=5
+| RD2-score1-3='''7'''
+| RD2-seed2=5
+| RD2-team2={{flagicon|POR}} [[Jaime Faria]]
+| RD2-score2-1=4
+| RD2-score2-2='''7'''
+| RD2-score2-3=5
+}}
+
+====Fourth qualifier====
+{{4TeamBracket-Tennis3
+| RD1=First round
+| RD2=Qualifying competition
+
+|team-width=175
+
+| RD1-seed1=4
+| RD1-team1='''{{flagicon|ESP}} [[Jaume Munar]]'''
+| RD1-score1-1=5
+| RD1-score1-2='''6'''
+| RD1-score1-3='''6'''
+| RD1-seed2=
+| RD1-team2={{flagicon|USA}} [[Marcos Giron]]
+| RD1-score2-1='''7'''
+| RD1-score2-2=1
+| RD1-score2-3=4
+
+| RD1-seed3=&nbsp;
+| RD1-team3={{flagicon|USA}} [[Zachary Svajda]]
+| RD1-score3-1='''7<sup>9</sup>'''
+| RD1-score3-2=2
+| RD1-score3-3=4
+| RD1-seed4=8
+| RD1-team4='''{{flagicon|USA}} [[Aleksandar Kovacevic (tennis)|Aleksandar Kovacevic]]'''
+| RD1-score4-1=6<sup>7</sup>
+| RD1-score4-2='''6'''
+| RD1-score4-3='''6'''
+
+| RD2-seed1=4
+| RD2-team1='''{{flagicon|ESP}} [[Jaume Munar]]'''
+| RD2-score1-1='''6'''
+| RD2-score1-2='''6'''
+| RD2-score1-3=
+| RD2-seed2=8
+| RD2-team2={{flagicon|USA}} [[Aleksandar Kovacevic (tennis)|Aleksandar Kovacevic]]
+| RD2-score2-1=2
+| RD2-score2-2=3
+| RD2-score2-3=
+}}
+
+==References==
+{{reflist}}
+
+==External links==
+*[http://www.protennislive.com/posting/2026/329/mds.pdf Main draw]
+*[http://www.protennislive.com/posting/2026/329/qs.pdf Qualifying draw] ([https://web.archive.org/web/20261001094935/https://www.protennislive.com/posting/2026/329/qs.pdf archived])
+
+{{2026 ATP Tour}}
+
+{{DEFAULTSORT:2026 Japan Open Tennis Championships - Singles}}
+
+[[Category:2026 ATP Tour]]
+[[Category:Japan Open (tennis)]]
+[[Category:2026 in Japanese sport]]
+[[Category:2026 in men's tennis]]
+[[Category:2026 in Asian sport]]

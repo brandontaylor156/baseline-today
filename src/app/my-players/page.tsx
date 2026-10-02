@@ -5,9 +5,12 @@ import { Flag } from "@/components/flag";
 import { Movement } from "@/components/movement";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { SignInPrompt } from "@/components/sign-in-prompt";
+import { WikiCredit } from "@/components/wiki-credit";
+import { RESULT_SELECT, titleFromUrl, toResult, type Result, type ResultRow } from "@/lib/data/results";
 import { formatPoints, TOUR_LABEL } from "@/lib/format";
 import type { Tour } from "@/lib/provider/types";
 import { createClient } from "@/lib/supabase/server";
+import { roundRank } from "@/lib/wiki/rows";
 
 export const metadata: Metadata = { title: "My players" };
 
@@ -40,11 +43,39 @@ export default async function MyPlayersPage() {
     })
     .sort((a, b) => (a.ranking?.rank ?? 9999) - (b.ranking?.rank ?? 9999));
 
+  // Each favorite's latest confirmed result.
+  const ids = rows.map((r) => r.player.id);
+  const last = new Map<number, Result>();
+  const sources: { title: string; url: string }[] = [];
+  if (ids.length) {
+    const { data: results } = await supabase
+      .from("matches")
+      .select(RESULT_SELECT)
+      .eq("status", "final")
+      .eq("confirmed", true)
+      .or(`player1_id.in.(${ids.join(",")}),player2_id.in.(${ids.join(",")})`)
+      .order("score_changed_at", { ascending: false })
+      .limit(200);
+    const sorted = ((results ?? []) as unknown as ResultRow[])
+      .map(toResult)
+      .sort((a, b) => (b.tournamentStart ?? "").localeCompare(a.tournamentStart ?? "") || roundRank(b.round) - roundRank(a.round));
+    for (const r of sorted) {
+      for (const p of [r.player1, r.player2]) {
+        if (p?.id != null && ids.includes(p.id) && !last.has(p.id)) last.set(p.id, r);
+      }
+    }
+    for (const r of last.values()) {
+      if (r.provider === "wikipedia" && r.sourceUrl && !sources.some((x) => x.url === r.sourceUrl)) {
+        sources.push({ title: titleFromUrl(r.sourceUrl), url: r.sourceUrl });
+      }
+    }
+  }
+
   return (
     <section className="space-y-4">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">My players</h1>
-        <p className="text-sm text-muted">Your favorites and where they stand this week. Live and upcoming matches are coming soon.</p>
+        <p className="text-sm text-muted">Your favorites, where they stand this week, and how their last match went.</p>
       </div>
 
       {rows.length === 0 ? (
@@ -80,6 +111,7 @@ export default async function MyPlayersPage() {
                     {TOUR_LABEL[tour]}
                     {player.country_code ? ` · ${player.country_code}` : ""}
                   </span>
+                  <LastResult playerId={player.id} result={last.get(player.id)} />
                 </span>
                 <span className="text-right">
                   <span className="block font-semibold tabular-nums">{ranking ? `#${ranking.rank}` : "Unranked"}</span>
@@ -95,6 +127,21 @@ export default async function MyPlayersPage() {
           ))}
         </ul>
       )}
+      <WikiCredit sources={sources} />
     </section>
+  );
+}
+
+function LastResult({ playerId, result: r }: { playerId: number; result: Result | undefined }) {
+  if (!r) return null;
+  const side = r.player1?.id === playerId ? 1 : 2;
+  const opponent = side === 1 ? r.player2 : r.player1;
+  const won = r.winner === side;
+  return (
+    <span className="mt-0.5 block truncate text-xs text-muted">
+      <span className={won ? "font-medium text-accent" : ""}>{won ? "Won" : "Lost"}</span> vs {opponent?.name ?? "?"} ·{" "}
+      {r.tournament.name}
+      {r.round ? ` ${r.round}` : ""}
+    </span>
   );
 }

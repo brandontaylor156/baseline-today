@@ -15,10 +15,13 @@ export function SiteHeader() {
         </Link>
         <nav aria-label="Main" className="flex gap-0.5 text-sm sm:gap-1">
           {liveScoresEnabled() && (
-            <Link href="/scores" className="rounded-md px-2 py-1.5 sm:px-2.5 font-medium text-accent hover:bg-surface-muted">
-              Scores
+            <Link href="/scores" className="rounded-md px-2 py-1.5 font-medium text-accent hover:bg-surface-muted sm:px-2.5">
+              Live
             </Link>
           )}
+          <Link href="/results" className="rounded-md px-2 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground sm:px-2.5">
+            Results
+          </Link>
           <Link href="/rankings/atp" className="rounded-md px-2 py-1.5 sm:px-2.5 text-muted hover:bg-surface-muted hover:text-foreground">
             ATP
           </Link>

@@ -1,7 +1,7 @@
 # Baseline Today
 
-ATP and WTA singles rankings, player profiles with credited photos, accent-insensitive search, and
-favorites with Google sign-in. A ground-up rebuild of my 2022 Flask tennis forum.
+ATP and WTA singles rankings, recent match results, player profiles with season records and
+credited photos, accent-insensitive search, and favorites with Google sign-in. A ground-up rebuild of my 2022 Flask tennis forum.
 
 **Live:** [baseline-today.vercel.app](https://baseline-today.vercel.app) · [![CI](https://github.com/brandontaylor156/baseline-today/actions/workflows/ci.yml/badge.svg)](https://github.com/brandontaylor156/baseline-today/actions/workflows/ci.yml)
 
@@ -15,12 +15,16 @@ favorites with Google sign-in. A ground-up rebuild of my 2022 Flask tennis forum
 - **Rankings:** top 100 per tour with movement, country flags and a selector over stored weekly snapshots.
 - **Player pages:** profile, current and best tracked rank, favorite count, and a freely licensed
   Wikimedia Commons photo with author and license, or an initials-and-flag avatar.
+- **Results:** finished matches from the last few days, usually within half an hour, read from
+  Wikipedia draw pages (credited, CC BY-SA 4.0) with plausibility and stability checks.
+- **Season records:** each player’s win-loss and recent results from this season’s tracked draws.
 - **Search:** live suggestions as you type; "djokovic", "Đoković" and "DJOKOVIĆ" all match.
 - **Favorites and "My players":** Google sign-in only. No passwords and no email sign-up, so nobody can
   use the site to send email.
 - Mobile-first, dark mode, server rendered, keyboard and screen-reader friendly.
 
-Live scores are planned for phase 2 (see [PLAN.md](PLAN.md)).
+Live scores depend on a paid data plan and are being evaluated (see [PLAN.md](PLAN.md) and
+[docs/trial-runbook.md](docs/trial-runbook.md)).
 
 ## How it works
 
@@ -38,6 +42,11 @@ Wikidata/Commons ─┼─ daily Vercel Cron ─▶ Supabase Postgres ◀─┤
 - **Row level security:** tennis data is public-read and writable only by the server's secret key.
   `favorites` and `profiles` are owner-only. Favorite counts come from a `security definer` function
   that returns a number and never reveals who favorited.
+- **Results from Wikipedia:** each tournament is matched to its draw page by title (distinctive
+  words or a curated alias), tour (WTA vs ATP mentions) and draw size; a bracket parser reads
+  finished matches; a result shows only after its page has been unchanged for 10 minutes, and
+  results that disappear from the page are hidden. A Supabase cron job checks every 10 minutes and
+  downloads only pages with new revisions.
 - **Search:** a generated `search_name` column (`unaccent`, with Đ→dj) plus a trigram index, queried
   through an RPC that ranks prefix matches first.
 - **Auth:** `@supabase/ssr` with session refresh in `proxy.ts` (skipped for visitors without a
@@ -73,11 +82,14 @@ npm run dev
 | `npm run test:e2e` | Playwright against `npm run build` output (set `E2E_BASE_URL` to test a deployment) |
 | `npm run sync:daily` | run the daily sync locally |
 | `npm run sync:photos -- 200` | backfill Wikimedia photos |
+| `npm run sync:results [-- backfill 2026]` | refresh Wikipedia results (or import a season) |
 
 Database schema: `supabase/migrations/` (idempotent SQL).
 
 ## Credits
 
-Rankings and player data from [BALLDONTLIE](https://www.balldontlie.io). Not affiliated with the ATP
-or WTA. Player photos from Wikimedia Commons, credited on each page and at `/credits`. Flags from
+Rankings and player data from [BALLDONTLIE](https://www.balldontlie.io). Match results from
+[Wikipedia](https://en.wikipedia.org/) draw pages under
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), linked wherever they appear.
+Not affiliated with the ATP or WTA. Player photos from Wikimedia Commons, credited on each page and at `/credits`. Flags from
 [flag-icons](https://github.com/lipis/flag-icons) (MIT).
