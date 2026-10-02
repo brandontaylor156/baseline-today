@@ -28,7 +28,16 @@ export function scoreSignature(m: {
   player1_game_score: string | null;
   player2_game_score: string | null;
 }): string {
-  return JSON.stringify([m.status, m.score, m.set_scores, m.player1_game_score, m.player2_game_score]);
+  return canonicalJson([m.status, m.score, m.set_scores, m.player1_game_score, m.player2_game_score]);
+}
+
+/** JSON with object keys sorted: Postgres jsonb returns keys in its own order, not insertion order. */
+export function canonicalJson(value: unknown): string {
+  return JSON.stringify(value, (_key, v: unknown) =>
+    v && typeof v === "object" && !Array.isArray(v)
+      ? Object.fromEntries(Object.entries(v as Record<string, unknown>).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
+      : v,
+  );
 }
 
 export function matchRow(

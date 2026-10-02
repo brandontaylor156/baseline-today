@@ -12,6 +12,11 @@ describe("score signature", () => {
     expect(scoreSignature(base)).not.toBe(scoreSignature({ ...base, player1_game_score: "30" }));
     expect(scoreSignature(base)).not.toBe(scoreSignature({ ...base, status: "suspended" }));
   });
+
+  it("ignores key order, since jsonb returns keys in its own order", () => {
+    const fromDb = { ...base, set_scores: [{ p1: 6, p2: 4, set: 1 }] };
+    expect(scoreSignature(fromDb)).toBe(scoreSignature(base));
+  });
 });
 
 describe("active window", () => {
