@@ -33,3 +33,11 @@ Goal: measure live-score lag, update cadence and coverage, then decide whether t
    table keeps the data collected so far.
    If **paying**: unset `TRIAL_SAMPLING` only; raise the polling limits to the paid tier (60/min).
 4. Run `supabase/trial/delete-data.sql` (raw measurements, including ESPN reference timings).
+5. **Remove the ESPN reference entirely** (committed promise): delete `src/lib/trial/espn.ts`,
+   `src/lib/trial/espn-parse.ts`, `src/app/api/trial/espn/`, the ESPN cases in
+   `src/lib/sync/match-rows.test.ts`, the `trial-espn-poll` job in `start-collector.sql`, and the
+   `'espn'` source from the trial tables (or drop both trial tables), in one commit.
+
+ESPN data is used only during the trial, only to time the provider, and is never shown on the site:
+`/scores` reads the `matches` table, which only the provider fills. The trial tables have no public
+access (checked by `supabase/tests/isolation.sql`).
