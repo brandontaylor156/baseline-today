@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { after, connection } from "next/server";
 
 import { AutoRefresh } from "@/components/auto-refresh";
 import { MatchCard } from "@/components/match-card";
 import { WikiCredit } from "@/components/wiki-credit";
 import { getRecentResults } from "@/lib/data/results";
+import { displayName } from "@/lib/data/tournaments";
 import { TOUR_LABEL } from "@/lib/format";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { refreshResults, RESULTS_STALE_MINUTES, STABLE_MINUTES } from "@/lib/sync/wiki-results";
@@ -42,7 +44,9 @@ export default async function ResultsPage() {
         groups.map((g) => (
           <section key={g.id} aria-labelledby={`r-${g.id}`} className="space-y-2">
             <h2 id={`r-${g.id}`} className="flex flex-wrap items-baseline gap-x-2 text-base font-semibold">
-              {g.name}
+              <Link href={`/tournaments/${g.id}`} className="hover:underline">
+                {displayName(g.name)}
+              </Link>
               <span className="text-xs font-normal text-muted">
                 {TOUR_LABEL[g.tour]}
                 {g.category ? ` · ${g.category}` : ""}

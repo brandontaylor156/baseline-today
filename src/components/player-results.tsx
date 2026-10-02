@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import type { Result } from "@/lib/data/results";
+import { displayName } from "@/lib/data/tournaments";
 
 import { Flag } from "./flag";
 
@@ -49,7 +50,9 @@ export function PlayerResults({ playerId, results }: { playerId: number; results
                 )}
               </span>
               <span className="block truncate text-xs text-muted">
-                {r.tournament.name}
+                <Link href={`/tournaments/${r.tournament.id}`} className="hover:underline">
+                  {displayName(r.tournament.name)}
+                </Link>
                 {r.round ? ` · ${r.round}` : ""}
               </span>
             </span>
