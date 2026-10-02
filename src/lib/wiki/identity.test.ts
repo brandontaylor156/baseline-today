@@ -82,6 +82,26 @@ describe("levelFits (Lyon ATP 250 vs the Open Sopra Steria de Lyon Challenger)",
   });
 });
 
+describe("gap-fill aliases", () => {
+  it("finds sponsor-named WTA 125 pages", () => {
+    expect(titleScore("2026 Dow Tennis Classic – Singles", "MIDLAND 125", "MIDLAND, USA", "wta")).toBeGreaterThan(0);
+    expect(titleScore("2026 Trophée Clarins – Singles", "PARIS 125", "PARIS, FRA", "wta")).toBeGreaterThan(0);
+    expect(titleScore("2026 SP Open – Singles", "SAO PAULO", "SAO PAULO, BRA", "wta")).toBeGreaterThan(0);
+  });
+
+  it("keeps ROME 125 apart from the WTA 1000 in Rome", () => {
+    expect(titleScore("2026 Italian Open – Women's singles", "ROME 125", "ROME, ITA", "wta")).toBe(0);
+    expect(titleScore("2026 Italian Open – Women's singles", "ROME", "ROME, ITA", "wta")).toBeGreaterThan(0);
+  });
+
+  it("doesn't read a roman numeral in the real name as an edition", () => {
+    expect(editionMatches("Grand Prix Hassan II", "2026 Grand Prix Hassan II – Singles")).toBe(true);
+    expect(editionMatches("SAINT MALO 125", "2026 L'Open 35 de Saint-Malo – Singles")).toBe(true);
+    expect(editionMatches("CONTREXEVILLE 125", "2026 Grand Est Open 88 – Singles")).toBe(true);
+    expect(editionMatches("ANTALYA 125 #2", "2026 Antalya Challenger 1 – Singles")).toBe(false);
+  });
+});
+
 describe("editions", () => {
   it("matches numbered editions", () => {
     expect(editionMatches("ANTALYA 125 #2", "2026 Antalya Challenger 2 – Singles")).toBe(true);

@@ -29,7 +29,7 @@ export const ALIASES: Record<string, string[]> = {
   "omnium banque nationale presente par rogers": ["Canadian Open", "National Bank Open"],
   "washington dc": ["Washington Open", "DC Open", "Mubadala DC Open", "Mubadala Citi DC Open"],
   "mubadala dc open": ["Washington Open", "DC Open"],
-  cleveland: ["Tennis in the Land"],
+  cleveland: ["Tennis in the Land", "Cleveland Open"],
   seoul: ["Korea Open"],
   tokyo: ["Pan Pacific Open"],
   osaka: ["Japan Women's Open", "Japan Open"],
@@ -44,6 +44,21 @@ export const ALIASES: Record<string, string[]> = {
   "abierto mexicano telcel presentado por hsbc": ["Mexican Open", "Abierto Mexicano Telcel"],
   "us open": ["US Open"],
   "nordea open": ["Swedish Open", "Nordea Open"],
+  // WTA 125s whose English pages carry sponsor/event names (found via Italian Wikipedia).
+  manila: ["Philippine Women's Open"],
+  midland: ["Dow Tennis Classic"],
+  "saint malo": ["L'Open 35 de Saint-Malo", "Open 35 de Saint-Malo"],
+  jiujiang: ["Jiangxi Open"],
+  paris: ["Trophée Clarins"],
+  bari: ["Levante Open", "Open delle Puglie"],
+  contrexeville: ["Grand Est Open 88"],
+  newport: ["Hall of Fame Open"],
+  bastad: ["Swedish Open"],
+  warsaw: ["Polish Open"],
+  philadelphia: ["Philly Open"],
+  "sao paulo": ["SP Open", "São Paulo Open"],
+  // Full names win over the shared city key (ROME 125 is not the WTA 1000 in Rome).
+  "rome 125": ["Roma Open"],
   "united cup": [],
   "laver cup": [],
 };
@@ -78,11 +93,22 @@ export function edition(name: string): number | null {
 
 const ROMAN: Record<number, string> = { 1: "i", 2: "ii", 3: "iii", 4: "iv" };
 
+/** Aliases for a provider name: its full name ("rome 125") first, then the shared base ("rome"). */
+export function aliasesFor(name: string): string[] | undefined {
+  const full = normalizeName(name.replace(/#\s*\d+|\(.*?\)/g, " "));
+  return ALIASES[full] ?? ALIASES[baseName(name)];
+}
+
 /** Numbered editions ("#2") must match "2"/"II" in the title; unnumbered ones must not carry 2+. */
 export function editionMatches(name: string, title: string): boolean {
   const n = edition(name);
-  const words = normalizeName(eventName(title)).split(/\s+/);
-  const titleNumber = words.map((w) => (/^\d+$/.test(w) ? Number(w) : Object.entries(ROMAN).find(([, r]) => r === w)?.[0])).find(Boolean);
+  // Numerals that are part of the tournament's own name ("Grand Prix Hassan II") aren't editions.
+  const own = new Set(normalizeName(name.replace(/#\s*\d+/g, " ")).split(/\s+/));
+  const words = normalizeName(eventName(title))
+    .split(/\s+/)
+    .filter((w) => !own.has(w));
+  // Editions are small numbers (#1–#4); "Open 35 de Saint-Malo" or "Grand Est Open 88" are names.
+  const titleNumber = words.map((w) => (/^[1-4]$/.test(w) ? Number(w) : Object.entries(ROMAN).find(([, r]) => r === w)?.[0])).find(Boolean);
   const titleN = titleNumber ? Number(titleNumber) : null;
   if (n === null) return titleN === null || titleN === 1;
   return titleN === n || (n === 1 && titleN === null);
@@ -90,7 +116,7 @@ export function editionMatches(name: string, title: string): boolean {
 
 /** Search phrases: aliases first, then the provider name and the city. */
 export function searchPhrases(name: string, location: string | null): string[] {
-  const aliases = ALIASES[baseName(name)] ?? [];
+  const aliases = aliasesFor(name) ?? [];
   const city = location?.split(",")[0]?.trim() ?? "";
   const cleaned = name.replace(/\b(125|250|500|1000)\b|#\s*\d+|\(.*?\)|\b(presented|presentado|présenté)\b.*$/gi, " ").replace(/\s+/g, " ").trim();
   const titleCase = (s: string) => s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
@@ -104,7 +130,7 @@ export function searchPhrases(name: string, location: string | null): string[] {
 export function titleScore(title: string, name: string, location: string | null, tour?: "atp" | "wta"): number {
   // ATP tour events are never Challengers (WTA 125 pages, though, are often named "… Challenger").
   if (tour === "atp" && /challenger/i.test(eventName(title))) return 0;
-  const aliasList = ALIASES[baseName(name)];
+  const aliasList = aliasesFor(name);
   if (aliasList && aliasList.length === 0) return 0; // team events without a bracket draw
   // An alias that matches the whole event name is decisive (also covers short names like "US Open").
   const exact = (aliasList ?? []).some((a) => normalizeName(a) === normalizeName(eventName(title)));
