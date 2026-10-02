@@ -373,3 +373,14 @@ test("private leagues ask signed-out visitors to sign in, keeping the invite cod
   await page.goto("/leagues?join=ABCD1234");
   await expect(page.getByText("code ABCD1234")).toBeVisible();
 });
+
+test("widgets: embeddable rankings, linked from the footer; bot endpoint off without keys", async ({ page, request }) => {
+  await page.goto("/");
+  await page.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "Widgets" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Widgets" })).toBeVisible();
+  const embed = await request.get("/embed/rankings/wta");
+  expect(embed.headers()["content-security-policy"]).toContain("frame-ancestors *");
+  expect(await embed.text()).toContain("WTA top 10");
+  expect((await request.get("/embed/rankings/itf")).status()).toBe(404);
+  expect((await request.post("/api/discord", { data: {} })).status()).toBe(404);
+});

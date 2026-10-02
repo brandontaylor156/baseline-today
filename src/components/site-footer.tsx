@@ -11,6 +11,9 @@ export function SiteFooter() {
           <Link href="/countries" className="underline-offset-2 hover:underline">
             Countries
           </Link>
+          <Link href="/widgets" className="underline-offset-2 hover:underline">
+            Widgets
+          </Link>
           <Link href="/credits" className="underline-offset-2 hover:underline">
             Credits
           </Link>

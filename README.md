@@ -61,6 +61,9 @@ search and favorites with Google sign-in. A ground-up rebuild of my 2022 Flask t
   invite code with nicknames only, and Pick'em streaks and badges.
 - **Match pages:** a preview or result page for every match (`/matches/<id>`) with chances,
   title stakes, form, head-to-head and a share image.
+- **Widgets, bot and digests:** iframe widgets for rankings and title chances (`/widgets`), a
+  Discord bot (`/odds`, `/rankings`, `/results`; Ed25519-verified, off until keys are set) and a
+  daily digest to Discord or Slack webhooks listed in `DIGEST_WEBHOOK_URLS`.
 - **Up next:** model win chances for scheduled matches on each tournament page and for your
   favorites on "My players".
 - **Season timeline:** each player's tournaments this season: round reached, who stopped them, W-L.

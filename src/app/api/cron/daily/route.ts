@@ -2,6 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 
 import { revalidateTag } from "next/cache";
 
+import { sendDigest } from "@/lib/digest";
 import { provider } from "@/lib/provider";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { TENNIS_TAG } from "@/lib/supabase/public";
@@ -25,5 +26,7 @@ export async function GET(request: Request) {
   console.log(`daily sync: ${JSON.stringify(result)}`);
   // Serve fresh rankings on the next visit instead of waiting out the hourly revalidation.
   if (result.status === "ok") revalidateTag(TENNIS_TAG, "max");
-  return Response.json(result, { status: result.status === "error" ? 500 : 200 });
+  // Daily digest to chat webhooks, if any are configured.
+  const digest = await sendDigest().catch((err: Error) => `error: ${err.message}`);
+  return Response.json({ ...result, digest }, { status: result.status === "error" ? 500 : 200 });
 }
