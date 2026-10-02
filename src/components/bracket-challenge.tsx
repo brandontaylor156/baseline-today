@@ -72,6 +72,9 @@ export function BracketChallenge({ model, open }: { model: DrawModel; open: bool
     setStatus(picks.length < needed ? `Saved ${picks.length} of ${needed} picks. Finish before the first result is in.` : "Saved. Good luck!");
   }
 
+  // Closed with no entry of yours and nobody on the board: nothing to show.
+  if (!open && !saved && !standings?.length) return null;
+
   return (
     <section aria-labelledby="challenge-heading" className="space-y-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2">

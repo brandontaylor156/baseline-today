@@ -15,11 +15,17 @@ const FINALS: Record<Tour, string> = { atp: "the ATP Finals in Turin", wta: "the
 const SPOTS = 8;
 const SHOWN = 30;
 
+function chance(p: number): string {
+  if (p >= 0.995) return "99%+";
+  if (p > 0 && p < 0.01) return "<1%";
+  return `${Math.round(p * 100)}%`;
+}
+
 export default async function RacePage({ searchParams }: PageProps<"/race">) {
   const q = await searchParams;
   const tour = typeof q.tour === "string" && isTour(q.tour) ? q.tour : "atp";
   const season = new Date().getUTCFullYear();
-  const { rows, live, events } = await getRace(tour, season);
+  const { rows, live, events, qualify, weeksLeft } = await getRace(tour, season);
   const top = rows.slice(0, SHOWN);
   const showProjection = live > 0;
 
@@ -66,8 +72,13 @@ export default async function RacePage({ searchParams }: PageProps<"/race">) {
                 Points
               </th>
               {showProjection && (
-                <th scope="col" className="whitespace-nowrap px-3 py-2 text-right font-medium">
+                <th scope="col" className="hidden whitespace-nowrap px-3 py-2 text-right font-medium sm:table-cell">
                   Projected
+                </th>
+              )}
+              {qualify && (
+                <th scope="col" className="whitespace-nowrap px-3 py-2 text-right font-medium">
+                  Finals chance
                 </th>
               )}
             </tr>
@@ -91,8 +102,13 @@ export default async function RacePage({ searchParams }: PageProps<"/race">) {
                 <td className="hidden px-2 py-2 text-right tabular-nums text-muted sm:table-cell">{r.events}</td>
                 <td className="px-2 py-2 text-right font-semibold tabular-nums">{r.points.toLocaleString("en-US")}</td>
                 {showProjection && (
-                  <td className="px-3 py-2 text-right tabular-nums text-muted">
+                  <td className="hidden px-3 py-2 text-right tabular-nums text-muted sm:table-cell">
                     {r.projected > r.points ? r.projected.toLocaleString("en-US") : "–"}
+                  </td>
+                )}
+                {qualify && (
+                  <td className="px-3 py-2 text-right font-semibold tabular-nums">
+                    {chance(qualify.get(r.key) ?? 0)}
                   </td>
                 )}
               </tr>
@@ -106,6 +122,13 @@ export default async function RacePage({ searchParams }: PageProps<"/race">) {
           The dashed line marks the {SPOTS} qualifying places. Projected adds each player’s expected points from the {live} tournament
           {live === 1 ? "" : "s"} in progress, using our model’s chances to go further.
         </p>
+        {qualify && (
+          <p>
+            Finals chance: how often a player finishes in the top {SPOTS} across 4,000 simulated finishes to the season ({weeksLeft}{" "}
+            week{weeksLeft === 1 ? "" : "s"} left). Events in progress end according to our model; after that, each player keeps
+            playing at their season rate and scores like one of their own events this season. A rough guide only.
+          </p>
+        )}
         <p>
           An estimate, not the tours’ own race: points come from our table for each category and round, across the {events}{" "}
           {TOUR_LABEL[tour]} events we track this season. It counts every event (the tours count a player’s best results only), skips

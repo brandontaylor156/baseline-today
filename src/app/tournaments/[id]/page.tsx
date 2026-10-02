@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { MatchCard } from "@/components/match-card";
 import { MatchupRow } from "@/components/matchup-row";
 import { BracketChallenge } from "@/components/bracket-challenge";
+import { DrawDifficulty } from "@/components/draw-difficulty";
 import { DrawExplorer } from "@/components/draw-explorer";
 import { TitleHistory } from "@/components/title-history";
 import { WikiCredit } from "@/components/wiki-credit";
@@ -84,6 +85,7 @@ export default async function TournamentPage({ params }: PageProps<"/tournaments
           <BracketChallenge model={live} open={false} />
         </>
       )}
+      {live && <DrawDifficulty model={live} />}
 
       {matchups.length > 0 && (
         <section aria-labelledby="next-heading" className="space-y-2">

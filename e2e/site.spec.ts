@@ -300,6 +300,7 @@ test("title chances on a tournament in progress", async ({ page }) => {
   await card.click();
   await expect(page).toHaveURL(/\/tournaments\/\d+$/);
   await expect(page.getByRole("heading", { name: "Title chances", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Draw difficulty" })).toBeVisible();
   const first = page.locator("#title-heading ~ div tbody tr").first();
   await expect(first).toContainText("%");
   // What if: pick a winner, the table switches to the scenario; reset brings it back.
@@ -325,6 +326,7 @@ test("season race with the qualifying line", async ({ page }) => {
   await page.getByRole("link", { name: "Season race →" }).click();
   await expect(page.getByRole("heading", { level: 1, name: /season race/ })).toBeVisible();
   expect(await page.locator("tbody tr").count()).toBeGreaterThan(8);
+  await expect(page.getByRole("columnheader", { name: "Finals chance" })).toBeVisible();
   await page.getByRole("navigation", { name: "Tour" }).getByRole("link", { name: "WTA" }).click();
   await expect(page).toHaveURL(/tour=wta/);
 });

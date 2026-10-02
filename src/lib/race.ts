@@ -26,6 +26,12 @@ export interface RaceRow {
   /** Points plus the expected extra from events in progress. */
   projected: number;
   events: number;
+  /** Points from each finished event (for simulating the rest of the season). */
+  history: number[];
+  /** For each event in progress: the possible final points and their chances. */
+  liveOutcomes: { points: number; p: number }[][];
+  /** The part of `points` that is a guaranteed minimum in events still in progress. */
+  liveBanked: number;
 }
 
 export const roundsFor = (drawSize: number | null) => (drawSize && drawSize > 1 ? Math.ceil(Math.log2(drawSize)) : 0);
@@ -77,6 +83,9 @@ export function raceTable(matches: SeasonMatch[], events: Map<number, RaceEvent>
   for (const [key, byEvent] of runs) {
     let points = 0;
     let projected = 0;
+    const history: number[] = [];
+    const liveOutcomes: { points: number; p: number }[][] = [];
+    let liveBanked = 0;
     for (const [tid, run] of byEvent) {
       const ev = events.get(tid)!;
       // Wins: rounds before the last one played, plus the last if won (robust to gaps and byes).
@@ -87,9 +96,20 @@ export function raceTable(matches: SeasonMatch[], events: Map<number, RaceEvent>
       const banked = pointsFor(ev.tour, ev.category, ev.rounds, wins, hadBye);
       points += banked;
       projected += alive ? Math.max(banked, expectedPoints(ev.tour, ev.category, ev.rounds, reach, hadBye)) : banked;
+      if (alive) {
+        liveBanked += banked;
+        const outcomes: { points: number; p: number }[] = [];
+        for (let r = wins; r <= ev.rounds; r++) {
+          const exactly = (reach[r] ?? 0) - (r < ev.rounds ? (reach[r + 1] ?? 0) : 0);
+          if (exactly > 1e-6) outcomes.push({ points: pointsFor(ev.tour, ev.category, ev.rounds, r, hadBye), p: exactly });
+        }
+        liveOutcomes.push(outcomes);
+      } else if (!live.has(tid)) {
+        history.push(banked);
+      }
     }
     const who = info.get(key)!;
-    rows.push({ key, id: who.id, name: who.name, country: who.country, points, projected: Math.round(projected), events: byEvent.size });
+    rows.push({ key, id: who.id, name: who.name, country: who.country, points, projected: Math.round(projected), events: byEvent.size, history, liveOutcomes, liveBanked });
   }
   return rows.sort((a, b) => b.points - a.points || b.projected - a.projected || a.name.localeCompare(b.name));
 }
