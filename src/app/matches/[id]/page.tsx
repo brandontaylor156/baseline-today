@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Flag } from "@/components/flag";
 import { MarketHistory } from "@/components/market-history";
 import { MatchCard } from "@/components/match-card";
+import { StartParty } from "@/components/party/start-party";
 import { WikiCredit } from "@/components/wiki-credit";
 import { getMatchPreview, type PreviewSide } from "@/lib/data/match-preview";
 import { titleFromUrl } from "@/lib/data/results";
@@ -127,6 +128,8 @@ export default async function MatchPage({ params }: PageProps<"/matches/[id]">) 
           </div>
         )}
       </section>
+
+      {match.status !== "final" && <StartParty matchId={match.id} />}
 
       {m.recap && (
         <section aria-labelledby="recap-heading" className="space-y-2">

@@ -25,6 +25,7 @@ export default function PrivacyPage() {
           <li>the players you favorite;</li>
           <li>your Pick’em picks and Bracket Challenge entries, and a leaderboard name only if you choose one;</li>
           <li>leagues you create or join, with the nickname you choose for each;</li>
+          <li>watch parties you start or join: your nickname there, the score the host keeps, and your “call it” picks (deleted when the host ends the party);</li>
           <li>
             if you turn on result notifications, your browser’s push address for this site (issued by your browser’s push
             service, such as Google or Apple), used only to send those notifications.
@@ -37,7 +38,9 @@ export default function PrivacyPage() {
         <p>
           Nobody else can see your favorites, your picks or your account details. If you choose a Pick’em leaderboard
           name, that name and your pick record appear on the public leaderboard; remove the name to go private again. In a
-          private league, other members see your nickname, Pick’em record and bracket points. Player pages show only an anonymous total of how
+          private league, other members see your nickname, Pick’em record and bracket points. In a watch party, other
+          members see your nickname and calls; chat messages and reactions are passed between people in the room in real time and
+          never stored. Player pages show only an anonymous total of how
           many people favorited that player.
         </p>
       </Section>

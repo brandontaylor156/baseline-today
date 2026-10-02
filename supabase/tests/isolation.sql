@@ -13,6 +13,8 @@ declare
   done_match bigint;
   tourney2 bigint;
   league_code text;
+  party_code text;
+  party uuid;
 begin
   -- Setup as the owner (bypasses RLS).
   insert into auth.users (id, aud, role, email, raw_user_meta_data)
@@ -303,6 +305,64 @@ begin
   exception when insufficient_privilege then denied := true;
   end;
   if not denied then raise exception 'FAIL: anon created a league'; end if;
+  checks := checks + 1;
+  reset role;
+
+  -- Watch parties: A hosts, B is outside until joining with the code.
+  perform set_config('request.jwt.claims', json_build_object('sub', user_a, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  party_code := public.create_party(open_match, 'Alice');
+  select id into party from public.parties where code = party_code;
+  if party is null then raise exception 'FAIL: host cannot see own party'; end if;
+  update public.parties set state = '{"points": [1]}' where id = party;
+  get diagnostics n = row_count;
+  if n <> 1 then raise exception 'FAIL: host cannot keep score'; end if;
+  checks := checks + 1;
+  reset role;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', user_b, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  select count(*) into n from public.parties;
+  if n <> 0 then raise exception 'FAIL: B sees a party before joining'; end if;
+  checks := checks + 1;
+
+  denied := false;
+  begin
+    insert into public.party_calls (party_id, call_key, side) values (party, 'set-1', 1);
+  exception when insufficient_privilege then denied := true;
+  end;
+  if not denied then raise exception 'FAIL: outsider made a call in a party'; end if;
+  checks := checks + 1;
+
+  perform public.join_party(lower(party_code), 'Bob');
+  select count(*) into n from public.party_members where party_id = party;
+  if n <> 2 then raise exception 'FAIL: B should see both members after joining (%)', n; end if;
+  insert into public.party_calls (party_id, call_key, side) values (party, 'set-1', 2);
+  checks := checks + 1;
+
+  update public.parties set state = '{"points": [2, 2, 2, 2]}' where id = party;
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'FAIL: a guest changed the score'; end if;
+  checks := checks + 1;
+
+  delete from public.party_members where nickname = 'Alice';
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'FAIL: a guest removed the host'; end if;
+  checks := checks + 1;
+  reset role;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', user_a, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  delete from public.party_members where party_id = party and nickname = 'Bob';
+  get diagnostics n = row_count;
+  if n <> 1 then raise exception 'FAIL: host cannot remove a guest'; end if;
+  checks := checks + 1;
+  reset role;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', user_b, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  select count(*) into n from public.parties;
+  if n <> 0 then raise exception 'FAIL: a removed guest still sees the party'; end if;
   checks := checks + 1;
   reset role;
 

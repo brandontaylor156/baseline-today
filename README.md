@@ -67,6 +67,11 @@ search and favorites with Google sign-in. A ground-up rebuild of my 2022 Flask t
 - **Paid extras (off by default):** in-match win chance on live scores (point-level model that
   reproduces the pre-match chance at 0-0), odds-movement charts from stored price changes, and
   AI-written recaps of finals and semifinals.
+- **Watch parties:** private rooms for a match (invite link, nicknames): real-time chat and
+  reactions over private Supabase Realtime channels (RLS on `realtime.messages`, never stored),
+  the score from live data or the host's point-by-point scorekeeping, the live win chance and a
+  momentum chart, and "call it" predictions per set with a room leaderboard. Verified with
+  throwaway accounts by `scripts/party-realtime-test.mts` and `scripts/party-ui-test.mts`.
 - **Up next:** model win chances for scheduled matches on each tournament page and for your
   favorites on "My players".
 - **Season timeline:** each player's tournaments this season: round reached, who stopped them, W-L.

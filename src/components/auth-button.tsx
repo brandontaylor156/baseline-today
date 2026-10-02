@@ -30,15 +30,15 @@ export function AuthButton() {
   }
 
   return (
-    <div className="flex items-center gap-1 text-sm">
-      <Link href="/my-players" className="rounded-md px-2.5 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground">
+    <div className="flex items-center gap-1 text-sm lg:gap-0">
+      <Link href="/my-players" className="rounded-md px-2.5 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground lg:px-1.5">
         My players
       </Link>
       <button
         type="button"
         onClick={signOut}
         title={user.name ? `Signed in as ${user.name}` : undefined}
-        className="rounded-md px-2.5 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground"
+        className="rounded-md px-2.5 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground lg:px-1.5"
       >
         Sign out
       </button>

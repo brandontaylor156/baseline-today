@@ -384,3 +384,16 @@ test("widgets: embeddable rankings, linked from the footer; bot endpoint off wit
   expect((await request.get("/embed/rankings/itf")).status()).toBe(404);
   expect((await request.post("/api/discord", { data: {} })).status()).toBe(404);
 });
+
+test("watch parties: start from a match, invite links ask to sign in, bad codes 404", async ({ page, request }) => {
+  await page.goto("/odds");
+  const preview = page.locator('a[href^="/matches/"]', { hasText: "Preview" }).first();
+  if ((await preview.count()) > 0) {
+    await preview.click();
+    await expect(page.getByRole("heading", { name: "Watch it together" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Sign in to start a party" })).toBeVisible();
+  }
+  await page.goto("/party/ABCD2345");
+  await expect(page.getByText("to join this watch party")).toBeVisible();
+  expect((await request.get("/party/nope")).status()).toBe(404);
+});

@@ -358,6 +358,105 @@ export type Database = {
           },
         ]
       }
+      parties: {
+        Row: {
+          code: string
+          created_at: string
+          ends_at: string
+          host_id: string
+          id: string
+          match_id: number
+          state: Json
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          ends_at?: string
+          host_id: string
+          id?: string
+          match_id: number
+          state?: Json
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          ends_at?: string
+          host_id?: string
+          id?: string
+          match_id?: number
+          state?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parties_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      party_calls: {
+        Row: {
+          call_key: string
+          called_at: string
+          party_id: string
+          side: number
+          user_id: string
+        }
+        Insert: {
+          call_key: string
+          called_at?: string
+          party_id: string
+          side: number
+          user_id?: string
+        }
+        Update: {
+          call_key?: string
+          called_at?: string
+          party_id?: string
+          side?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "party_calls_party_id_fkey"
+            columns: ["party_id"]
+            isOneToOne: false
+            referencedRelation: "parties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      party_members: {
+        Row: {
+          joined_at: string
+          nickname: string
+          party_id: string
+          user_id: string
+        }
+        Insert: {
+          joined_at?: string
+          nickname: string
+          party_id: string
+          user_id: string
+        }
+        Update: {
+          joined_at?: string
+          nickname?: string
+          party_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "party_members_party_id_fkey"
+            columns: ["party_id"]
+            isOneToOne: false
+            referencedRelation: "parties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       picks: {
         Row: {
           match_id: number
@@ -901,10 +1000,19 @@ export type Database = {
         Args: { p_name: string; p_nickname: string }
         Returns: string
       }
+      create_party: {
+        Args: { p_match_id: number; p_nickname: string }
+        Returns: string
+      }
       hide_stray_wiki_results: { Args: never; Returns: number }
       immutable_unaccent: { Args: { value: string }; Returns: string }
       is_league_member: { Args: { p_league_id: string }; Returns: boolean }
+      is_party_member: { Args: { p_party_id: string }; Returns: boolean }
       join_league: {
+        Args: { p_code: string; p_nickname: string }
+        Returns: string
+      }
+      join_party: {
         Args: { p_code: string; p_nickname: string }
         Returns: string
       }
