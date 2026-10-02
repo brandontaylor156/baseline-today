@@ -22,6 +22,12 @@ Goal: measure live-score lag, update cadence and coverage, then decide whether t
 ## During
 
 - `npm run trial:report` at any time. Check after the first night for 429s and coverage gaps.
+- **Does paid WTA data include WTA 125 matches?** (Brandon, 2026-10-02.) The free tournaments list
+  includes WTA 125 events (e.g. Mallorca, Rovereto, Lisbon 125 in the trial week), but that doesn't
+  prove their matches are covered. Check with one call per event:
+  `GET /wta/v1/matches?tournament_ids[]=<id>` for a WTA 125 in play, and see whether live 125
+  matches appear in `is_live=true`. Record the answer (yes / results only / no) in the trial report;
+  it decides whether paying would also fill the WTA 125 gaps on the Results page.
 - Rate budget during the trial: 5 requests/min per tour. Polling uses at most 3/min per tour, plus
   a full schedule refresh every 15 min.
 
