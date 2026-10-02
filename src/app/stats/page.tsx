@@ -53,6 +53,9 @@ export default async function StatsPage({ searchParams }: PageProps<"/stats">) {
             {season} {TOUR_LABEL[tour]} season · {matches.length.toLocaleString("en-US")} tracked matches ·{" "}
             <Link href={`/ratings?tour=${tour}`} className="font-medium text-accent hover:underline">
               Model ratings →
+            </Link> ·{" "}
+            <Link href={`/race?tour=${tour}`} className="font-medium text-accent hover:underline">
+              Season race →
             </Link>
           </p>
         </div>

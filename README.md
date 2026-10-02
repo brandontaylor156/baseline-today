@@ -51,6 +51,11 @@ search and favorites with Google sign-in. A ground-up rebuild of my 2022 Flask t
   result is posted (RLS); only players who choose a leaderboard name appear publicly.
 - **Rating history and track record:** each player's weekly model rating as a chart; the model's
   record this week, its wins against the ranking and its biggest misses (ratings page, homepage).
+- **Season race:** estimated points this season from our points table and tracked results, with a
+  projection for events in progress and the qualifying line for the Finals.
+- **Share cards and calendars:** head-to-head links unfurl as a card with the record and win
+  chances; public iCalendar feeds per player and per tour (`/calendar/players/<id>.ics`,
+  `/calendar/atp.ics`) for Google, Apple or Outlook calendars.
 - **Up next:** model win chances for scheduled matches on each tournament page and for your
   favorites on "My players".
 - **Season timeline:** each player's tournaments this season: round reached, who stopped them, W-L.

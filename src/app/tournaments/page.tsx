@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { calendarSections, dateRange, displayName, getSeasonTournaments, type TournamentSummary } from "@/lib/data/tournaments";
 import { TOUR_LABEL } from "@/lib/format";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Tournaments",
@@ -67,7 +68,16 @@ export default async function TournamentsPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Tournaments</h1>
-        <p className="text-sm text-muted">{season} ATP and WTA singles calendar</p>
+        <p className="text-sm text-muted">
+          {season} ATP and WTA singles calendar · Add to your calendar:{" "}
+          <a href={`${SITE_URL.replace(/^https:/, "webcal:")}/calendar/atp.ics`} className="font-medium text-accent hover:underline">
+            ATP
+          </a>{" "}
+          ·{" "}
+          <a href={`${SITE_URL.replace(/^https:/, "webcal:")}/calendar/wta.ics`} className="font-medium text-accent hover:underline">
+            WTA
+          </a>
+        </p>
       </div>
 
       <Section title="This week" list={now} empty="No tour events this week." />

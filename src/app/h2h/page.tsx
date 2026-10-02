@@ -16,7 +16,15 @@ const id = (v: string | string[] | undefined) => (typeof v === "string" && /^\d+
 export async function generateMetadata({ searchParams }: PageProps<"/h2h">): Promise<Metadata> {
   const q = await searchParams;
   const [a, b] = await Promise.all([id(q.a), id(q.b)].map((x) => (x ? getPlayer(x) : null)));
-  return { title: a && b ? `${a.fullName} vs ${b.fullName}` : "Head-to-head" };
+  if (!a || !b || a.tour !== b.tour || a.id === b.id) return { title: "Head-to-head" };
+  const title = `${a.fullName} vs ${b.fullName}`;
+  const card = `/h2h/card?a=${a.id}&b=${b.id}`;
+  return {
+    title,
+    description: `Head-to-head record and win chances for ${title}.`,
+    openGraph: { title, images: [{ url: card, width: 1200, height: 630, alt: title }] },
+    twitter: { card: "summary_large_image", images: [card] },
+  };
 }
 
 function Side({ player, wins, align }: { player: PlayerDetail; wins: number; align: "left" | "right" }) {

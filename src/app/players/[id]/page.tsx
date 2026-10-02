@@ -16,6 +16,7 @@ import { getSeasonMatches } from "@/lib/data/season";
 import { getPlayerStats } from "@/lib/data/stats";
 import { getPlayer, getRankingDates } from "@/lib/data/tennis";
 import { bestRank, formatDate, formatHeight, formatPlays, formatPoints, formatWeight, TOUR_LABEL } from "@/lib/format";
+import { SITE_URL } from "@/lib/site";
 import { seasonTimeline } from "@/lib/timeline";
 
 export const revalidate = 3600;
@@ -106,6 +107,13 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
             >
               Head-to-head
             </Link>
+            <a
+              href={`${SITE_URL.replace(/^https:/, "webcal:")}/calendar/players/${player.id}.ics`}
+              className="inline-flex items-center rounded-lg border border-border bg-surface px-3.5 py-1.5 text-sm font-medium hover:bg-surface-muted"
+              title="Subscribe in Google Calendar, Apple Calendar or Outlook"
+            >
+              Add to calendar
+            </a>
           </div>
         </div>
       </header>

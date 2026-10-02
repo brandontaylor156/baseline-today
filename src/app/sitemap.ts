@@ -32,6 +32,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     page("/odds", "daily", 0.7),
     page("/stats", "daily", 0.7),
     page("/ratings", "weekly", 0.6),
+    page("/race", "daily", 0.6),
+    page("/pickem", "daily", 0.5),
     page("/countries", "weekly", 0.5),
     page("/h2h", "weekly", 0.4),
     ...rankings.flat().map((r) => page(`/players/${r.player.id}`, "weekly", 0.6)),

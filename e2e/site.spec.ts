@@ -35,7 +35,7 @@ test.describe("rankings", () => {
 
   test("the page never scrolls sideways", async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 740 });
-    for (const path of ["/", "/rankings/wta", "/credits", "/pickem", "/ratings", "/tournaments/752"]) {
+    for (const path of ["/", "/rankings/wta", "/credits", "/pickem", "/ratings", "/race", "/tournaments/752"]) {
       await page.goto(path);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       expect(overflow, path).toBeLessThanOrEqual(0);
@@ -318,4 +318,30 @@ test("pick'em: open matches, leaderboards, sign-in prompt", async ({ page }) => 
   await expect(page.getByRole("heading", { level: 1, name: "Pick’em" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "This week" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Sign in with Google" })).toBeVisible();
+});
+
+test("season race with the qualifying line", async ({ page }) => {
+  await page.goto("/stats");
+  await page.getByRole("link", { name: "Season race →" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: /season race/ })).toBeVisible();
+  expect(await page.locator("tbody tr").count()).toBeGreaterThan(8);
+  await page.getByRole("navigation", { name: "Tour" }).getByRole("link", { name: "WTA" }).click();
+  await expect(page).toHaveURL(/tour=wta/);
+});
+
+test("matchup share card and calendar feeds", async ({ page, request }) => {
+  await page.goto("/rankings/atp");
+  const hrefs = await page.locator("tbody tr a").evaluateAll((as) => as.slice(0, 2).map((a) => a.getAttribute("href")!));
+  const [a, b] = hrefs.map((h) => h.split("/").pop());
+  await page.goto(`/h2h?a=${a}&b=${b}`);
+  const og = await page.locator('meta[property="og:image"]').getAttribute("content");
+  expect(og).toContain(`/h2h/card?a=${a}&b=${b}`);
+  const card = await request.get(`/h2h/card?a=${a}&b=${b}`);
+  expect(card.headers()["content-type"]).toBe("image/png");
+
+  const feed = await request.get(`/calendar/players/${a}.ics`);
+  expect(feed.headers()["content-type"]).toContain("text/calendar");
+  expect(await feed.text()).toMatch(/^BEGIN:VCALENDAR\r\n/);
+  expect((await request.get("/calendar/wta.ics")).status()).toBe(200);
+  expect((await request.get("/calendar/itf.ics")).status()).toBe(404);
 });
