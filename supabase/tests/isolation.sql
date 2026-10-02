@@ -76,6 +76,14 @@ begin
   if not denied then raise exception 'FAIL: signed-in user can write tennis data'; end if;
   checks := checks + 1;
 
+  denied := false;
+  begin
+    update public.matches set score = 'x';
+  exception when insufficient_privilege then denied := true;
+  end;
+  if not denied then raise exception 'FAIL: signed-in user can write matches'; end if;
+  checks := checks + 1;
+
   if public.player_favorite_count(player) <> 1 then raise exception 'FAIL: favorite count'; end if;
   checks := checks + 1;
   reset role;
@@ -94,6 +102,17 @@ begin
   exception when insufficient_privilege then denied := true;
   end;
   if not denied then raise exception 'FAIL: anon can query favorites'; end if;
+  checks := checks + 1;
+
+  select count(*) into n from public.matches;  -- readable (count irrelevant)
+  checks := checks + 1;
+
+  denied := false;
+  begin
+    select count(*) into n from public.trial_observations;
+  exception when insufficient_privilege then denied := true;
+  end;
+  if not denied then raise exception 'FAIL: anon can read trial measurements'; end if;
   checks := checks + 1;
 
   denied := false;

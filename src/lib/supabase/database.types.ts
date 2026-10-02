@@ -40,6 +40,113 @@ export type Database = {
           },
         ]
       }
+      matches: {
+        Row: {
+          duration: string | null
+          id: number
+          is_live: boolean
+          not_before_text: string | null
+          player1_game_score: string | null
+          player1_id: number | null
+          player2_game_score: string | null
+          player2_id: number | null
+          provider: string
+          provider_id: number
+          result_detail: string | null
+          round: string | null
+          scheduled_at: string | null
+          score: string | null
+          score_changed_at: string | null
+          season: number | null
+          server: string | null
+          set_scores: Json
+          status: string
+          tour: string
+          tournament_id: number
+          updated_at: string
+          winner_id: number | null
+        }
+        Insert: {
+          duration?: string | null
+          id?: never
+          is_live?: boolean
+          not_before_text?: string | null
+          player1_game_score?: string | null
+          player1_id?: number | null
+          player2_game_score?: string | null
+          player2_id?: number | null
+          provider?: string
+          provider_id: number
+          result_detail?: string | null
+          round?: string | null
+          scheduled_at?: string | null
+          score?: string | null
+          score_changed_at?: string | null
+          season?: number | null
+          server?: string | null
+          set_scores?: Json
+          status?: string
+          tour: string
+          tournament_id: number
+          updated_at?: string
+          winner_id?: number | null
+        }
+        Update: {
+          duration?: string | null
+          id?: never
+          is_live?: boolean
+          not_before_text?: string | null
+          player1_game_score?: string | null
+          player1_id?: number | null
+          player2_game_score?: string | null
+          player2_id?: number | null
+          provider?: string
+          provider_id?: number
+          result_detail?: string | null
+          round?: string | null
+          scheduled_at?: string | null
+          score?: string | null
+          score_changed_at?: string | null
+          season?: number | null
+          server?: string | null
+          set_scores?: Json
+          status?: string
+          tour?: string
+          tournament_id?: number
+          updated_at?: string
+          winner_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_player1_id_fkey"
+            columns: ["player1_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_player2_id_fkey"
+            columns: ["player2_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_winner_id_fkey"
+            columns: ["winner_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_images: {
         Row: {
           author: string
@@ -224,6 +331,123 @@ export type Database = {
           last_refreshed_at?: string | null
           locked_until?: string | null
           status?: string | null
+        }
+        Relationships: []
+      }
+      tournaments: {
+        Row: {
+          category: string | null
+          draw_size: number | null
+          end_date: string | null
+          id: number
+          location: string | null
+          name: string
+          provider: string
+          provider_id: number
+          season: number | null
+          start_date: string | null
+          surface: string | null
+          tour: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          draw_size?: number | null
+          end_date?: string | null
+          id?: never
+          location?: string | null
+          name: string
+          provider?: string
+          provider_id: number
+          season?: number | null
+          start_date?: string | null
+          surface?: string | null
+          tour: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          draw_size?: number | null
+          end_date?: string | null
+          id?: never
+          location?: string | null
+          name?: string
+          provider?: string
+          provider_id?: number
+          season?: number | null
+          start_date?: string | null
+          surface?: string | null
+          tour?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      trial_observations: {
+        Row: {
+          games_state: string
+          id: number
+          match_key: string
+          observed_at: string
+          players_key: string
+          point_state: string | null
+          source: string
+          status: string | null
+          tour: string
+        }
+        Insert: {
+          games_state: string
+          id?: never
+          match_key: string
+          observed_at?: string
+          players_key: string
+          point_state?: string | null
+          source: string
+          status?: string | null
+          tour: string
+        }
+        Update: {
+          games_state?: string
+          id?: never
+          match_key?: string
+          observed_at?: string
+          players_key?: string
+          point_state?: string | null
+          source?: string
+          status?: string | null
+          tour?: string
+        }
+        Relationships: []
+      }
+      trial_polls: {
+        Row: {
+          error: string | null
+          http_status: number | null
+          id: number
+          latency_ms: number | null
+          live_count: number | null
+          polled_at: string
+          source: string
+          tour: string
+        }
+        Insert: {
+          error?: string | null
+          http_status?: number | null
+          id?: never
+          latency_ms?: number | null
+          live_count?: number | null
+          polled_at?: string
+          source: string
+          tour: string
+        }
+        Update: {
+          error?: string | null
+          http_status?: number | null
+          id?: never
+          latency_ms?: number | null
+          live_count?: number | null
+          polled_at?: string
+          source?: string
+          tour?: string
         }
         Relationships: []
       }

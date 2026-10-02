@@ -29,10 +29,72 @@ export interface ProviderRanking {
   player: ProviderPlayer;
 }
 
+export interface ProviderTournament {
+  tour: Tour;
+  providerId: number;
+  name: string;
+  location: string | null;
+  surface: string | null;
+  category: string | null;
+  season: number | null;
+  startDate: string | null; // YYYY-MM-DD
+  endDate: string | null;
+  drawSize: number | null;
+}
+
+export type MatchStatus =
+  | "scheduled"
+  | "in_progress"
+  | "final"
+  | "postponed"
+  | "canceled"
+  | "delayed"
+  | "suspended"
+  | "abandoned"
+  | "unknown";
+
+export interface SetScore {
+  set: number;
+  p1: number | null;
+  p2: number | null;
+  p1Tiebreak: number | null;
+  p2Tiebreak: number | null;
+}
+
+export interface ProviderMatch {
+  tour: Tour;
+  providerId: number;
+  tournament: ProviderTournament;
+  season: number | null;
+  round: string | null;
+  player1: ProviderPlayer | null;
+  player2: ProviderPlayer | null;
+  /** 1 or 2 when finished, else null. */
+  winner: 1 | 2 | null;
+  status: MatchStatus;
+  /** walkover, retired or defaulted when the provider says so. */
+  resultDetail: string | null;
+  isLive: boolean;
+  score: string | null;
+  sets: SetScore[];
+  p1GameScore: string | null;
+  p2GameScore: string | null;
+  server: string | null;
+  scheduledAt: string | null; // ISO
+  notBeforeText: string | null;
+  duration: string | null;
+}
+
 export interface TennisProvider {
   readonly name: string;
   /** Latest published singles ranking, best `limit` players. */
   getRankings(tour: Tour, limit: number): Promise<ProviderRanking[]>;
   /** Full profiles for the given provider player ids. */
   getPlayers(tour: Tour, providerIds: number[]): Promise<ProviderPlayer[]>;
+  /** All tournaments of a season (free tier). */
+  getTournaments(tour: Tour, season: number): Promise<ProviderTournament[]>;
+  /** Matches of the given tournaments (paid tier). */
+  getMatches(tour: Tour, tournamentProviderIds: number[]): Promise<ProviderMatch[]>;
+  /** Matches in progress right now (paid tier). */
+  getLiveMatches(tour: Tour): Promise<ProviderMatch[]>;
 }

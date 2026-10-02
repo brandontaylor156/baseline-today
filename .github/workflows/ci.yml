@@ -34,7 +34,7 @@ jobs:
           retention-days: 7
 
   isolation:
-    name: Row level security isolation test
+    name: Database tests (RLS isolation, sync integration)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -46,3 +46,9 @@ jobs:
       # Throwaway local Supabase with our migrations applied; never touches the real project.
       - run: npx supabase start -x studio,imgproxy,mailpit,edge-runtime,logflare,vector,realtime,storage-api,postgres-meta,supavisor
       - run: scripts/test-isolation.sh
+      - name: Sync integration tests (fake provider, local Supabase)
+        run: |
+          eval "$(npx supabase status -o env)"
+          export INTEGRATION_SUPABASE_URL="$API_URL"
+          export INTEGRATION_SUPABASE_KEY="${SERVICE_ROLE_KEY:-$SECRET_KEY}"
+          npm run test:integration

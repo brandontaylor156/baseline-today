@@ -4,6 +4,7 @@ import { TOURS, type TennisProvider, type Tour } from "@/lib/provider/types";
 import type { AdminClient } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
 
+import { syncTournaments } from "./matches";
 import { runPhotoSync, type PhotoSyncSummary } from "./photos";
 import { playerRow, profileRow, staleBefore } from "./rows";
 
@@ -22,6 +23,7 @@ export interface TourSummary {
   ranked: number;
   newPlayers: number;
   profilesRefreshed: number;
+  tournaments: number;
 }
 
 export type DailySyncResult =
@@ -37,7 +39,14 @@ function must<T>(result: { data: T | null; error: { message: string } | null }, 
 
 async function syncTour(db: AdminClient, provider: TennisProvider, tour: Tour, now: Date): Promise<TourSummary> {
   const rankings = await provider.getRankings(tour, RANKING_LIMIT);
-  const summary: TourSummary = { tour, rankingDate: rankings[0]?.rankingDate ?? null, ranked: 0, newPlayers: 0, profilesRefreshed: 0 };
+  const summary: TourSummary = {
+    tour,
+    rankingDate: rankings[0]?.rankingDate ?? null,
+    ranked: 0,
+    newPlayers: 0,
+    profilesRefreshed: 0,
+    tournaments: 0,
+  };
   if (rankings.length === 0) return summary;
 
   // New players only: ranking rows can carry sparse player data that must not overwrite profiles.
@@ -94,6 +103,9 @@ async function syncTour(db: AdminClient, provider: TennisProvider, tour: Tour, n
     if (savedProfiles.error) throw new Error(`save profiles: ${savedProfiles.error.message}`);
     summary.profilesRefreshed = profiles.length;
   }
+
+  // Season calendar (free tier): tells the live refresh which tournaments are in play.
+  summary.tournaments = await syncTournaments(db, provider, tour, now);
 
   return summary;
 }

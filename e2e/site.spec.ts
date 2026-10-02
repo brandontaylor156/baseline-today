@@ -132,3 +132,11 @@ test("privacy page is linked from every page", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1, name: "Privacy" })).toBeVisible();
   await expect(page.getByText("no analytics, advertising or third-party tracking cookies", { exact: false })).toBeVisible();
 });
+
+test("live scores stay hidden until switched on", async ({ page, request }) => {
+  await page.goto("/");
+  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Scores" })).toHaveCount(0);
+  expect((await request.get("/scores")).status()).toBe(404);
+  expect((await request.get("/api/live/refresh")).status()).toBe(404);
+  expect((await request.get("/api/trial/espn")).status()).toBe(404);
+});

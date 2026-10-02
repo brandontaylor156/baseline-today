@@ -2,16 +2,22 @@ import "server-only";
 
 import {
   mapLatestRankings,
+  mapMatch,
   mapPlayer,
+  mapTournament,
+  type BdlMatch,
   type BdlPage,
   type BdlPlayer,
   type BdlRanking,
+  type BdlTournament,
 } from "./balldontlie-map";
-import type { ProviderPlayer, ProviderRanking, TennisProvider, Tour } from "./types";
+import type { ProviderMatch, ProviderPlayer, ProviderRanking, ProviderTournament, TennisProvider, Tour } from "./types";
 
 const BASE_URL = "https://api.balldontlie.io";
 const MAX_PER_PAGE = 100;
 const MAX_ATTEMPTS = 3;
+/** Safety stop for cursor pagination (100 per page). */
+const MAX_PAGES = 10;
 
 export class ProviderError extends Error {
   constructor(
@@ -50,6 +56,22 @@ async function request<T>(tour: Tour, path: string, params: URLSearchParams): Pr
   }
 }
 
+/** Follows next_cursor until the last page. */
+async function requestAll<T>(tour: Tour, path: string, params: URLSearchParams): Promise<T[]> {
+  const rows: T[] = [];
+  let cursor: number | null | undefined;
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const p = new URLSearchParams(params);
+    p.set("per_page", String(MAX_PER_PAGE));
+    if (cursor) p.set("cursor", String(cursor));
+    const res = await request<T>(tour, path, p);
+    rows.push(...res.data);
+    cursor = res.meta.next_cursor;
+    if (!cursor) break;
+  }
+  return rows;
+}
+
 export const balldontlie: TennisProvider = {
   name: "balldontlie",
 
@@ -68,5 +90,23 @@ export const balldontlie: TennisProvider = {
       players.push(...page.data.map((p) => mapPlayer(tour, p)));
     }
     return players;
+  },
+
+  async getTournaments(tour: Tour, season: number): Promise<ProviderTournament[]> {
+    const rows = await requestAll<BdlTournament>(tour, "tournaments", new URLSearchParams({ season: String(season) }));
+    return rows.map((t) => mapTournament(tour, t));
+  },
+
+  async getMatches(tour: Tour, tournamentProviderIds: number[]): Promise<ProviderMatch[]> {
+    if (tournamentProviderIds.length === 0) return [];
+    const params = new URLSearchParams();
+    for (const id of tournamentProviderIds) params.append("tournament_ids[]", String(id));
+    const rows = await requestAll<BdlMatch>(tour, "matches", params);
+    return rows.map((m) => mapMatch(tour, m));
+  },
+
+  async getLiveMatches(tour: Tour): Promise<ProviderMatch[]> {
+    const rows = await requestAll<BdlMatch>(tour, "matches", new URLSearchParams({ is_live: "true" }));
+    return rows.map((m) => mapMatch(tour, m));
   },
 };

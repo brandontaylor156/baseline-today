@@ -1,29 +1,37 @@
 import Link from "next/link";
 
+import { liveScoresEnabled } from "@/lib/features";
+
 import { AuthButton } from "./auth-button";
 import { SearchBox } from "./search-box";
 
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
-      <div className="mx-auto flex max-w-4xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3">
+      <div className="mx-auto flex max-w-4xl flex-wrap items-center gap-x-3 gap-y-3 px-4 py-3 sm:gap-x-6">
         <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
           <span aria-hidden className="inline-block size-3 rounded-full bg-accent" />
           Baseline Today
         </Link>
-        <nav aria-label="Rankings" className="flex gap-1 text-sm">
-          <Link href="/rankings/atp" className="rounded-md px-2.5 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground">
+        <nav aria-label="Main" className="flex gap-0.5 text-sm sm:gap-1">
+          {liveScoresEnabled() && (
+            <Link href="/scores" className="rounded-md px-2 py-1.5 sm:px-2.5 font-medium text-accent hover:bg-surface-muted">
+              Scores
+            </Link>
+          )}
+          <Link href="/rankings/atp" className="rounded-md px-2 py-1.5 sm:px-2.5 text-muted hover:bg-surface-muted hover:text-foreground">
             ATP
           </Link>
-          <Link href="/rankings/wta" className="rounded-md px-2.5 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground">
+          <Link href="/rankings/wta" className="rounded-md px-2 py-1.5 sm:px-2.5 text-muted hover:bg-surface-muted hover:text-foreground">
             WTA
           </Link>
         </nav>
-        <div className="ml-auto sm:order-last sm:ml-0">
-          <AuthButton />
-        </div>
-        <div className="order-last w-full sm:order-none sm:ml-auto sm:w-64">
+        {/* Phones: logo and links on the first row, search and sign-in share the second. */}
+        <div className="order-9 min-w-0 flex-1 basis-48 sm:order-none sm:ml-auto sm:w-64 sm:flex-none sm:basis-auto">
           <SearchBox />
+        </div>
+        <div className="order-10 sm:order-last">
+          <AuthButton />
         </div>
       </div>
     </header>
