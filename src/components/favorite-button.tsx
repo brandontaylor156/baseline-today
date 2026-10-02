@@ -3,9 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { createClient } from "@/lib/supabase/client";
-
-import { signInWithGoogle, useUser } from "./use-user";
+import { loadClient, signInWithGoogle, useUser } from "./use-user";
 
 /**
  * Favorite toggle on a cached player page. Reads and writes the user's own favorites row
@@ -21,11 +19,8 @@ export function FavoriteButton({ playerId, initialCount }: { playerId: number; i
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
-    createClient()
-      .from("favorites")
-      .select("player_id")
-      .eq("player_id", playerId)
-      .maybeSingle()
+    loadClient()
+      .then((supabase) => supabase.from("favorites").select("player_id").eq("player_id", playerId).maybeSingle())
       .then(({ data }) => {
         if (!cancelled) setFavorited(Boolean(data));
       });
@@ -38,7 +33,7 @@ export function FavoriteButton({ playerId, initialCount }: { playerId: number; i
     if (!user) return signInWithGoogle(pathname);
     if (favorited === null || busy) return;
     setBusy(true);
-    const supabase = createClient();
+    const supabase = await loadClient();
     const { error } = favorited
       ? await supabase.from("favorites").delete().eq("player_id", playerId)
       : await supabase.from("favorites").insert({ player_id: playerId });

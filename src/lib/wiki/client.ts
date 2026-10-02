@@ -55,6 +55,8 @@ export interface PageRevision {
   revid: number;
   timestamp: string;
   content: string;
+  /** Page categories without the "Category:" prefix, e.g. "2025 ATP Challenger Tour". */
+  categories: string[];
 }
 
 /** Latest revision ids and timestamps (cheap; no content). Missing pages are omitted. */
@@ -84,12 +86,33 @@ export async function latestRevisions(titles: string[]): Promise<Map<string, Pag
     const data = await api<{
       query?: {
         redirects?: { from: string; to: string }[];
-        pages?: { title: string; missing?: boolean; revisions?: { revid: number; timestamp: string; slots: { main: { content: string } } }[] }[];
+        pages?: {
+          title: string;
+          missing?: boolean;
+          revisions?: { revid: number; timestamp: string; slots: { main: { content: string } } }[];
+          categories?: { title: string }[];
+        }[];
       };
-    }>({ action: "query", prop: "revisions", rvprop: "ids|timestamp|content", rvslots: "main", redirects: "1", titles: title });
+    }>({
+      action: "query",
+      prop: "revisions|categories",
+      rvprop: "ids|timestamp|content",
+      rvslots: "main",
+      cllimit: "50",
+      redirects: "1",
+      titles: title,
+    });
     const p = data.query?.pages?.[0];
     const r = p?.revisions?.[0];
-    if (p && !p.missing && r) out.set(title, { title: p.title, revid: r.revid, timestamp: r.timestamp, content: r.slots.main.content });
+    if (p && !p.missing && r) {
+      out.set(title, {
+        title: p.title,
+        revid: r.revid,
+        timestamp: r.timestamp,
+        content: r.slots.main.content,
+        categories: (p.categories ?? []).map((c) => c.title.replace(/^Category:/, "")),
+      });
+    }
   }
   return out;
 }

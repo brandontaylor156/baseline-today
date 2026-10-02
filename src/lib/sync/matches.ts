@@ -50,13 +50,15 @@ async function ensurePlayers(db: AdminClient, tour: Tour, provider: string, play
 async function saveMatches(db: AdminClient, tour: Tour, provider: string, matches: ProviderMatch[], now: Date) {
   if (matches.length === 0) return;
 
-  const tournaments = [...new Map(matches.map((m) => [m.tournament.providerId, m.tournament])).values()];
+  // One row per edition: the provider reuses tournament ids every season.
+  const editionKey = (providerId: number, season: number | null) => `${providerId}|${season}`;
+  const tournaments = [...new Map(matches.map((m) => [editionKey(m.tournament.providerId, m.tournament.season), m.tournament])).values()];
   const { data: tRows, error: tErr } = await db
     .from("tournaments")
-    .upsert(tournaments.map((t) => tournamentRow(t, provider, now)), { onConflict: "provider,tour,provider_id" })
-    .select("id, provider_id");
+    .upsert(tournaments.map((t) => tournamentRow(t, provider, now)), { onConflict: "provider,tour,provider_id,season" })
+    .select("id, provider_id, season");
   fail("save tournaments", tErr);
-  const tournamentIds = new Map((tRows ?? []).map((t) => [t.provider_id, t.id]));
+  const tournamentIds = new Map((tRows ?? []).map((t) => [editionKey(t.provider_id, t.season), t.id]));
 
   const playerIds = await ensurePlayers(
     db,
@@ -75,7 +77,7 @@ async function saveMatches(db: AdminClient, tour: Tour, provider: string, matche
   const before = new Map((existing ?? []).map((e) => [e.provider_id, e]));
 
   const rows = matches.flatMap((m) => {
-    const tournamentId = tournamentIds.get(m.tournament.providerId);
+    const tournamentId = tournamentIds.get(editionKey(m.tournament.providerId, m.tournament.season));
     if (tournamentId === undefined) return [];
     const row = matchRow(
       m,
@@ -246,7 +248,7 @@ export async function syncTournaments(db: AdminClient, provider: TennisProvider,
   if (tournaments.length === 0) return 0;
   const saved = await db
     .from("tournaments")
-    .upsert(tournaments.map((t) => tournamentRow(t, provider.name, now)), { onConflict: "provider,tour,provider_id" });
+    .upsert(tournaments.map((t) => tournamentRow(t, provider.name, now)), { onConflict: "provider,tour,provider_id,season" });
   fail("save tournaments", saved.error);
   return tournaments.length;
 }

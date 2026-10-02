@@ -42,15 +42,15 @@ export function PlayerResults({ playerId, results }: { playerId: number; results
                 <span className="text-muted">vs</span>
                 <Flag code={opponent?.countryCode ?? null} />
                 {opponent?.id != null ? (
-                  <Link href={`/players/${opponent.id}`} className="truncate font-medium hover:underline">
+                  <Link href={`/players/${opponent.id}`} className="truncate py-0.5 font-medium hover:underline">
                     {opponent.name}
                   </Link>
                 ) : (
                   <span className="truncate font-medium">{opponent?.name ?? "Unknown"}</span>
                 )}
               </span>
-              <span className="block truncate text-xs text-muted">
-                <Link href={`/tournaments/${r.tournament.id}`} className="hover:underline">
+              <span className="mt-1.5 block truncate text-xs text-muted">
+                <Link href={`/tournaments/${r.tournament.id}`} className="inline-block py-0.5 hover:underline">
                   {displayName(r.tournament.name)}
                 </Link>
                 {r.round ? ` · ${r.round}` : ""}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { drawSizeFits, editionMatches, eventName, searchPhrases, titleScore, tourMentioned } from "./identity";
+import { drawSizeFits, editionMatches, eventName, levelFits, searchPhrases, titleScore, tourMentioned } from "./identity";
 
 describe("eventName", () => {
   it("extracts the event from a draw title", () => {
@@ -68,6 +68,17 @@ describe("tour and draw checks", () => {
     expect(drawSizeFits(96, 96)).toBe(true);
     expect(drawSizeFits(32, 28)).toBe(true);
     expect(drawSizeFits(0, 32)).toBe(false); // draw not made yet
+  });
+});
+
+describe("levelFits (Lyon ATP 250 vs the Open Sopra Steria de Lyon Challenger)", () => {
+  it("uses Wikipedia categories to match the event level", () => {
+    expect(levelFits(["2025 ATP Challenger Tour", "Open Sopra Steria de Lyon"], "atp", "ATP 250")).toBe(false);
+    expect(levelFits(["2026 ATP Tour", "Japan Open (tennis)"], "atp", "ATP 500")).toBe(true);
+    expect(levelFits(["2025 WTA 125 tournaments"], "wta", "WTA 125")).toBe(true);
+    expect(levelFits(["2025 WTA Tour"], "wta", "WTA 125")).toBe(false);
+    expect(levelFits(["2025 WTA 125 tournaments"], "wta", "WTA 1000")).toBe(false);
+    expect(levelFits([], "wta", "WTA 250")).toBe(true);
   });
 });
 

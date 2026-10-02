@@ -1,13 +1,19 @@
 # Baseline Today
 
-ATP and WTA singles rankings, recent match results, player profiles with season records and
-credited photos, accent-insensitive search, and favorites with Google sign-in. A ground-up rebuild of my 2022 Flask tennis forum.
+ATP and WTA singles rankings, recent match results, tournament pages, head-to-head records, and
+player profiles with ranking history, season records and credited photos, plus accent-insensitive
+search and favorites with Google sign-in. A ground-up rebuild of my 2022 Flask tennis forum.
 
 **Live:** [baseline-today.vercel.app](https://baseline-today.vercel.app) · [![CI](https://github.com/brandontaylor156/baseline-today/actions/workflows/ci.yml/badge.svg)](https://github.com/brandontaylor156/baseline-today/actions/workflows/ci.yml)
 
 <p>
-  <img src="docs/screenshots/rankings-desktop.png" alt="ATP rankings on desktop" width="62%">
-  <img src="docs/screenshots/player-mobile-dark.png" alt="Player page on mobile in dark mode" width="30%">
+  <img src="docs/screenshots/rankings-desktop.png" alt="ATP rankings with photos and flags" width="62%">
+  <img src="docs/screenshots/player-mobile-dark.png" alt="Player page with ranking history chart, dark mode" width="30%">
+</p>
+<p>
+  <img src="docs/screenshots/h2h-desktop.png" alt="Head-to-head: Sinner vs Alcaraz" width="32%">
+  <img src="docs/screenshots/tournament-desktop.png" alt="Tournament page with results by round, dark mode" width="32%">
+  <img src="docs/screenshots/results-desktop.png" alt="Recent results with Wikipedia credit" width="32%">
 </p>
 
 ## Features
@@ -18,6 +24,13 @@ credited photos, accent-insensitive search, and favorites with Google sign-in. A
 - **Results:** finished matches from the last few days, usually within half an hour, read from
   Wikipedia draw pages (credited, CC BY-SA 4.0) with plausibility and stability checks.
 - **Season records:** each player’s win-loss and recent results from this season’s tracked draws.
+- **Ranking history:** weekly rank since January 2025 as an accessible chart (crosshair, arrow keys,
+  table view), from a one-off backfill of historical rankings.
+- **Tournaments:** this week, coming up, recent champions, the full calendar, and a page per event
+  with every finished match by round.
+- **Head-to-head:** any two players from the same tour: record, split by surface, every meeting
+  since 2024 (16,000+ matches imported across three seasons).
+- **Share cards:** generated preview images for players and the site.
 - **Search:** live suggestions as you type; "djokovic", "Đoković" and "DJOKOVIĆ" all match.
 - **Favorites and "My players":** Google sign-in only. No passwords and no email sign-up, so nobody can
   use the site to send email.
@@ -82,7 +95,10 @@ npm run dev
 | `npm run test:e2e` | Playwright against `npm run build` output (set `E2E_BASE_URL` to test a deployment) |
 | `npm run sync:daily` | run the daily sync locally |
 | `npm run sync:photos -- 200` | backfill Wikimedia photos |
-| `npm run sync:results [-- backfill 2026]` | refresh Wikipedia results (or import a season) |
+| `npm run sync:results [-- backfill 2026 | relink]` | refresh Wikipedia results, import a season, or relink players |
+| `npm run sync:rankings-history -- 2025-01-01` | backfill weekly rankings |
+| `npm run sync:tournaments -- 2025` | store a season’s calendar |
+| `npm run audit:draws` | re-check every tournament → draw page pairing (`--fix` to hide and rediscover) |
 
 Database schema: `supabase/migrations/` (idempotent SQL).
 

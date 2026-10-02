@@ -128,6 +128,19 @@ export function tourMentioned(wikitext: string, tour: "atp" | "wta"): boolean {
 }
 
 /**
+ * The page's Wikipedia categories must match the event's level: ATP tour events never take an
+ * "ATP Challenger Tour" page (even when its title lacks the word), WTA 125 events never take a
+ * tour-level "WTA Tour" page and vice versa. Pages without level categories pass.
+ */
+export function levelFits(categories: string[], tour: "atp" | "wta", eventCategory: string | null): boolean {
+  if (tour === "atp") return !categories.some((c) => /ATP Challenger Tour/i.test(c));
+  const is125 = /125/.test(eventCategory ?? "");
+  const page125 = categories.some((c) => /WTA 125/i.test(c));
+  const pageTour = categories.some((c) => /^\d{4} WTA Tour$/i.test(c));
+  return is125 ? !pageTour : !page125;
+}
+
+/**
  * The page's number of players must fit the tournament's draw (a 96-player Masters page is not a
  * 32-player WTA 125). Pages without a draw yet can't be verified.
  */

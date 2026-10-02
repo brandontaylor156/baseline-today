@@ -5,9 +5,10 @@ import type { AdminClient } from "@/lib/supabase/admin";
 import type { Json, Tables } from "@/lib/supabase/database.types";
 import { isPlausibleResult, parseDraw } from "@/lib/wiki/draw-parse";
 import { latestRevisionIds, latestRevisions, pageUrl, searchDrawPages, type PageRevision } from "@/lib/wiki/client";
-import { drawSizeFits, editionMatches, searchPhrases, titleScore, tourMentioned } from "@/lib/wiki/identity";
+import { drawSizeFits, editionMatches, levelFits, searchPhrases, titleScore, tourMentioned } from "@/lib/wiki/identity";
 import { normalizeName } from "@/lib/wiki/names";
 import {
+  findPlayer,
   knownPlayers,
   playerIndex,
   resultSignature,
@@ -82,7 +83,13 @@ async function discover(db: AdminClient, t: Tournament, index: Map<string, numbe
     const parsed = parseDraw(rev.content, normalizeName);
     const pagePlayers = new Set(parsed.flatMap((m) => [normalizeName(m.p1.name), normalizeName(m.p2.name)])).size;
     // Right tour (WTA vs ATP mentions) and a draw that fits the tournament's size.
-    if (!tourMentioned(rev.content, t.tour as Tour) || !drawSizeFits(pagePlayers, t.draw_size)) continue;
+    if (
+      !tourMentioned(rev.content, t.tour as Tour) ||
+      !levelFits(rev.categories, t.tour as Tour, t.category) ||
+      !drawSizeFits(pagePlayers, t.draw_size)
+    ) {
+      continue;
+    }
     const known = knownPlayers(parsed, index);
     const score = scored.get(title)!;
     if (!best || score > best.score || (score === best.score && known > best.known)) best = { rev, known, score };
@@ -246,6 +253,40 @@ async function processTournaments(db: AdminClient, list: Tournament[], now: Date
     summary.confirmed += confirmed?.length ?? 0;
   }
   return summary;
+}
+
+/**
+ * Links stored results to player profiles added since (e.g. by the rankings backfill). Results
+ * keep their names either way; this only fills in missing player ids.
+ */
+export async function relinkPlayers(db: AdminClient) {
+  const cache = new Map<Tour, Map<string, number>>();
+  let linked = 0;
+  for (const tour of ["atp", "wta"] as const) {
+    const index = await loadIndex(db, tour, cache);
+    for (let from = 0; ; from += 1000) {
+      const { data, error } = await db
+        .from("matches")
+        .select("id, player1_id, player2_id, player1_name, player2_name, winner_side")
+        .eq("provider", WIKI_PROVIDER)
+        .eq("tour", tour)
+        .or("player1_id.is.null,player2_id.is.null")
+        .order("id")
+        .range(from, from + 999);
+      fail("unlinked results", error);
+      for (const m of data ?? []) {
+        const p1 = m.player1_id ?? (m.player1_name ? findPlayer(index, m.player1_name) : null);
+        const p2 = m.player2_id ?? (m.player2_name ? findPlayer(index, m.player2_name) : null);
+        if (p1 === m.player1_id && p2 === m.player2_id) continue;
+        const winner = m.winner_side === 1 ? p1 : m.winner_side === 2 ? p2 : null;
+        const { error: uErr } = await db.from("matches").update({ player1_id: p1, player2_id: p2, winner_id: winner }).eq("id", m.id);
+        fail("relink", uErr);
+        linked++;
+      }
+      if (!data || data.length < 1000) break;
+    }
+  }
+  return linked;
 }
 
 /** One-off: discover and import every finished tournament of a season (npm run sync:results). */

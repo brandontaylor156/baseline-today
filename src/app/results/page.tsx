@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   description: "Finished ATP and WTA singles matches from the last few days.",
 };
 
+/** Latest results shown per tournament; the tournament page has the rest. */
+const PER_TOURNAMENT = 6;
+
 export default async function ResultsPage() {
   await connection();
   const now = new Date();
@@ -53,12 +56,17 @@ export default async function ResultsPage() {
               </span>
             </h2>
             <ul className="grid gap-2 sm:grid-cols-2">
-              {g.results.map((r) => (
+              {g.results.slice(0, PER_TOURNAMENT).map((r) => (
                 <li key={r.id}>
                   <MatchCard match={r} />
                 </li>
               ))}
             </ul>
+            {g.results.length > PER_TOURNAMENT && (
+              <Link href={`/tournaments/${g.id}`} className="inline-block py-1 text-sm font-medium text-accent hover:underline">
+                All {g.results.length} results →
+              </Link>
+            )}
             <WikiCredit sources={g.sources} />
           </section>
         ))

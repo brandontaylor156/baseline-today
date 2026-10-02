@@ -3,9 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
-import { createClient } from "@/lib/supabase/client";
-
-import { signInWithGoogle, useUser } from "./use-user";
+import { loadClient, signInWithGoogle, useUser } from "./use-user";
 
 export function AuthButton() {
   const user = useUser();
@@ -27,7 +25,7 @@ export function AuthButton() {
   }
 
   async function signOut() {
-    await createClient().auth.signOut();
+    await (await loadClient()).auth.signOut();
     router.refresh();
   }
 

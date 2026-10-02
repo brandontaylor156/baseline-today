@@ -35,6 +35,8 @@ export function PlayerAvatar({
       alt={large ? name : ""}
       loading={large ? "eager" : "lazy"}
       decoding="async"
+      // No credentials: Wikimedia's image servers would otherwise set third-party cookies.
+      crossOrigin="anonymous"
       className={`${box} shrink-0 rounded-full bg-surface-muted object-cover object-top`}
     />
   ) : (

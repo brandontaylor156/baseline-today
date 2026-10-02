@@ -148,6 +148,16 @@ describe("refreshTour", () => {
     expect(finished.winner_id).toBe(finished.player2_id);
   });
 
+  it("keeps one row per season when the provider reuses a tournament id", async () => {
+    const lastYear: TennisProvider = { ...fake.p, getTournaments: async () => [{ ...tournament, season: 2025, startDate: "2025-10-07", endDate: "2025-10-18" }] };
+    await syncTournaments(db, lastYear, "atp", new Date("2025-07-01T00:00:00Z"));
+    const { data } = await db.from("tournaments").select("season, start_date").eq("provider_id", 9319).order("season");
+    expect(data).toEqual([
+      { season: 2025, start_date: "2025-10-07" },
+      { season: 2026, start_date: "2026-10-07" },
+    ]);
+  });
+
   it("refuses a second provider call while the lock is held", async () => {
     const r = await refreshTour(db, fake.p, "atp", later(5));
     expect(r.status).toBe("skipped");

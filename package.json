@@ -15,7 +15,9 @@
     "test:integration": "vitest run --mode integration",
     "trial:report": "tsx --env-file=.env.local --conditions=react-server scripts/trial-report.mts",
     "sync:results": "tsx --env-file=.env.local --conditions=react-server scripts/sync-results.mts",
-    "sync:rankings-history": "tsx --env-file=.env.local --conditions=react-server scripts/sync-rankings-history.mts"
+    "sync:rankings-history": "tsx --env-file=.env.local --conditions=react-server scripts/sync-rankings-history.mts",
+    "sync:tournaments": "tsx --env-file=.env.local --conditions=react-server scripts/sync-tournaments.mts",
+    "audit:draws": "tsx --env-file=.env.local --conditions=react-server scripts/audit-draw-levels.mts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

@@ -7,7 +7,11 @@ test.describe("rankings", () => {
     const rows = page.locator("tbody tr");
     await expect(rows).toHaveCount(100);
     await expect(rows.first().locator("td").first()).toContainText("1");
-    await expect(page.getByText(/As of \d{1,2} [A-Z][a-z]{2} \d{4}/)).toBeVisible();
+    // With stored history the date is a snapshot picker, newest week selected.
+    const picker = page.getByLabel("As of");
+    await expect(picker).toBeVisible();
+    await expect(picker.locator("option:checked")).toHaveText(/^\d{1,2} [A-Z][a-z]{2} \d{4}$/);
+    expect(await picker.locator("option").count()).toBeGreaterThan(10);
   });
 
   test("tour switch goes to the WTA rankings", async ({ page }) => {
@@ -152,4 +156,50 @@ test("results page lists finished matches with Wikipedia credit", async ({ page 
     await expect(credit).toHaveAttribute("href", /creativecommons\.org\/licenses\/by-sa\/4\.0/);
     await expect(page.locator('a[href*="en.wikipedia.org/wiki/"]').first()).toBeVisible();
   }
+});
+
+test.describe("tournaments", () => {
+  test("calendar lists events and opens a tournament", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Events" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Tournaments" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Full season" })).toBeVisible();
+    const first = page.locator("section[aria-label='Full season'] details[open] a").first();
+    await first.click();
+    await expect(page).toHaveURL(/\/tournaments\/\d+$/);
+    await expect(page.getByRole("link", { name: "← Tournaments" })).toBeVisible();
+  });
+
+  test("unknown tournaments are 404s", async ({ page }) => {
+    expect((await page.goto("/tournaments/999999999"))?.status()).toBe(404);
+  });
+});
+
+test.describe("player extras", () => {
+  test("ranking history chart with a table view", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("tbody tr").first().getByRole("link").click();
+    await expect(page.getByRole("heading", { name: "Ranking history" })).toBeVisible();
+    await page.getByText("Show as table").click();
+    await expect(page.locator("table caption", { hasText: "rank by week" })).toBeAttached();
+  });
+
+  test("share card is a PNG", async ({ page, request }) => {
+    await page.goto("/");
+    const href = await page.locator("tbody tr").first().getByRole("link").getAttribute("href");
+    const res = await request.get(`${href}/opengraph-image`);
+    expect(res.status()).toBe(200);
+    expect(res.headers()["content-type"]).toBe("image/png");
+  });
+
+  test("head-to-head from a player page", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("tbody tr").first().getByRole("link").click();
+    await page.getByRole("link", { name: "Head-to-head" }).click();
+    await expect(page).toHaveURL(/\/h2h\?a=\d+$/);
+    await page.getByLabel("Compare with").fill("zverev");
+    await page.getByRole("button", { name: /Zverev/ }).first().click();
+    await expect(page).toHaveURL(/\/h2h\?a=\d+&b=\d+$/);
+    await expect(page.getByRole("heading", { name: /Meetings/ })).toBeVisible();
+  });
 });

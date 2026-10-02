@@ -84,8 +84,14 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
         <div>
           <p className="text-sm font-medium text-accent">{TOUR_LABEL[player.tour]}</p>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{player.fullName}</h1>
-          <div className="mt-3">
+          <div className="mt-3 flex flex-col items-center gap-2 sm:flex-row sm:items-start sm:gap-4">
             <FavoriteButton playerId={player.id} initialCount={player.favoriteCount} />
+            <Link
+              href={`/h2h?a=${player.id}`}
+              className="inline-flex items-center rounded-lg border border-border bg-surface px-3.5 py-1.5 text-sm font-medium hover:bg-surface-muted"
+            >
+              Head-to-head
+            </Link>
           </div>
         </div>
       </header>
