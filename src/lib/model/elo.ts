@@ -165,3 +165,19 @@ export function evaluate(predictions: Prediction[]) {
       .map(([b, v]) => ({ bucket: `${b * 10}–${b * 10 + 10}%`, n: v.n, predicted: v.pSum / v.n, actual: v.wins / v.n })),
   };
 }
+
+/**
+ * Best-of-5 chance from a best-of-3 one: solve for the per-set chance s with
+ * P3(s) = s²(3 − 2s), then P5(s) = s³(10 − 15s + 6s²). Longer matches favour the stronger player.
+ */
+export function bestOfFive(p3: number): number {
+  let lo = 0;
+  let hi = 1;
+  for (let i = 0; i < 50; i++) {
+    const s = (lo + hi) / 2;
+    if (s * s * (3 - 2 * s) < p3) lo = s;
+    else hi = s;
+  }
+  const s = (lo + hi) / 2;
+  return s ** 3 * (10 - 15 * s + 6 * s * s);
+}

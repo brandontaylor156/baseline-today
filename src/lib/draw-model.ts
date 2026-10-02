@@ -1,6 +1,6 @@
 // A tournament's draw with everything needed to compute title chances, in the server or the
 // browser (pure; the "what if" explorer reruns it on every click).
-import { calibrate, newRating, winProbability, type Rating, type Surface } from "@/lib/model/elo";
+import { bestOfFive, calibrate, newRating, winProbability, type Rating, type Surface } from "@/lib/model/elo";
 import { titleOdds, type PlayedResult } from "@/lib/title-odds";
 
 export interface DrawPlayer {
@@ -19,6 +19,8 @@ export interface DrawModel {
   rounds: number;
   surface: Surface | null;
   calibration: number;
+  /** 5 for men's Grand Slams. */
+  bestOf?: 3 | 5;
   players: DrawPlayer[];
   played: PlayedResult[];
 }
@@ -48,6 +50,7 @@ export function winChance(model: DrawModel): (a: string, b: string) => number {
     let p = cache.get(k);
     if (p === undefined) {
       p = calibrate(winProbability(ratings.get(a) ?? newRating(), ratings.get(b) ?? newRating(), model.surface), model.calibration);
+      if (model.bestOf === 5) p = bestOfFive(p);
       cache.set(k, p);
     }
     return p;

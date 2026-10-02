@@ -12,6 +12,8 @@ export interface LoadedMatch extends EloMatch {
   season: number | null;
   player1Id: number | null;
   player2Id: number | null;
+  /** 5 for men's Grand Slam matches. */
+  bestOf: 3 | 5;
 }
 
 /** Stable key: our player id when linked, else the normalized name (Italian spellings stay apart). */
@@ -23,7 +25,7 @@ export async function loadResults(db: AdminClient): Promise<LoadedMatch[]> {
   for (let from = 0; ; from += 1000) {
     const { data, error } = await db
       .from("matches")
-      .select("id, tour, season, round, winner_side, result_detail, player1_id, player2_id, player1_name, player2_name, tournaments!inner(start_date, surface)")
+      .select("id, tour, season, round, winner_side, result_detail, player1_id, player2_id, player1_name, player2_name, tournaments!inner(start_date, surface, category)")
       .eq("status", "final")
       .eq("confirmed", true)
       .not("winner_side", "is", null)
@@ -41,7 +43,7 @@ export async function loadResults(db: AdminClient): Promise<LoadedMatch[]> {
       player2_id: number | null;
       player1_name: string | null;
       player2_name: string | null;
-      tournaments: { start_date: string | null; surface: string | null };
+      tournaments: { start_date: string | null; surface: string | null; category: string | null };
     }[]) {
       if (r.result_detail === "walkover") continue;
       out.push({
@@ -54,6 +56,7 @@ export async function loadResults(db: AdminClient): Promise<LoadedMatch[]> {
         key2: playerKey(r.player2_id, r.player2_name),
         winner: r.winner_side as 1 | 2,
         surface: normalizeSurface(r.tournaments.surface),
+        bestOf: r.tour === "atp" && /grand slam/i.test(r.tournaments.category ?? "") ? 5 : 3,
         order: `${r.tournaments.start_date ?? "0000-00-00"}|${String(roundRank(r.round)).padStart(2, "0")}|${String(r.id).padStart(10, "0")}`,
       });
     }

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { calibrate, newRating, normalizeSurface, winProbability, type Rating } from "@/lib/model/elo";
+import { bestOfFive, calibrate, newRating, normalizeSurface, winProbability, type Rating } from "@/lib/model/elo";
 import { playerKey } from "@/lib/model/load";
 import { modelEdge, summarizeMarket, type Edge, type MarketSummary } from "@/lib/model/odds";
 import type { Tour } from "@/lib/provider/types";
@@ -156,7 +156,8 @@ export async function getUpcoming(now = new Date(), filter: UpcomingFilter = {})
     const k2 = playerKey(r.player2_id, r.player2_name);
     const r1 = ratingOf.get(`${r.tour}|${k1}`);
     const r2 = ratingOf.get(`${r.tour}|${k2}`);
-    const model1 = calibrate(winProbability(toRating(r1), toRating(r2), normalizeSurface(r.tournaments.surface)), info.calibration[r.tour] ?? 1);
+    const base = calibrate(winProbability(toRating(r1), toRating(r2), normalizeSurface(r.tournaments.surface)), info.calibration[r.tour] ?? 1);
+    const model1 = r.tour === "atp" && /grand slam/i.test(r.tournaments.category ?? "") ? bestOfFive(base) : base;
     const market = summarizeMarket(oddsBy.get(r.id) ?? []);
     const side = (p: Row["p1"], id: number | null, name: string | null, country: string | null): Side => ({
       id: p?.id ?? id,

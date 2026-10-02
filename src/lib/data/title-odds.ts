@@ -19,7 +19,7 @@ type Db = AdminClient | ReturnType<typeof createPublicClient>;
 export async function loadDrawModel(db: Db, tournamentId: number, calibration: Record<string, number>): Promise<DrawModel | null> {
   const [{ data: draw }, { data: t }, { data: results }] = await Promise.all([
     db.from("wiki_draws").select("bracket").eq("tournament_id", tournamentId).maybeSingle(),
-    db.from("tournaments").select("tour, surface").eq("id", tournamentId).maybeSingle(),
+    db.from("tournaments").select("tour, surface, category").eq("id", tournamentId).maybeSingle(),
     db
       .from("matches")
       .select("player1_id, player2_id, player1_name, player2_name, winner_side")
@@ -68,6 +68,7 @@ export async function loadDrawModel(db: Db, tournamentId: number, calibration: R
     rounds: Math.round(Math.log2(bracket.size)),
     surface: normalizeSurface(t.surface),
     calibration: calibration[t.tour] ?? 1,
+    bestOf: t.tour === "atp" && /grand slam/i.test(t.category ?? "") ? 5 : 3,
     players: lines.map((l) => {
       const pr = l.id !== null ? profile.get(l.id) : undefined;
       return {

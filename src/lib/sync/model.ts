@@ -1,6 +1,6 @@
 import "server-only";
 
-import { calibrate, evaluate, fitCalibration, runElo } from "@/lib/model/elo";
+import { bestOfFive, calibrate, evaluate, fitCalibration, runElo } from "@/lib/model/elo";
 import { loadResults } from "@/lib/model/load";
 import type { AdminClient } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
@@ -59,7 +59,13 @@ export async function computeModel(db: AdminClient, now = new Date()) {
     const fitOn = predictions.filter((p) => seasonByOrder.get(p.match.order) === season - 1);
     const c = fitOn.length >= 200 ? fitCalibration(fitOn) : 1;
     calibration[tour] = Number(c.toFixed(4));
-    const thisSeason = predictions.filter((p) => seasonByOrder.get(p.match.order) === season).map((p) => ({ ...p, p1: calibrate(p.p1, c) }));
+    // Men's Grand Slams are best of five: the same set-level strength, a longer match.
+    const bestOf = new Map(tourResults.map((m) => [m.order, m.bestOf]));
+    const final = (p: { match: { order: string }; p1: number }) => {
+      const q = calibrate(p.p1, c);
+      return bestOf.get(p.match.order) === 5 ? bestOfFive(q) : q;
+    };
+    const thisSeason = predictions.filter((p) => seasonByOrder.get(p.match.order) === season).map((p) => ({ ...p, p1: final(p) }));
     const e = evaluate(thisSeason);
     backtest[tour] = {
       n: e.n,
@@ -91,7 +97,7 @@ export async function computeModel(db: AdminClient, now = new Date()) {
     }
 
     const idByOrder = new Map(tourResults.map((m) => [m.order, m.id]));
-    const probs = predictions.map((p) => ({ id: idByOrder.get(p.match.order)!, p: Number(calibrate(p.p1, c).toFixed(4)) }));
+    const probs = predictions.map((p) => ({ id: idByOrder.get(p.match.order)!, p: Number(final(p).toFixed(4)) }));
     for (let i = 0; i < probs.length; i += BATCH) {
       const { error } = await db.rpc("set_pre_match_probs", { p_rows: probs.slice(i, i + BATCH) as unknown as Json });
       if (error) throw new Error(`save probabilities: ${error.message}`);

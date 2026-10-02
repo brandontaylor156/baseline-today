@@ -840,6 +840,7 @@ export type Database = {
         Args: { p_name: string; p_nickname: string }
         Returns: string
       }
+      hide_stray_wiki_results: { Args: never; Returns: number }
       immutable_unaccent: { Args: { value: string }; Returns: string }
       is_league_member: { Args: { p_league_id: string }; Returns: boolean }
       join_league: {
@@ -895,6 +896,15 @@ export type Database = {
         }[]
       }
       set_pre_match_probs: { Args: { p_rows: Json }; Returns: number }
+      stray_wiki_results: {
+        Args: never
+        Returns: {
+          name: string
+          results: number
+          season: number
+          tournament_id: number
+        }[]
+      }
       try_acquire_sync_lock: {
         Args: { p_key: string; p_ttl_seconds: number }
         Returns: boolean

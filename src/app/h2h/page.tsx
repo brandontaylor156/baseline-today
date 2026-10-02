@@ -60,7 +60,7 @@ export default async function H2HPage({ searchParams }: PageProps<"/h2h">) {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Head-to-head</h1>
-        <p className="text-sm text-muted">Every meeting in the tracked draws since 2024.</p>
+        <p className="text-sm text-muted">Every meeting in the tracked draws since 2015.</p>
       </div>
 
       {(!a || !b) && <H2HPickers a={a?.id ?? null} tour={a?.tour ?? null} />}

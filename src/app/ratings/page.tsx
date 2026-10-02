@@ -86,7 +86,7 @@ export default async function RatingsPage({ searchParams }: PageProps<"/ratings"
         <div>
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Model ratings</h1>
           <p className="text-sm text-muted">
-            Elo ratings from every tracked {TOUR_LABEL[tour]} result since 2024. Active players with {MIN_MATCHES}+ matches.
+            Elo ratings from every tracked {TOUR_LABEL[tour]} result since 2015. Active players with {MIN_MATCHES}+ matches.
           </p>
         </div>
         <nav aria-label="Tour" className="flex rounded-lg border border-border bg-surface p-0.5 text-sm">

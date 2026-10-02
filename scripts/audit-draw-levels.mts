@@ -9,11 +9,19 @@ const fix = process.argv.includes("--fix");
 const db = createAdminClient();
 const UA = "BaselineToday/1.0 (https://github.com/brandontaylor156/baseline-today)";
 
-const { data: draws, error } = await db
-  .from("wiki_draws")
-  .select("tournament_id, page_title, tournaments!inner(tour, name, category, season)")
-  .eq("status", "found");
-if (error) throw new Error(error.message);
+// Page through: the API returns at most 1,000 rows per request.
+const draws: unknown[] = [];
+for (let from = 0; ; from += 1000) {
+  const { data, error } = await db
+    .from("wiki_draws")
+    .select("tournament_id, page_title, tournaments!inner(tour, name, category, season)")
+    .eq("status", "found")
+    .order("tournament_id")
+    .range(from, from + 999);
+  if (error) throw new Error(error.message);
+  draws.push(...(data ?? []));
+  if (!data || data.length < 1000) break;
+}
 
 type Row = { tournament_id: number; page_title: string; tournaments: { tour: "atp" | "wta"; name: string; category: string | null; season: number } };
 const rows = (draws ?? []) as unknown as Row[];
@@ -58,4 +66,15 @@ if (fix && failing.length) {
     .in("tournament_id", ids)
     .select("tournament_id");
   console.log(`hid ${hidden.data?.length ?? 0} results, queued ${reset.data?.length ?? 0} tournaments for rediscovery`);
+}
+
+// Second rule: every visible result must come from its tournament's current draw page (results
+// left over from an earlier, replaced pairing would double up the event).
+const { data: strays, error: strayErr } = await db.rpc("stray_wiki_results");
+if (strayErr) throw new Error(strayErr.message);
+console.log(`${strays?.length ?? 0} tournaments show results from a page that isn't theirs`);
+for (const s of strays ?? []) console.log(`  ${s.season} ${s.name}: ${s.results} results`);
+if (fix && strays?.length) {
+  const { data: hidden } = await db.rpc("hide_stray_wiki_results");
+  console.log(`hid ${hidden ?? 0} stray results`);
 }

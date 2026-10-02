@@ -149,7 +149,7 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
             Model rating
           </h2>
           <p className="mb-3 text-xs text-muted">
-            Weekly Elo rating from tracked results; higher is stronger. Everyone starts at 1500 in January 2024, so early 2024 is a
+            Weekly Elo rating from tracked results; higher is stronger. Everyone starts at 1500 in January 2015, so 2015 is a
             warm-up.{" "}
             <Link href={`/ratings?tour=${player.tour}`} className="underline underline-offset-2">
               All ratings

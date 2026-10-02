@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { evaluate, expected, kFactor, newRating, normalizeSurface, runElo, winProbability, type EloMatch } from "./elo";
+import { bestOfFive, evaluate, expected, kFactor, newRating, normalizeSurface, runElo, winProbability, type EloMatch } from "./elo";
 
 const m = (key1: string, key2: string, winner: 1 | 2, order: string, surface: EloMatch["surface"] = "hard"): EloMatch => ({ key1, key2, winner, surface, order });
 
@@ -46,5 +46,14 @@ describe("elo", () => {
     expect(e.n).toBe(2);
     expect(e.accuracy).toBe(0.5);
     expect(e.brier).toBeCloseTo(((0.2) ** 2 + 0.7 ** 2) / 2);
+  });
+});
+
+describe("bestOfFive", () => {
+  it("keeps even matches even and stretches favourites", () => {
+    expect(bestOfFive(0.5)).toBeCloseTo(0.5);
+    expect(bestOfFive(0.7)).toBeGreaterThan(0.7);
+    expect(bestOfFive(0.3)).toBeLessThan(0.3);
+    expect(bestOfFive(0.7) + bestOfFive(0.3)).toBeCloseTo(1);
   });
 });

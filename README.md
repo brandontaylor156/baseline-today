@@ -29,7 +29,7 @@ search and favorites with Google sign-in. A ground-up rebuild of my 2022 Flask t
 - **Tournaments:** this week, coming up, recent champions, the full calendar, and a page per event
   with every finished match by round.
 - **Head-to-head:** any two players from the same tour: record, split by surface, every meeting
-  since 2024 (16,000+ matches imported across three seasons).
+  since 2015 (52,000+ results across twelve seasons, from Wikipedia draw pages).
 - **This week:** the homepage shows events in play, latest results, upsets, biggest ranking movers
   and both top 10s.
 - **Predictions and odds:** a surface-aware Elo model (calibrated on the previous season; about 63%

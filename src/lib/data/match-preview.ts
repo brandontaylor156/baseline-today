@@ -3,7 +3,7 @@ import "server-only";
 import { cache } from "react";
 
 import { titleChances } from "@/lib/draw-model";
-import { calibrate, newRating, normalizeSurface, winProbability, type Rating } from "@/lib/model/elo";
+import { bestOfFive, calibrate, newRating, normalizeSurface, winProbability, type Rating } from "@/lib/model/elo";
 import { playerKey } from "@/lib/model/load";
 import { summarizeMarket, type MarketSummary } from "@/lib/model/odds";
 import type { Tour } from "@/lib/provider/types";
@@ -98,7 +98,11 @@ export const getMatchPreview = cache(async (matchId: number): Promise<MatchPrevi
   const c = info.calibration[tour] ?? 1;
   const ra = ratingOf.get(keyA);
   const rb = ratingOf.get(keyB);
-  const p = (s: string | null) => calibrate(winProbability(ra ? toRating(ra) : newRating(), rb ? toRating(rb) : newRating(), normalizeSurface(s)), c);
+  const fiveSets = tour === "atp" && /grand slam/i.test(row.tournaments.category ?? "");
+  const p = (s: string | null) => {
+    const q = calibrate(winProbability(ra ? toRating(ra) : newRating(), rb ? toRating(rb) : newRating(), normalizeSurface(s)), c);
+    return fiveSets ? bestOfFive(q) : q;
+  };
   const haveRatings = Boolean(ra && rb);
 
   // Title stakes: chance now, and if each wins this match.
