@@ -17,6 +17,19 @@ as $$
   select extensions.unaccent('extensions.unaccent'::regdictionary, value)
 $$;
 
+-- Search key: lower case, accents removed. Đ/đ become "dj" (Serbian/Croatian), not unaccent's "d",
+-- so "djokovic" finds Đoković. Used for stored names and for search input alike.
+create or replace function public.search_normalize(value text)
+returns text
+language sql
+immutable
+parallel safe
+strict
+set search_path = ''
+as $$
+  select lower(public.immutable_unaccent(replace(replace(value, chr(272), 'Dj'), chr(273), 'dj')))  -- Đ, đ
+$$;
+
 -- ---------------------------------------------------------------------------
 -- Tennis data
 -- ---------------------------------------------------------------------------
@@ -29,7 +42,6 @@ create table if not exists public.players (
   first_name text,
   last_name text,
   full_name text not null,
-  search_name text generated always as (lower(public.immutable_unaccent(full_name))) stored,
   country_code text,
   country_name text,
   birth_place text,
@@ -45,6 +57,9 @@ create table if not exists public.players (
   updated_at timestamptz not null default now(),
   unique (provider, tour, provider_id)
 );
+
+alter table public.players
+  add column if not exists search_name text generated always as (public.search_normalize(full_name)) stored;
 
 create index if not exists players_search_name_trgm
   on public.players using gin (search_name extensions.gin_trgm_ops);
