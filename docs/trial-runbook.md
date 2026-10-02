@@ -38,6 +38,8 @@ Goal: measure live-score lag, update cadence and coverage, then decide whether t
    `src/lib/sync/match-rows.test.ts`, the `trial-espn-poll` job in `start-collector.sql`, and the
    `'espn'` source from the trial tables (or drop both trial tables), in one commit.
 
+**If the trial is skipped**, do steps 4–5 anyway (Brandon, 2026-10-02): no ESPN code or data stays.
+
 ESPN data is used only during the trial, only to time the provider, and is never shown on the site:
 `/scores` reads the `matches` table, which only the provider fills. The trial tables have no public
 access (checked by `supabase/tests/isolation.sql`).
