@@ -38,6 +38,11 @@ search and favorites with Google sign-in. A ground-up rebuild of my 2022 Flask t
   model's edge. Labeled as estimates, not betting advice, with 18+ and problem-gambling help.
 - **Stats:** season leaderboards (wins, win rate, titles, comebacks, tiebreaks), the biggest upsets
   by pre-match model chance, and per-player splits by surface, tiebreaks, deciding sets and form.
+- **Model ratings:** the Elo table for active players (all courts or by surface), who the model
+  rates well above or below their ranking, and a calibration table showing how often favorites won.
+- **Up next:** model win chances for scheduled matches on each tournament page and for your
+  favorites on "My players".
+- **Season timeline:** each player's tournaments this season: round reached, who stopped them, W-L.
 - **Rank race:** both players' weekly ranks on one chart on the head-to-head page.
 - **Countries:** each nation's top-100 players, season record, titles and recent results.
 - **Share cards:** generated preview images for players and the site.

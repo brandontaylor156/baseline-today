@@ -259,3 +259,32 @@ test.describe("installable app", () => {
     expect((await request.delete("/api/push/subscribe", { data: body })).status()).toBe(401);
   });
 });
+
+test("model ratings: table, surface switch and accuracy", async ({ page }) => {
+  await page.goto("/stats");
+  await page.getByRole("link", { name: "Model ratings →" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Model ratings" })).toBeVisible();
+  expect(await page.locator("tbody tr").count()).toBeGreaterThan(10);
+  await page.getByRole("navigation", { name: "Surface" }).getByRole("link", { name: "Clay" }).click();
+  await expect(page).toHaveURL(/surface=clay/);
+  await expect(page.getByRole("heading", { name: /Top 50 · Clay/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "How accurate is it?" })).toBeVisible();
+});
+
+test("player page shows this season's tournaments", async ({ page }) => {
+  await page.goto("/rankings/atp");
+  await page.locator("tbody tr").first().getByRole("link").click();
+  const year = new Date().getUTCFullYear();
+  await expect(page.getByRole("heading", { name: `${year} tournaments` })).toBeVisible();
+});
+
+test("robots and sitemap", async ({ request }) => {
+  const robots = await (await request.get("/robots.txt")).text();
+  expect(robots).toContain("Disallow: /my-players");
+  expect(robots).toContain("/sitemap.xml");
+  const sitemap = await request.get("/sitemap.xml");
+  expect(sitemap.status()).toBe(200);
+  const xml = await sitemap.text();
+  expect(xml).toContain("/players/");
+  expect(xml).toContain("/tournaments/");
+});

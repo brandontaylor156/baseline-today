@@ -6,12 +6,15 @@ import { FavoriteButton } from "@/components/favorite-button";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { PlayerResults } from "@/components/player-results";
 import { PlayerStatsSection } from "@/components/player-stats";
+import { PlayerTimeline } from "@/components/player-timeline";
 import { RankChart } from "@/components/rank-chart";
 import { WikiCredit } from "@/components/wiki-credit";
 import { getPlayerResults } from "@/lib/data/results";
+import { getSeasonMatches } from "@/lib/data/season";
 import { getPlayerStats } from "@/lib/data/stats";
 import { getPlayer, getRankingDates } from "@/lib/data/tennis";
 import { bestRank, formatDate, formatHeight, formatPlays, formatPoints, formatWeight, TOUR_LABEL } from "@/lib/format";
+import { seasonTimeline } from "@/lib/timeline";
 
 export const revalidate = 3600;
 
@@ -45,10 +48,11 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
   if (!player) notFound();
 
   const year = new Date().getUTCFullYear();
-  const [results, tourDates, stats] = await Promise.all([
+  const [results, tourDates, stats, seasonMatches] = await Promise.all([
     getPlayerResults(player.id),
     getRankingDates(player.tour),
     getPlayerStats(player.id, year),
+    getSeasonMatches(player.tour, year),
   ]);
   const latest = player.history.at(-1);
   const best = bestRank(player.history);
@@ -145,6 +149,8 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
       </section>
 
       <PlayerStatsSection season={stats.season} all={stats.all} year={year} since={stats.since} />
+
+      <PlayerTimeline rows={seasonTimeline(seasonMatches, player.id)} year={year} />
 
       {results.recent.length > 0 && (
         <section aria-labelledby="results-heading" className="rounded-xl border border-border bg-surface p-4 sm:p-5">

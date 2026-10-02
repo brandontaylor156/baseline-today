@@ -256,6 +256,7 @@ export type Database = {
           elo_hard: number
           grass_matches: number
           hard_matches: number
+          last_played: string | null
           matches: number
           name: string | null
           player_id: number | null
@@ -271,6 +272,7 @@ export type Database = {
           elo_hard: number
           grass_matches?: number
           hard_matches?: number
+          last_played?: string | null
           matches: number
           name?: string | null
           player_id?: number | null
@@ -286,6 +288,7 @@ export type Database = {
           elo_hard?: number
           grass_matches?: number
           hard_matches?: number
+          last_played?: string | null
           matches?: number
           name?: string | null
           player_id?: number | null

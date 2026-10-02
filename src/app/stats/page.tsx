@@ -50,7 +50,10 @@ export default async function StatsPage({ searchParams }: PageProps<"/stats">) {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Stats</h1>
           <p className="text-sm text-muted">
-            {season} {TOUR_LABEL[tour]} season · {matches.length.toLocaleString("en-US")} tracked matches
+            {season} {TOUR_LABEL[tour]} season · {matches.length.toLocaleString("en-US")} tracked matches ·{" "}
+            <Link href={`/ratings?tour=${tour}`} className="font-medium text-accent hover:underline">
+              Model ratings →
+            </Link>
           </p>
         </div>
         <nav aria-label="Tour" className="flex rounded-lg border border-border bg-surface p-0.5 text-sm">

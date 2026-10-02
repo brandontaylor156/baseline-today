@@ -19,13 +19,18 @@ export async function computeModel(db: AdminClient, now = new Date()) {
   const calibration: Record<string, number> = {};
   const summary: Record<string, { players: number; matches: number }> = {};
   // Out-of-sample accuracy of this season so far (calibration was fitted on last season).
-  const backtest: Record<string, { n: number; accuracy: number; logLoss: number }> = {};
+  const backtest: Record<string, { n: number; accuracy: number; logLoss: number; brier: number; buckets: { bucket: string; n: number; predicted: number; actual: number }[] }> = {};
 
-  // Names for unlinked players come from the results themselves.
+  // Names for unlinked players come from the results themselves; last played from the sort key.
   const nameOf = new Map<string, string>();
+  const lastPlayed = new Map<string, string>();
   for (const m of results) {
     if (m.key1.startsWith("name:")) nameOf.set(m.key1, m.key1.slice(5));
     if (m.key2.startsWith("name:")) nameOf.set(m.key2, m.key2.slice(5));
+    const date = m.order.slice(0, 10);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date) && date !== "0000-00-00") {
+      for (const k of [m.key1, m.key2]) if (date > (lastPlayed.get(k) ?? "")) lastPlayed.set(k, date);
+    }
   }
 
   for (const tour of ["atp", "wta"] as const) {
@@ -36,7 +41,13 @@ export async function computeModel(db: AdminClient, now = new Date()) {
     calibration[tour] = Number(c.toFixed(4));
     const thisSeason = predictions.filter((p) => seasonByOrder.get(p.match.order) === season).map((p) => ({ ...p, p1: calibrate(p.p1, c) }));
     const e = evaluate(thisSeason);
-    backtest[tour] = { n: e.n, accuracy: Number(e.accuracy.toFixed(4)), logLoss: Number(e.logLoss.toFixed(4)) };
+    backtest[tour] = {
+      n: e.n,
+      accuracy: Number(e.accuracy.toFixed(4)),
+      logLoss: Number(e.logLoss.toFixed(4)),
+      brier: Number(e.brier.toFixed(4)),
+      buckets: e.calibration.map((b) => ({ ...b, predicted: Number(b.predicted.toFixed(4)), actual: Number(b.actual.toFixed(4)) })),
+    };
 
     const rows = [...ratings.entries()].map(([key, r]) => ({
       tour,
@@ -51,6 +62,7 @@ export async function computeModel(db: AdminClient, now = new Date()) {
       hard_matches: r.surfaceMatches.hard,
       clay_matches: r.surfaceMatches.clay,
       grass_matches: r.surfaceMatches.grass,
+      last_played: lastPlayed.get(key) ?? null,
       updated_at: now.toISOString(),
     }));
     for (let i = 0; i < rows.length; i += BATCH) {

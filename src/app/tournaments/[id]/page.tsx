@@ -3,7 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { MatchCard } from "@/components/match-card";
+import { MatchupRow } from "@/components/matchup-row";
 import { WikiCredit } from "@/components/wiki-credit";
+import { getUpcoming } from "@/lib/data/predictions";
 import { dateRange, displayName, getTournament } from "@/lib/data/tournaments";
 import { TOUR_LABEL } from "@/lib/format";
 
@@ -30,6 +32,7 @@ export async function generateMetadata({ params }: PageProps<"/tournaments/[id]"
 export default async function TournamentPage({ params }: PageProps<"/tournaments/[id]">) {
   const t = await load(params);
   if (!t) notFound();
+  const { matchups } = await getUpcoming(new Date(), { cached: true, tournamentId: t.id });
 
   const facts = [TOUR_LABEL[t.tour], t.category, t.location ? displayName(t.location.split(",")[0]) : null, t.surface, t.drawSize ? `${t.drawSize}-player draw` : null].filter(Boolean);
 
@@ -59,6 +62,25 @@ export default async function TournamentPage({ params }: PageProps<"/tournaments
             )}
           </span>
         </div>
+      )}
+
+      {matchups.length > 0 && (
+        <section aria-labelledby="next-heading" className="space-y-2">
+          <div className="flex items-baseline justify-between">
+            <h2 id="next-heading" className="text-sm font-semibold uppercase tracking-wide text-muted">
+              Up next
+            </h2>
+            <Link href="/odds" className="text-xs font-medium text-accent hover:underline">
+              Odds →
+            </Link>
+          </div>
+          <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
+            {matchups.map((m) => (
+              <MatchupRow key={m.id} m={m} />
+            ))}
+          </ul>
+          <p className="text-xs text-muted">Win chances from our model: estimates, not betting advice.</p>
+        </section>
       )}
 
       {t.rounds.length === 0 ? (

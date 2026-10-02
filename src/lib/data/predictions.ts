@@ -13,7 +13,10 @@ const isoDate = (d: Date) => d.toISOString().slice(0, 10);
 
 export interface ModelInfo {
   calibration: Record<string, number>;
-  backtest: Record<string, { n: number; accuracy: number; logLoss: number }>;
+  backtest: Record<
+    string,
+    { n: number; accuracy: number; logLoss: number; brier?: number; buckets?: { bucket: string; n: number; predicted: number; actual: number }[] }
+  >;
   season: number | null;
   updatedAt: string | null;
 }
@@ -75,10 +78,18 @@ export async function predictPair(tour: Tour, a: number, b: number, surface: str
   return { p, minMatches: Math.min(ra.matches, rb.matches) };
 }
 
+export interface UpcomingFilter {
+  /** Read through the data cache (for cached pages); default false. */
+  cached?: boolean;
+  tournamentId?: number;
+  playerIds?: number[];
+}
+
 /** Upcoming matches (draw pairings and provider schedules) with model probabilities and odds. */
-export async function getUpcoming(now = new Date()): Promise<{ matchups: Matchup[]; info: ModelInfo }> {
-  const db = createPublicClient({ cached: false });
-  const { data, error } = await db
+export async function getUpcoming(now = new Date(), filter: UpcomingFilter = {}): Promise<{ matchups: Matchup[]; info: ModelInfo }> {
+  const db = createPublicClient({ cached: filter.cached ?? false });
+  if (filter.playerIds && filter.playerIds.length === 0) return { matchups: [], info: await getModelInfo() };
+  let query = db
     .from("matches")
     .select(
       `id, provider, tour, round, scheduled_at, player1_id, player2_id, player1_name, player2_name, player1_country, player2_country,
@@ -89,8 +100,13 @@ export async function getUpcoming(now = new Date()): Promise<{ matchups: Matchup
     .eq("status", "scheduled")
     .eq("confirmed", true)
     .gte("tournaments.end_date", isoDate(now))
-    .lte("tournaments.start_date", isoDate(new Date(now.getTime() + 7 * DAY)))
-    .limit(500);
+    .lte("tournaments.start_date", isoDate(new Date(now.getTime() + 7 * DAY)));
+  if (filter.tournamentId !== undefined) query = query.eq("tournament_id", filter.tournamentId);
+  if (filter.playerIds) {
+    const ids = filter.playerIds.join(",");
+    query = query.or(`player1_id.in.(${ids}),player2_id.in.(${ids})`);
+  }
+  const { data, error } = await query.limit(500);
   if (error) throw new Error(`upcoming: ${error.message}`);
 
   type Row = {

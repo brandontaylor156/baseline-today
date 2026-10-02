@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Flag } from "@/components/flag";
+import { MatchupRow } from "@/components/matchup-row";
 import { Movement } from "@/components/movement";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { PushToggle } from "@/components/push-toggle";
 import { SignInPrompt } from "@/components/sign-in-prompt";
 import { WikiCredit } from "@/components/wiki-credit";
+import { getUpcoming } from "@/lib/data/predictions";
 import { RESULT_SELECT, titleFromUrl, toResult, type Result, type ResultRow } from "@/lib/data/results";
 import { formatPoints, TOUR_LABEL } from "@/lib/format";
 import type { Tour } from "@/lib/provider/types";
@@ -74,6 +76,7 @@ export default async function MyPlayersPage() {
   }
 
   const push = pushConfig();
+  const { matchups: upcoming } = await getUpcoming(new Date(), { playerIds: ids });
 
   return (
     <section className="space-y-4">
@@ -132,6 +135,19 @@ export default async function MyPlayersPage() {
             </li>
           ))}
         </ul>
+      )}
+      {upcoming.length > 0 && (
+        <section aria-labelledby="next-heading" className="space-y-2">
+          <h2 id="next-heading" className="text-sm font-semibold uppercase tracking-wide text-muted">
+            Up next
+          </h2>
+          <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
+            {upcoming.map((m) => (
+              <MatchupRow key={m.id} m={m} />
+            ))}
+          </ul>
+          <p className="text-xs text-muted">Win chances from our model: estimates, not betting advice. Pairings from tournament draws.</p>
+        </section>
       )}
       <WikiCredit sources={sources} />
     </section>
