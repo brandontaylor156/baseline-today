@@ -345,3 +345,21 @@ test("matchup share card and calendar feeds", async ({ page, request }) => {
   expect((await request.get("/calendar/wta.ics")).status()).toBe(200);
   expect((await request.get("/calendar/itf.ics")).status()).toBe(404);
 });
+
+test("match pages: preview from Up next, result from a result card", async ({ page, request }) => {
+  await page.goto("/odds");
+  const preview = page.locator('a[href^="/matches/"]', { hasText: "Preview" }).first();
+  if ((await preview.count()) > 0) {
+    await preview.click();
+    await expect(page).toHaveURL(/\/matches\/\d+$/);
+    await expect(page.getByText("Match preview")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Form" })).toBeVisible();
+    const og = await request.get(`${new URL(page.url()).pathname}/opengraph-image`);
+    expect(og.headers()["content-type"]).toBe("image/png");
+  }
+  await page.goto("/results");
+  await page.locator('article a[href^="/matches/"]').first().click();
+  await expect(page).toHaveURL(/\/matches\/\d+$/);
+  await expect(page.getByText("Result", { exact: true })).toBeVisible();
+  expect((await request.get("/matches/999999999")).status()).toBe(404);
+});

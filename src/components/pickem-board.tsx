@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -100,7 +101,10 @@ export function PickemBoard({ matches, weekStart, seasonStart }: { matches: Pick
             <li key={m.id} className="space-y-2 px-4 py-3 text-sm">
               <p className="text-xs text-muted">
                 {m.tournament}
-                {m.round ? ` · ${m.round}` : ""}
+                {m.round ? ` · ${m.round}` : ""} ·{" "}
+                <Link href={`/matches/${m.id}`} className="hover:text-foreground hover:underline">
+                  Preview
+                </Link>
               </p>
               <div className="grid grid-cols-2 gap-2">
                 {([1, 2] as const).map((side) => {

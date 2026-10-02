@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { getCountries } from "@/lib/data/countries";
+import { getScheduledMatchIds } from "@/lib/data/match-preview";
 import { getRankingDates, getRankings } from "@/lib/data/tennis";
 import { getSeasonTournaments } from "@/lib/data/tournaments";
 import { TOURS } from "@/lib/provider/types";
@@ -11,7 +12,7 @@ export const revalidate = 86400;
 // Section pages, this week's ranked players, this season's tournaments and every country page.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const season = new Date().getUTCFullYear();
-  const [rankings, tournaments, countries] = await Promise.all([
+  const [rankings, tournaments, countries, upcoming] = await Promise.all([
     Promise.all(
       TOURS.map(async (t) => {
         const [latest] = await getRankingDates(t);
@@ -20,6 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ),
     getSeasonTournaments(season),
     getCountries(),
+    getScheduledMatchIds(),
   ]);
 
   const page = (path: string, changeFrequency: "daily" | "weekly", priority: number) => ({ url: `${SITE_URL}${path}`, changeFrequency, priority });
@@ -39,5 +41,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...rankings.flat().map((r) => page(`/players/${r.player.id}`, "weekly", 0.6)),
     ...tournaments.map((t) => page(`/tournaments/${t.id}`, "weekly", 0.5)),
     ...countries.map((c) => page(`/countries/${c.code}`, "weekly", 0.4)),
+    ...upcoming.map((id) => page(`/matches/${id}`, "daily", 0.5)),
   ];
 }

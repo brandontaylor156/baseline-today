@@ -36,7 +36,9 @@ export function MatchupRow({ m }: { m: Matchup }) {
   return (
     <li className="space-y-1.5 px-4 py-3 text-sm">
       <div className="flex items-center justify-between gap-2 text-xs text-muted">
-        <span>{m.round ?? ""}</span>
+        <Link href={`/matches/${m.id}`} className="hover:text-foreground hover:underline">
+          {m.round ?? "Match"} · Preview
+        </Link>
         <span>{m.scheduledAt ? <LocalTime iso={m.scheduledAt} fallback={null} /> : "Time TBA"}</span>
       </div>
       {[1, 2].map((s) => {

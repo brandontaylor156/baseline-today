@@ -71,7 +71,9 @@ export function MatchCard({ match: m }: { match: ScoreMatch }) {
       className={`rounded-xl border bg-surface p-3 text-sm ${m.isLive ? "border-accent/60" : "border-border"}`}
     >
       <div className="mb-2 flex items-center justify-between gap-2 text-xs text-muted">
-        <span className="truncate">{m.round ?? ""}</span>
+        <Link href={`/matches/${m.id}`} className="truncate hover:text-foreground hover:underline">
+          {m.round ?? "Match"}
+        </Link>
         <span className={`shrink-0 ${m.isLive ? "font-semibold text-accent" : ""}`}>
           {m.isLive && <span aria-hidden className="mr-1 inline-block size-1.5 animate-pulse rounded-full bg-accent align-middle" />}
           {label === "Scheduled" && m.scheduledAt ? <LocalTime iso={m.scheduledAt} fallback={m.notBefore} /> : label}
