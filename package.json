@@ -10,7 +10,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "sync:daily": "tsx --env-file=.env.local --conditions=react-server scripts/sync-daily.mts",
-    "sync:photos": "tsx --env-file=.env.local --conditions=react-server scripts/sync-photos.mts"
+    "sync:photos": "tsx --env-file=.env.local --conditions=react-server scripts/sync-photos.mts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
