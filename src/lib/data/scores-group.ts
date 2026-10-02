@@ -26,6 +26,8 @@ export interface ScoreMatch {
   player1: ScoreSide | null;
   player2: ScoreSide | null;
   winner: 1 | 2 | null;
+  /** Live matches: player 1's chance to win from the current score (our model). */
+  winChance?: number | null;
 }
 
 export interface TournamentGroup {

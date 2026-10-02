@@ -39,6 +39,10 @@ export interface MatchPreview {
   bySurface: { surface: string; p: number }[];
   h2h: HeadToHead | null;
   market: MarketSummary | null;
+  /** Market's margin-free chance for side A over time (when prices were stored). */
+  marketHistory: { at: string; p: number }[];
+  /** AI-written recap (finals and semifinals, when enabled). */
+  recap: { body: string; model: string } | null;
 }
 
 type RatingRow = { player_key: string; elo: number; elo_hard: number; elo_clay: number; elo_grass: number; matches: number; hard_matches: number; clay_matches: number; grass_matches: number };
@@ -80,7 +84,7 @@ export const getMatchPreview = cache(async (matchId: number): Promise<MatchPrevi
   const keyA = playerKey(row.player1_id, match.player1.name);
   const keyB = playerKey(row.player2_id, match.player2.name);
 
-  const [info, ratings, ranks, odds, model] = await Promise.all([
+  const [info, ratings, ranks, odds, oddsHistory, recap, model] = await Promise.all([
     getModelInfo(),
     db.from("player_ratings").select("player_key, elo, elo_hard, elo_clay, elo_grass, matches, hard_matches, clay_matches, grass_matches").eq("tour", tour).in("player_key", [keyA, keyB]),
     db
@@ -90,6 +94,8 @@ export const getMatchPreview = cache(async (matchId: number): Promise<MatchPrevi
       .order("ranking_date", { ascending: false })
       .limit(10),
     db.from("odds").select("vendor, player1_odds, player2_odds").eq("match_id", matchId),
+    db.from("odds_history").select("vendor, taken_at, player1_odds, player2_odds").eq("match_id", matchId).order("taken_at"),
+    db.from("match_recaps").select("body, model").eq("match_id", matchId).maybeSingle(),
     scheduled ? getDrawModel(match.tournament.id) : Promise.resolve(null),
   ]);
   const ratingOf = new Map(((ratings.data ?? []) as RatingRow[]).map((r) => [r.player_key, r]));
@@ -124,6 +130,16 @@ export const getMatchPreview = cache(async (matchId: number): Promise<MatchPrevi
     row.player1_id !== null && row.player2_id !== null ? getHeadToHead(row.player1_id, row.player2_id) : Promise.resolve(null),
   ]);
   const books = (odds.data ?? []).map((o) => ({ vendor: o.vendor, p1: o.player1_odds, p2: o.player2_odds }));
+  // Replay the price changes: after each one, the consensus of every book's latest price.
+  const latest = new Map<string, { vendor: string; p1: number | null; p2: number | null }>();
+  const marketHistory: { at: string; p: number }[] = [];
+  for (const h of oddsHistory.data ?? []) {
+    latest.set(h.vendor, { vendor: h.vendor, p1: h.player1_odds, p2: h.player2_odds });
+    const fair = summarizeMarket([...latest.values()]).fair1;
+    if (fair === null) continue;
+    if (marketHistory.at(-1)?.at === h.taken_at) marketHistory[marketHistory.length - 1].p = fair;
+    else marketHistory.push({ at: h.taken_at, p: fair });
+  }
 
   const side = (k: string, s: NonNullable<Result["player1"]>, id: number | null, r: RatingRow | undefined, form: PreviewSide["form"], title: PreviewSide["title"]): PreviewSide => ({
     key: k,
@@ -148,6 +164,8 @@ export const getMatchPreview = cache(async (matchId: number): Promise<MatchPrevi
     bySurface: haveRatings ? (["Hard", "Clay", "Grass"] as const).map((s) => ({ surface: s, p: p(s) })) : [],
     h2h,
     market: books.length ? summarizeMarket(books) : null,
+    marketHistory,
+    recap: recap.data ?? null,
   };
 });
 

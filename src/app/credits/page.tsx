@@ -48,6 +48,17 @@ export default async function CreditsPage() {
         </p>
       </section>
 
+      <section aria-labelledby="recaps-heading" className="space-y-2">
+        <h2 id="recaps-heading" className="text-lg font-semibold">
+          Match recaps
+        </h2>
+        <p className="text-sm text-muted">
+          When switched on, short recaps of finals and semifinals are written by Anthropic’s Claude from the match facts shown on
+          the same page (players, score, round, our model’s pre-match chance, head-to-head). They are labelled as AI-written and
+          can contain mistakes; no visitor data is sent.
+        </p>
+      </section>
+
       <section aria-labelledby="photos-heading" className="space-y-3">
         <h2 id="photos-heading" className="text-lg font-semibold">
           Player photos

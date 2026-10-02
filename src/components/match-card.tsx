@@ -83,6 +83,18 @@ export function MatchCard({ match: m }: { match: ScoreMatch }) {
         <Row m={m} side={1} />
         <Row m={m} side={2} />
       </div>
+      {m.isLive && m.winChance != null && (
+        <div className="mt-2 flex items-center gap-2 text-[11px] text-muted" title="Chance to win from the current score, by our model">
+          <span className="tabular-nums">{Math.round(m.winChance * 100)}%</span>
+          <span aria-hidden className="flex h-1 flex-1 overflow-hidden rounded-full bg-surface-muted">
+            <span className="bg-chart-line" style={{ width: `${m.winChance * 100}%` }} />
+          </span>
+          <span className="tabular-nums">{Math.round((1 - m.winChance) * 100)}%</span>
+          <span className="sr-only">
+            Live win chance: {m.player1?.name} {Math.round(m.winChance * 100)}%, {m.player2?.name} {Math.round((1 - m.winChance) * 100)}%
+          </span>
+        </div>
+      )}
     </article>
   );
 }

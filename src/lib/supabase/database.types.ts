@@ -128,6 +128,35 @@ export type Database = {
         }
         Relationships: []
       }
+      match_recaps: {
+        Row: {
+          body: string
+          created_at: string
+          match_id: number
+          model: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          match_id: number
+          model: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          match_id?: number
+          model?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_recaps_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: true
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matches: {
         Row: {
           confirmed: boolean
@@ -290,6 +319,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "odds_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      odds_history: {
+        Row: {
+          match_id: number
+          player1_odds: number | null
+          player2_odds: number | null
+          taken_at: string
+          vendor: string
+        }
+        Insert: {
+          match_id: number
+          player1_odds?: number | null
+          player2_odds?: number | null
+          taken_at?: string
+          vendor: string
+        }
+        Update: {
+          match_id?: number
+          player1_odds?: number | null
+          player2_odds?: number | null
+          taken_at?: string
+          vendor?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "odds_history_match_id_fkey"
             columns: ["match_id"]
             isOneToOne: false
             referencedRelation: "matches"

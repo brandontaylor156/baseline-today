@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Flag } from "@/components/flag";
+import { MarketHistory } from "@/components/market-history";
 import { MatchCard } from "@/components/match-card";
 import { WikiCredit } from "@/components/wiki-credit";
 import { getMatchPreview, type PreviewSide } from "@/lib/data/match-preview";
@@ -127,6 +128,18 @@ export default async function MatchPage({ params }: PageProps<"/matches/[id]">) 
         )}
       </section>
 
+      {m.recap && (
+        <section aria-labelledby="recap-heading" className="space-y-2">
+          <h2 id="recap-heading" className="text-sm font-semibold uppercase tracking-wide text-muted">
+            Recap
+          </h2>
+          <div className="rounded-xl border border-border bg-surface p-4 text-sm leading-relaxed">
+            <p>{m.recap.body}</p>
+            <p className="mt-2 text-xs text-muted">Written by AI (Claude) from the facts on this page. It can make mistakes.</p>
+          </div>
+        </section>
+      )}
+
       {(a.title || b.title) && (
         <section aria-labelledby="stakes-heading" className="space-y-2">
           <h2 id="stakes-heading" className="text-sm font-semibold uppercase tracking-wide text-muted">
@@ -178,6 +191,7 @@ export default async function MatchPage({ params }: PageProps<"/matches/[id]">) 
             {m.market.fair1 !== null && ` The market gives ${a.name} ${pct(m.market.fair1)} once the margin is removed.`} 18+. Betting
             carries risk.
           </p>
+          {m.marketHistory.length >= 2 && <MarketHistory points={m.marketHistory} name={a.name} model={m.chanceA} />}
         </section>
       )}
 

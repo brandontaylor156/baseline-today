@@ -64,6 +64,9 @@ search and favorites with Google sign-in. A ground-up rebuild of my 2022 Flask t
 - **Widgets, bot and digests:** iframe widgets for rankings and title chances (`/widgets`), a
   Discord bot (`/odds`, `/rankings`, `/results`; Ed25519-verified, off until keys are set) and a
   daily digest to Discord or Slack webhooks listed in `DIGEST_WEBHOOK_URLS`.
+- **Paid extras (off by default):** in-match win chance on live scores (point-level model that
+  reproduces the pre-match chance at 0-0), odds-movement charts from stored price changes, and
+  AI-written recaps of finals and semifinals.
 - **Up next:** model win chances for scheduled matches on each tournament page and for your
   favorites on "My players".
 - **Season timeline:** each player's tournaments this season: round reached, who stopped them, W-L.
@@ -111,6 +114,19 @@ Wikidata/Commons ─┼─ daily Vercel Cron ─▶ Supabase Postgres ◀─┤
   through an RPC that ranks prefix matches first.
 - **Auth:** `@supabase/ssr` with session refresh in `proxy.ts` (skipped for visitors without a
   session) and `getClaims()` verification. Signed-in UI is a client island, so pages stay cacheable.
+
+## Optional switches
+
+Everything below is off until its variables are set in Vercel (production):
+
+| Feature | Variables | Notes |
+|---|---|---|
+| Live scores and in-match win chance | `LIVE_SCORES_ENABLED=1` | Paid BALLDONTLIE plan (or its trial) |
+| Bookmaker odds and odds movement | `ODDS_ENABLED=1` | BALLDONTLIE GOAT plan |
+| Result notifications | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | `node scripts/push-keys.mjs` writes both |
+| AI recaps of finals and semifinals | `ANTHROPIC_API_KEY`, `RECAPS_ENABLED=1`, `RECAPS_DAILY_LIMIT` (default 10) | Claude Haiku; labelled as AI-written |
+| Discord bot | `DISCORD_PUBLIC_KEY`, plus `DISCORD_APP_ID` and `DISCORD_BOT_TOKEN` locally for `node scripts/discord-register.mjs` | Interactions URL: `/api/discord` |
+| Daily digest | `DIGEST_WEBHOOK_URLS` (comma-separated Discord or Slack webhook URLs) | Sent after the daily sync |
 
 ## Stack
 

@@ -4,6 +4,7 @@ import { notifyFavorites } from "@/lib/push/notify";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { TENNIS_TAG } from "@/lib/supabase/public";
 import { scoreBrackets } from "@/lib/sync/bracket-scores";
+import { generateRecaps } from "@/lib/sync/recaps";
 import { snapshotTitleOdds } from "@/lib/sync/title-snapshots";
 import { refreshResults } from "@/lib/sync/wiki-results";
 
@@ -20,7 +21,9 @@ export async function GET() {
   const snapshots = result.status === "ok" ? await snapshotTitleOdds(db).catch((err: Error) => `error: ${err.message}`) : undefined;
   // Bracket Challenge scores follow the results.
   const brackets = result.status === "ok" ? await scoreBrackets(db).catch((err: Error) => `error: ${err.message}`) : undefined;
+  // AI recaps of finals and semifinals (off unless switched on; capped per day).
+  const recaps = result.status === "ok" ? await generateRecaps(db).catch((err: Error) => `error: ${err.message}`) : undefined;
   // Fans hear about newly confirmed results (no-op until push keys are set).
   const push = result.status === "skipped" ? undefined : await notifyFavorites(db);
-  return Response.json({ ...result, snapshots, brackets, push }, { headers: { "Cache-Control": "no-store" } });
+  return Response.json({ ...result, snapshots, brackets, recaps, push }, { headers: { "Cache-Control": "no-store" } });
 }

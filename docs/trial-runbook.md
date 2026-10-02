@@ -13,8 +13,9 @@ Goal: measure live-score lag, update cadence and coverage, then decide whether t
 1. **Brandon:** start the 48-hour trial at app.balldontlie.io for **ATP and WTA**, on the same account
    and key (no key change needed). Tell Claude "started".
 2. **Claude:** check that one `matches?is_live=true` call per tour returns 200 instead of 401.
-3. **Claude:** turn on `LIVE_SCORES_ENABLED=1` and `TRIAL_SAMPLING=1` in Vercel production (not
-   secrets), then redeploy.
+3. **Claude:** turn on `LIVE_SCORES_ENABLED=1`, `TRIAL_SAMPLING=1` and `ODDS_ENABLED=1` in Vercel
+   production (not secrets), then redeploy. Live matches then show the in-match win chance, and
+   odds start filling `odds_history` (the odds-movement chart on match pages).
 4. **Claude:** run `supabase/trial/start-collector.sql` (polls every 20s, stops itself after 48.5h).
 5. **Claude:** after 2 minutes, confirm `trial_polls` has 200s for both sources and tours and that
    `/scores` shows real matches.
@@ -28,6 +29,9 @@ Goal: measure live-score lag, update cadence and coverage, then decide whether t
   `GET /wta/v1/matches?tournament_ids[]=<id>` for a WTA 125 in play, and see whether live 125
   matches appear in `is_live=true`. Record the answer (yes / results only / no) in the trial report;
   it decides whether paying would also fill the WTA 125 gaps on the Results page.
+- **Check the new live features** on a live match: the win-chance bar under the score on `/scores`
+  moves with the score; a match page with stored prices shows the market line after two price
+  changes.
 - Rate budget during the trial: 5 requests/min per tour. Polling uses at most 3/min per tour, plus
   a full schedule refresh every 15 min.
 

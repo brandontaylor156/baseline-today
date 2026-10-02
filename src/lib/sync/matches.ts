@@ -127,7 +127,19 @@ async function saveOdds(db: AdminClient, provider: TennisProvider, tour: Tour, t
       const id = matchId.get(o.matchProviderId);
       return id === undefined ? [] : [{ match_id: id, vendor: o.vendor, player1_odds: o.p1, player2_odds: o.p2, updated_at: o.updatedAt }];
     });
-    if (rows.length) fail("save odds", (await db.from("odds").upsert(rows, { onConflict: "match_id,vendor" })).error);
+    if (rows.length === 0) return;
+    // History: a row only where a bookmaker's price changed since we last stored it.
+    const { data: before } = await db.from("odds").select("match_id, vendor, player1_odds, player2_odds").in("match_id", [...new Set(rows.map((r) => r.match_id))]);
+    const prev = new Map((before ?? []).map((b) => [`${b.match_id}|${b.vendor}`, b]));
+    const now = new Date().toISOString();
+    const changed = rows
+      .filter((r) => {
+        const b = prev.get(`${r.match_id}|${r.vendor}`);
+        return !b || b.player1_odds !== r.player1_odds || b.player2_odds !== r.player2_odds;
+      })
+      .map((r) => ({ match_id: r.match_id, vendor: r.vendor, player1_odds: r.player1_odds, player2_odds: r.player2_odds, taken_at: now }));
+    fail("save odds", (await db.from("odds").upsert(rows, { onConflict: "match_id,vendor" })).error);
+    if (changed.length) fail("save odds history", (await db.from("odds_history").insert(changed)).error);
   } catch (err) {
     console.error(`odds ${tour}: ${err instanceof Error ? err.message : err}`);
   }

@@ -1,8 +1,11 @@
 import "server-only";
 
+import { liveChance, serveModelFor, stateFromScore } from "@/lib/live-prob";
+import { bestOfFive, calibrate, newRating, normalizeSurface, winProbability, type Rating } from "@/lib/model/elo";
 import type { MatchStatus, SetScore, Tour } from "@/lib/provider/types";
 import { createPublicClient } from "@/lib/supabase/public";
 
+import { getModelInfo } from "./predictions";
 import { groupMatches, type ScoreMatch, type TournamentGroup } from "./scores-group";
 
 export type { ScoreMatch, TournamentGroup };
@@ -85,11 +88,58 @@ export async function getScores(now = new Date()): Promise<{ groups: TournamentG
 
   const rows = state.data ?? [];
   const times = rows.map((r) => r.last_refreshed_at).filter((t): t is string => Boolean(t));
+  const list = matches.data as unknown as Row[];
+  const chances = await liveChances(db, list.filter((r) => r.is_live));
   return {
-    groups: groupMatches((matches.data as unknown as Row[]).map(toMatch)),
+    groups: groupMatches(list.map((r) => ({ ...toMatch(r), winChance: chances.get(r.id) ?? null }))),
     freshness: {
       refreshedAt: times.length === 2 ? times.sort()[0] : null,
       unauthorized: rows.some((r) => r.status === "unauthorized"),
     },
   };
+}
+
+/** Which side serves, from the provider's server field. */
+function serverIsP1(r: Row): boolean | null {
+  const s = (r.server ?? "").toLowerCase();
+  if (!s) return null;
+  if (s === "1" || s === "player1" || (r.p1 && (s === String(r.p1.id) || s === r.p1.full_name.toLowerCase()))) return true;
+  if (s === "2" || s === "player2" || (r.p2 && (s === String(r.p2.id) || s === r.p2.full_name.toLowerCase()))) return false;
+  return null;
+}
+
+// Typical share of serve points won on each tour (sets the scale of the in-match model).
+const SERVE_AVERAGE: Record<Tour, number> = { atp: 0.63, wta: 0.56 };
+
+type Db = ReturnType<typeof createPublicClient>;
+
+/** Player 1's chance to win each live match from the current score. */
+async function liveChances(db: Db, live: Row[]): Promise<Map<number, number>> {
+  const out = new Map<number, number>();
+  const linked = live.filter((r) => r.p1 && r.p2);
+  if (linked.length === 0) return out;
+  const keys = [...new Set(linked.flatMap((r) => [`id:${r.p1!.id}`, `id:${r.p2!.id}`]))];
+  const [{ data }, info] = await Promise.all([
+    db.from("player_ratings").select("tour, player_key, elo, elo_hard, elo_clay, elo_grass, matches, hard_matches, clay_matches, grass_matches").in("player_key", keys),
+    getModelInfo(),
+  ]);
+  const ratings = new Map<string, Rating>(
+    (data ?? []).map((r) => [
+      `${r.tour}|${r.player_key}`,
+      { overall: r.elo, surface: { hard: r.elo_hard, clay: r.elo_clay, grass: r.elo_grass }, matches: r.matches, surfaceMatches: { hard: r.hard_matches, clay: r.clay_matches, grass: r.grass_matches } },
+    ]),
+  );
+  for (const r of linked) {
+    const tour = r.tour as Tour;
+    const state = stateFromScore((Array.isArray(r.set_scores) ? r.set_scores : []) as SetScore[], r.player1_game_score, r.player2_game_score, serverIsP1(r));
+    if (!state) continue;
+    const fiveSets = tour === "atp" && /grand slam/i.test(r.tournaments.category ?? "");
+    const base = calibrate(
+      winProbability(ratings.get(`${tour}|id:${r.p1!.id}`) ?? newRating(), ratings.get(`${tour}|id:${r.p2!.id}`) ?? newRating(), normalizeSurface(r.tournaments.surface)),
+      info.calibration[tour] ?? 1,
+    );
+    const pre = fiveSets ? bestOfFive(base) : base;
+    out.set(r.id, liveChance(serveModelFor(pre, fiveSets ? 5 : 3, SERVE_AVERAGE[tour]), state));
+  }
+  return out;
 }
