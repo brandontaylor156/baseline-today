@@ -8,7 +8,7 @@ const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const ref = new URL(url).hostname.split(".")[0];
 const admin = createClient(url, process.env.SUPABASE_SECRET_KEY!, { auth: { persistSession: false } });
 const [matchId, out] = [Number(process.argv[2]), process.argv[3]];
-const base = "http://localhost:3100";
+const base = process.env.PARTY_BASE_URL ?? "http://localhost:3100";
 const created: string[] = [];
 
 async function session(label: string) {
