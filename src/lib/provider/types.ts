@@ -87,8 +87,11 @@ export interface ProviderMatch {
 
 export interface TennisProvider {
   readonly name: string;
-  /** Latest published singles ranking, best `limit` players. */
-  getRankings(tour: Tour, limit: number): Promise<ProviderRanking[]>;
+  /**
+   * Singles ranking, best `limit` players: the latest, or the snapshot in effect on `date`
+   * (YYYY-MM-DD; the provider returns the nearest earlier ranking week).
+   */
+  getRankings(tour: Tour, limit: number, date?: string): Promise<ProviderRanking[]>;
   /** Full profiles for the given provider player ids. */
   getPlayers(tour: Tour, providerIds: number[]): Promise<ProviderPlayer[]>;
   /** All tournaments of a season (free tier). */

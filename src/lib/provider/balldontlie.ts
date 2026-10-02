@@ -75,8 +75,9 @@ async function requestAll<T>(tour: Tour, path: string, params: URLSearchParams):
 export const balldontlie: TennisProvider = {
   name: "balldontlie",
 
-  async getRankings(tour: Tour, limit: number): Promise<ProviderRanking[]> {
+  async getRankings(tour: Tour, limit: number, date?: string): Promise<ProviderRanking[]> {
     const params = new URLSearchParams({ per_page: String(Math.min(limit, MAX_PER_PAGE)) });
+    if (date) params.set("date", date);
     const page = await request<BdlRanking>(tour, "rankings", params);
     return mapLatestRankings(tour, page.data, limit);
   },

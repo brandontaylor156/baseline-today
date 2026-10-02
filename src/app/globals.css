@@ -11,6 +11,8 @@
   --accent-soft: #e3f1e8;
   --up: #1f7a4d;
   --down: #b4232f;
+  /* Chart series color, validated (dataviz checks) against the light surface. */
+  --chart-line: #1f7a4d;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -25,6 +27,8 @@
     --accent-soft: #173326;
     --up: #5fd08f;
     --down: #f27c84;
+    /* Darker than --accent: the chart lightness band for dark surfaces is L 0.48–0.67. */
+    --chart-line: #3fa86e;
   }
 }
 
@@ -39,6 +43,7 @@
   --color-accent-soft: var(--accent-soft);
   --color-up: var(--up);
   --color-down: var(--down);
+  --color-chart-line: var(--chart-line);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

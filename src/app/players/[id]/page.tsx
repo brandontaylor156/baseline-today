@@ -5,9 +5,10 @@ import { notFound } from "next/navigation";
 import { FavoriteButton } from "@/components/favorite-button";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { PlayerResults } from "@/components/player-results";
+import { RankChart } from "@/components/rank-chart";
 import { WikiCredit } from "@/components/wiki-credit";
 import { getPlayerResults } from "@/lib/data/results";
-import { getPlayer } from "@/lib/data/tennis";
+import { getPlayer, getRankingDates } from "@/lib/data/tennis";
 import { bestRank, formatDate, formatHeight, formatPlays, formatPoints, formatWeight, TOUR_LABEL } from "@/lib/format";
 
 export const revalidate = 3600;
@@ -25,14 +26,23 @@ async function load(params: PageProps<"/players/[id]">["params"]) {
 
 export async function generateMetadata({ params }: PageProps<"/players/[id]">): Promise<Metadata> {
   const player = await load(params);
-  return player ? { title: player.fullName } : {};
+  if (!player) return {};
+  const latest = player.history.at(-1);
+  const description = [
+    `${TOUR_LABEL[player.tour]} singles`,
+    latest ? `ranked #${latest.rank}` : null,
+    player.countryName,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  return { title: player.fullName, description, openGraph: { title: player.fullName, description } };
 }
 
 export default async function PlayerPage({ params }: PageProps<"/players/[id]">) {
   const player = await load(params);
   if (!player) notFound();
 
-  const results = await getPlayerResults(player.id);
+  const [results, tourDates] = await Promise.all([getPlayerResults(player.id), getRankingDates(player.tour)]);
   const latest = player.history.at(-1);
   const best = bestRank(player.history);
   // The provider's birthplace is often just the country; don't repeat it.
@@ -94,6 +104,16 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
           hint="tour-level, from tracked draws"
         />
       </dl>
+
+      {player.history.length > 1 && (
+        <section aria-labelledby="chart-heading" className="rounded-xl border border-border bg-surface p-4 sm:p-5">
+          <h2 id="chart-heading" className="text-sm font-semibold uppercase tracking-wide text-muted">
+            Ranking history
+          </h2>
+          <p className="mb-3 text-xs text-muted">Weekly {TOUR_LABEL[player.tour]} rank while in the top 100</p>
+          <RankChart history={player.history} tourDates={tourDates} tourLabel={TOUR_LABEL[player.tour]} />
+        </section>
+      )}
 
       <section aria-labelledby="bio-heading" className="rounded-xl border border-border bg-surface p-4 sm:p-5">
         <h2 id="bio-heading" className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
