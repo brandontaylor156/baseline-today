@@ -216,7 +216,7 @@ Playwright browser tests, isolation test) on every push.
 
 ## 10. Open questions / to verify
 
-- Does one BALLDONTLIE free key cover both ATP and WTA? (Phase A, first step)
+- ~~Does one BALLDONTLIE free key cover both ATP and WTA?~~ **Yes** (verified 2026-10-01; each tour has its own 5 req/min limit).
 - BALLDONTLIE live latency and "today's matches" query (Phase B trial)
 - Is the old Flask app still deployed anywhere? If so, take it down.
 - Wikimedia coverage: how many of the top 200 have a freely licensed photo? (measured in Phase A)

@@ -234,7 +234,18 @@ export type Database = {
     Functions: {
       immutable_unaccent: { Args: { value: string }; Returns: string }
       player_favorite_count: { Args: { p_player_id: number }; Returns: number }
+      ranking_dates: { Args: { p_tour: string }; Returns: string[] }
       search_normalize: { Args: { value: string }; Returns: string }
+      search_players: {
+        Args: { p_limit?: number; p_query: string }
+        Returns: {
+          country_code: string
+          current_rank: number
+          full_name: string
+          id: number
+          tour: string
+        }[]
+      }
       try_acquire_sync_lock: {
         Args: { p_key: string; p_ttl_seconds: number }
         Returns: boolean

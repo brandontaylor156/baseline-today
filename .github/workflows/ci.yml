@@ -7,6 +7,10 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    env:
+      # Public by design (shipped to every browser); RLS protects the data. Needed to prerender pages.
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -1,7 +1,10 @@
 import { timingSafeEqual } from "node:crypto";
 
+import { revalidateTag } from "next/cache";
+
 import { provider } from "@/lib/provider";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { TENNIS_TAG } from "@/lib/supabase/public";
 import { runDailySync } from "@/lib/sync/daily";
 
 export const maxDuration = 300;
@@ -20,5 +23,7 @@ export async function GET(request: Request) {
 
   const result = await runDailySync(createAdminClient(), provider);
   console.log(`daily sync: ${JSON.stringify(result)}`);
+  // Serve fresh rankings on the next visit instead of waiting out the hourly revalidation.
+  if (result.status === "ok") revalidateTag(TENNIS_TAG, "max");
   return Response.json(result, { status: result.status === "error" ? 500 : 200 });
 }

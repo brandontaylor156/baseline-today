@@ -1,0 +1,122 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+
+import { PlayerAvatar } from "@/components/player-avatar";
+import { getPlayer } from "@/lib/data/tennis";
+import { bestRank, formatDate, formatHeight, formatPlays, formatPoints, formatWeight, TOUR_LABEL } from "@/lib/format";
+
+export const revalidate = 3600;
+
+// No pages at build time; each player page is rendered on first visit, then cached (ISR).
+export function generateStaticParams() {
+  return [];
+}
+
+async function load(params: PageProps<"/players/[id]">["params"]) {
+  const { id } = await params;
+  if (!/^\d+$/.test(id)) return null;
+  return getPlayer(Number(id));
+}
+
+export async function generateMetadata({ params }: PageProps<"/players/[id]">): Promise<Metadata> {
+  const player = await load(params);
+  return player ? { title: player.fullName } : {};
+}
+
+export default async function PlayerPage({ params }: PageProps<"/players/[id]">) {
+  const player = await load(params);
+  if (!player) notFound();
+
+  const latest = player.history.at(-1);
+  const best = bestRank(player.history);
+  // The provider's birthplace is often just the country; don't repeat it.
+  const birthPlace = player.birthPlace && player.birthPlace !== player.countryName ? player.birthPlace : null;
+  const facts: [string, string | null][] = [
+    ["Country", player.countryName ?? player.countryCode],
+    ["Born", [player.birthDate && formatDate(player.birthDate), birthPlace].filter(Boolean).join(" · ") || null],
+    ["Plays", formatPlays(player.plays)],
+    ["Height", formatHeight(player.heightCm)],
+    ["Weight", formatWeight(player.weightKg)],
+    ["Turned pro", player.turnedPro ? String(player.turnedPro) : null],
+  ];
+
+  return (
+    <article className="space-y-6">
+      <Link href={`/rankings/${player.tour}`} className="text-sm text-muted hover:text-foreground">
+        ← {TOUR_LABEL[player.tour]} rankings
+      </Link>
+
+      <header className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-end sm:text-left">
+        <figure className="flex flex-col items-center gap-1">
+          <PlayerAvatar name={player.fullName} image={player.image} size="lg" />
+          {player.image && (
+            <figcaption className="max-w-36 text-[10px] leading-tight text-muted">
+              <a href={player.image.sourceUrl} className="hover:underline">
+                {player.image.author}
+              </a>
+              {", "}
+              {player.image.licenseUrl ? (
+                <a href={player.image.licenseUrl} className="hover:underline">
+                  {player.image.license}
+                </a>
+              ) : (
+                player.image.license
+              )}
+            </figcaption>
+          )}
+        </figure>
+        <div>
+          <p className="text-sm font-medium text-accent">{TOUR_LABEL[player.tour]}</p>
+          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{player.fullName}</h1>
+          <p className="mt-1 text-sm text-muted">
+            {player.favoriteCount > 0
+              ? `Favorited by ${player.favoriteCount} ${player.favoriteCount === 1 ? "fan" : "fans"}`
+              : "No favorites yet"}
+          </p>
+        </div>
+      </header>
+
+      <dl className="grid grid-cols-3 gap-3">
+        <Stat label="Current rank" value={latest ? `#${latest.rank}` : "Unranked"} />
+        <Stat label="Points" value={formatPoints(latest?.points ?? null)} />
+        <Stat
+          label="Best tracked rank"
+          value={best ? `#${best.rank}` : "–"}
+          hint={best ? `first reached ${formatDate(best.date)}` : undefined}
+        />
+      </dl>
+
+      <section aria-labelledby="bio-heading" className="rounded-xl border border-border bg-surface p-4 sm:p-5">
+        <h2 id="bio-heading" className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
+          Profile
+        </h2>
+        <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+          {facts
+            .filter((f): f is [string, string] => Boolean(f[1]))
+            .map(([label, value]) => (
+              <div key={label} className="flex justify-between gap-4 border-b border-border pb-2 sm:block sm:border-0 sm:pb-0">
+                <dt className="text-sm text-muted">{label}</dt>
+                <dd className="text-right font-medium sm:text-left">{value}</dd>
+              </div>
+            ))}
+        </dl>
+      </section>
+
+      <p className="text-xs text-muted">
+        Match results and season record arrive with live scores. Best tracked rank counts only the snapshots stored since
+        this site began recording.
+      </p>
+    </article>
+  );
+}
+
+function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
+  return (
+    <div className="rounded-xl border border-border bg-surface p-3 sm:p-4">
+      <dt className="text-xs text-muted">{label}</dt>
+      <dd className="mt-1 text-xl font-semibold tabular-nums sm:text-2xl">{value}</dd>
+      {hint && <dd className="mt-0.5 text-[11px] leading-tight text-muted">{hint}</dd>}
+    </div>
+  );
+}
