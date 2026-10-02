@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AuthButton } from "./auth-button";
 import { SearchBox } from "./search-box";
 
 export function SiteHeader() {
@@ -18,6 +19,9 @@ export function SiteHeader() {
             WTA
           </Link>
         </nav>
+        <div className="ml-auto sm:order-last sm:ml-0">
+          <AuthButton />
+        </div>
         <div className="order-last w-full sm:order-none sm:ml-auto sm:w-64">
           <SearchBox />
         </div>

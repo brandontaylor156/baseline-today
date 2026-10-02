@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { FavoriteButton } from "@/components/favorite-button";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { getPlayer } from "@/lib/data/tennis";
 import { bestRank, formatDate, formatHeight, formatPlays, formatPoints, formatWeight, TOUR_LABEL } from "@/lib/format";
@@ -69,11 +70,9 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
         <div>
           <p className="text-sm font-medium text-accent">{TOUR_LABEL[player.tour]}</p>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{player.fullName}</h1>
-          <p className="mt-1 text-sm text-muted">
-            {player.favoriteCount > 0
-              ? `Favorited by ${player.favoriteCount} ${player.favoriteCount === 1 ? "fan" : "fans"}`
-              : "No favorites yet"}
-          </p>
+          <div className="mt-3">
+            <FavoriteButton playerId={player.id} initialCount={player.favoriteCount} />
+          </div>
         </div>
       </header>
 
