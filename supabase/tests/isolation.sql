@@ -8,6 +8,9 @@ declare
   n integer;
   checks integer := 0;
   denied boolean;
+  tourney bigint;
+  open_match bigint;
+  done_match bigint;
 begin
   -- Setup as the owner (bypasses RLS).
   insert into auth.users (id, aud, role, email, raw_user_meta_data)
@@ -154,6 +157,81 @@ begin
   checks := checks + 1;
 
   if public.player_favorite_count(player) <> 1 then raise exception 'FAIL: anon favorite count'; end if;
+  checks := checks + 1;
+  reset role;
+
+  -- Pick'em: an open and a finished match; A is unnamed, B has a leaderboard name.
+  insert into public.tournaments (provider, tour, provider_id, name, start_date, season)
+  values ('test', 'atp', -1, 'Isolation Open', current_date, extract(year from current_date)::int) returning id into tourney;
+  insert into public.matches (provider, tour, provider_id, tournament_id, status)
+  values ('test', 'atp', -1, tourney, 'scheduled') returning id into open_match;
+  insert into public.matches (provider, tour, provider_id, tournament_id, status, winner_side, score_changed_at, pre_match_p1)
+  values ('test', 'atp', -2, tourney, 'final', 1, now(), 0.7) returning id into done_match;
+  insert into public.picks (user_id, match_id, side) values (user_a, done_match, 1), (user_b, done_match, 2);
+  update public.profiles set leaderboard_name = 'Bob Iso' where id = user_b;
+
+  denied := false;
+  begin
+    update public.profiles set leaderboard_name = '<script>' where id = user_a;
+  exception when check_violation then denied := true;
+  end;
+  if not denied then raise exception 'FAIL: leaderboard name format not enforced'; end if;
+  checks := checks + 1;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', user_a, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  insert into public.picks (match_id, side) values (open_match, 2);
+  checks := checks + 1;
+
+  denied := false;
+  begin
+    update public.picks set side = 2 where match_id = done_match;
+    get diagnostics n = row_count;
+    if n = 0 then denied := true; end if;
+  exception when insufficient_privilege then denied := true;
+  end;
+  if not denied then raise exception 'FAIL: A changed a pick after the result'; end if;
+  checks := checks + 1;
+
+  denied := false;
+  begin
+    insert into public.picks (match_id, side) values (done_match, 1) on conflict do nothing;
+    get diagnostics n = row_count;
+    if n = 0 then denied := true; end if;
+  exception when insufficient_privilege then denied := true;
+  end;
+  if not denied then raise exception 'FAIL: A picked a finished match'; end if;
+  checks := checks + 1;
+
+  select count(*) into n from public.pickem_leaderboard(current_date - 1) where name in ('You', 'Bob Iso');
+  if n <> 2 then raise exception 'FAIL: A should see own row and named B (%)', n; end if;
+  checks := checks + 1;
+  reset role;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', user_b, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  select count(*) into n from public.picks where user_id = user_a;
+  if n <> 0 then raise exception 'FAIL: B can read A''s picks'; end if;
+  checks := checks + 1;
+
+  update public.picks set side = 1 where user_id = user_a;
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'FAIL: B changed A''s pick'; end if;
+  checks := checks + 1;
+  reset role;
+
+  perform set_config('request.jwt.claims', '{"role":"anon"}', true);
+  set local role anon;
+  select count(*) into n from public.pickem_leaderboard(current_date - 1) where name in ('You', 'Bob Iso');
+  if n <> 1 then raise exception 'FAIL: anon leaderboard should list only named players (%)', n; end if;
+  checks := checks + 1;
+
+  denied := false;
+  begin
+    select count(*) into n from public.picks;
+  exception when insufficient_privilege then denied := true;
+  end;
+  if not denied then raise exception 'FAIL: anon can query picks'; end if;
   checks := checks + 1;
   reset role;
 

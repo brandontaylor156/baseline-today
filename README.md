@@ -46,6 +46,9 @@ search and favorites with Google sign-in. A ground-up rebuild of my 2022 Flask t
 - **Interactive draw with "what if":** the bracket with every player's chance in their slot; tap
   who wins any match and all title chances update in the browser. A small-multiples chart shows
   how each contender's chance moved as results came in.
+- **Pick'em:** pick winners of upcoming matches (Google sign-in); weekly and season leaderboards
+  that compare each player with the model on the same matches. Picks are private and lock once a
+  result is posted (RLS); only players who choose a leaderboard name appear publicly.
 - **Up next:** model win chances for scheduled matches on each tournament page and for your
   favorites on "My players".
 - **Season timeline:** each player's tournaments this season: round reached, who stopped them, W-L.

@@ -35,7 +35,7 @@ test.describe("rankings", () => {
 
   test("the page never scrolls sideways", async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 740 });
-    for (const path of ["/", "/rankings/wta", "/credits"]) {
+    for (const path of ["/", "/rankings/wta", "/credits", "/pickem", "/ratings", "/tournaments/752"]) {
       await page.goto(path);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       expect(overflow, path).toBeLessThanOrEqual(0);
@@ -306,4 +306,12 @@ test("title chances on a tournament in progress", async ({ page }) => {
     await page.getByRole("button", { name: /^Reset/ }).click();
     await expect(page.getByRole("heading", { name: /with your picks/ })).toHaveCount(0);
   }
+});
+
+test("pick'em: open matches, leaderboards, sign-in prompt", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Pick’em" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Pick’em" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "This week" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Sign in with Google" })).toBeVisible();
 });

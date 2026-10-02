@@ -23,6 +23,7 @@ export default function PrivacyPage() {
         <ul className="list-disc space-y-1 pl-5">
           <li>your Google account’s name, email address and profile picture link, used only to identify your account;</li>
           <li>the players you favorite;</li>
+          <li>your Pick’em picks, and a leaderboard name only if you choose one;</li>
           <li>
             if you turn on result notifications, your browser’s push address for this site (issued by your browser’s push
             service, such as Google or Apple), used only to send those notifications.
@@ -33,7 +34,8 @@ export default function PrivacyPage() {
 
       <Section title="What others can see">
         <p>
-          Nobody else can see your favorites or your account details. Player pages show only an anonymous total of how
+          Nobody else can see your favorites, your picks or your account details. If you choose a Pick’em leaderboard
+          name, that name and your pick record appear on the public leaderboard; remove the name to go private again. Player pages show only an anonymous total of how
           many people favorited that player.
         </p>
       </Section>

@@ -209,6 +209,35 @@ export type Database = {
           },
         ]
       }
+      picks: {
+        Row: {
+          match_id: number
+          picked_at: string
+          side: number
+          user_id: string
+        }
+        Insert: {
+          match_id: number
+          picked_at?: string
+          side: number
+          user_id?: string
+        }
+        Update: {
+          match_id?: number
+          picked_at?: string
+          side?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "picks_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_images: {
         Row: {
           author: string
@@ -383,16 +412,19 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          leaderboard_name: string | null
         }
         Insert: {
           created_at?: string
           display_name?: string | null
           id: string
+          leaderboard_name?: string | null
         }
         Update: {
           created_at?: string
           display_name?: string | null
           id?: string
+          leaderboard_name?: string | null
         }
         Relationships: []
       }
@@ -678,6 +710,17 @@ export type Database = {
     }
     Functions: {
       immutable_unaccent: { Args: { value: string }; Returns: string }
+      match_open_for_picks: { Args: { p_match_id: number }; Returns: boolean }
+      pickem_leaderboard: {
+        Args: { p_since: string }
+        Returns: {
+          correct: number
+          is_me: boolean
+          model_correct: number
+          name: string
+          settled: number
+        }[]
+      }
       player_favorite_count: { Args: { p_player_id: number }; Returns: number }
       ranking_dates: { Args: { p_tour: string }; Returns: string[] }
       save_push_subscription: {
