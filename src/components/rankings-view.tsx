@@ -8,6 +8,7 @@ import { TOURS, type Tour } from "@/lib/provider/types";
 import { DateSelect } from "./date-select";
 import { Flag } from "./flag";
 import { Movement } from "./movement";
+import { Movers } from "./movers";
 import { PlayerAvatar } from "./player-avatar";
 
 export async function RankingsView({ tour, date }: { tour: Tour; date?: string }) {
@@ -43,6 +44,8 @@ export async function RankingsView({ tour, date }: { tour: Tour; date?: string }
           {selected && <DateSelect basePath={basePath} dates={dates} value={selected} />}
         </div>
       </div>
+
+      <Movers rows={rows} />
 
       {rows.length === 0 ? (
         <p className="rounded-lg border border-border bg-surface p-6 text-center text-muted">

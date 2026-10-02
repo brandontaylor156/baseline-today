@@ -30,7 +30,21 @@ search and favorites with Google sign-in. A ground-up rebuild of my 2022 Flask t
   with every finished match by round.
 - **Head-to-head:** any two players from the same tour: record, split by surface, every meeting
   since 2024 (16,000+ matches imported across three seasons).
+- **This week:** the homepage shows events in play, latest results, upsets, biggest ranking movers
+  and both top 10s.
+- **Predictions and odds:** a surface-aware Elo model (calibrated on the previous season; about 63%
+  of 2026 matches called correctly) gives win chances for upcoming pairings and any head-to-head.
+  With a paid odds plan it compares bookmakers: best price, margin-free market chance and the
+  model's edge. Labeled as estimates, not betting advice, with 18+ and problem-gambling help.
+- **Stats:** season leaderboards (wins, win rate, titles, comebacks, tiebreaks), the biggest upsets
+  by pre-match model chance, and per-player splits by surface, tiebreaks, deciding sets and form.
+- **Rank race:** both players' weekly ranks on one chart on the head-to-head page.
+- **Countries:** each nation's top-100 players, season record, titles and recent results.
 - **Share cards:** generated preview images for players and the site.
+- **Installable app:** web app manifest, icons, an offline page, and a service worker that caches
+  only build assets (never pages or API responses).
+- **Result notifications:** opt-in web push when a favorite finishes a match (also on iPhone once
+  the site is added to the Home Screen).
 - **Search:** live suggestions as you type; "djokovic", "Đoković" and "DJOKOVIĆ" all match.
 - **Favorites and "My players":** Google sign-in only. No passwords and no email sign-up, so nobody can
   use the site to send email.
@@ -60,6 +74,10 @@ Wikidata/Commons ─┼─ daily Vercel Cron ─▶ Supabase Postgres ◀─┤
   finished matches; a result shows only after its page has been unchanged for 10 minutes, and
   results that disappear from the page are hidden. A Supabase cron job checks every 10 minutes and
   downloads only pages with new revisions.
+- **Notifications:** `push_subscriptions` is owner-only and saved through a `security definer`
+  function keyed on `auth.uid()`. After each results check, newly confirmed results are claimed
+  atomically (`notified_at`) and sent with VAPID keys from `scripts/push-keys.mjs`, so overlapping
+  runs never notify twice. Results older than a day are never pushed.
 - **Search:** a generated `search_name` column (`unaccent`, with Đ→dj) plus a trigram index, queried
   through an RPC that ranks prefix matches first.
 - **Auth:** `@supabase/ssr` with session refresh in `proxy.ts` (skipped for visitors without a

@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("rankings", () => {
-  test("home shows the ATP top 100 with links to players", async ({ page }) => {
-    await page.goto("/");
+  test("ATP rankings show the top 100 with links to players", async ({ page }) => {
+    await page.goto("/rankings/atp");
     await expect(page.getByRole("heading", { level: 1, name: "ATP rankings" })).toBeVisible();
     const rows = page.locator("tbody tr");
     await expect(rows).toHaveCount(100);
@@ -15,7 +15,7 @@ test.describe("rankings", () => {
   });
 
   test("tour switch goes to the WTA rankings", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/rankings/atp");
     await page.getByRole("navigation", { name: "Tour" }).getByRole("link", { name: "WTA" }).click();
     await expect(page).toHaveURL(/\/rankings\/wta$/);
     await expect(page.getByRole("heading", { level: 1, name: "WTA rankings" })).toBeVisible();
@@ -45,7 +45,7 @@ test.describe("rankings", () => {
 
 test.describe("player page", () => {
   test("opens from the rankings with profile, stats and favorite button", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/rankings/atp");
     const first = page.locator("tbody tr").first().getByRole("link");
     const name = (await first.locator("span.font-medium").textContent())!.trim();
     await first.click();
@@ -60,7 +60,7 @@ test.describe("player page", () => {
   });
 
   test("photos are credited", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/rankings/atp");
     await page.locator("tbody tr").first().getByRole("link").click();
     const photo = page.locator("figure img");
     if ((await photo.count()) > 0) {
@@ -177,7 +177,7 @@ test.describe("tournaments", () => {
 
 test.describe("player extras", () => {
   test("ranking history chart with a table view", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/rankings/atp");
     await page.locator("tbody tr").first().getByRole("link").click();
     await expect(page.getByRole("heading", { name: "Ranking history" })).toBeVisible();
     await page.getByText("Show as table").click();
@@ -185,7 +185,7 @@ test.describe("player extras", () => {
   });
 
   test("share card is a PNG", async ({ page, request }) => {
-    await page.goto("/");
+    await page.goto("/rankings/atp");
     const href = await page.locator("tbody tr").first().getByRole("link").getAttribute("href");
     const res = await request.get(`${href}/opengraph-image`);
     expect(res.status()).toBe(200);
@@ -193,7 +193,7 @@ test.describe("player extras", () => {
   });
 
   test("head-to-head from a player page", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/rankings/atp");
     await page.locator("tbody tr").first().getByRole("link").click();
     await page.getByRole("link", { name: "Head-to-head" }).click();
     await expect(page).toHaveURL(/\/h2h\?a=\d+$/);
@@ -210,4 +210,52 @@ test("odds page shows predictions with the betting disclaimer", async ({ page })
   await expect(page.getByRole("heading", { level: 1, name: "Odds and predictions" })).toBeVisible();
   await expect(page.getByRole("note")).toContainText("Estimates, not betting advice");
   await expect(page.getByRole("note")).toContainText("18+");
+});
+
+test("home shows this week: top 10s and movers", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByText("This week in tennis")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "ATP top 10" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "WTA top 10" })).toBeVisible();
+  await page.getByRole("link", { name: "Full rankings →" }).first().click();
+  await expect(page).toHaveURL(/\/rankings\/atp$/);
+});
+
+test("stats and countries pages", async ({ page }) => {
+  await page.goto("/stats?tour=wta");
+  await expect(page.getByRole("heading", { level: 1, name: "Stats" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Most wins" })).toBeVisible();
+  await page.goto("/countries");
+  await page.locator("main a[href^=\"/countries/\"]").first().click();
+  await expect(page).toHaveURL(/\/countries\/[A-Z]{3}$/);
+  await expect(page.getByRole("link", { name: "← Countries" })).toBeVisible();
+});
+
+test.describe("installable app", () => {
+  test("manifest with icons, and a fresh service worker", async ({ request }) => {
+    const manifest = await (await request.get("/manifest.webmanifest")).json();
+    expect(manifest.display).toBe("standalone");
+    for (const icon of manifest.icons) {
+      const res = await request.get(icon.src);
+      expect(res.status(), icon.src).toBe(200);
+      expect(res.headers()["content-type"]).toBe("image/png");
+    }
+    const sw = await request.get("/sw.js");
+    expect(sw.status()).toBe(200);
+    expect(sw.headers()["cache-control"]).toContain("no-store");
+    expect(await sw.text()).toContain("notificationclick");
+  });
+
+  test("offline page exists and isn't indexed", async ({ page }) => {
+    await page.goto("/offline");
+    await expect(page.getByRole("heading", { level: 1, name: "You’re offline" })).toBeVisible();
+    await expect(page.locator('meta[name="robots"][content*="noindex"]').first()).toBeAttached();
+  });
+
+  test("push subscriptions need a signed-in user", async ({ request }) => {
+    const body = { endpoint: "https://push.test.invalid/x", keys: { p256dh: "k", auth: "a" } };
+    const post = await request.post("/api/push/subscribe", { data: body });
+    expect([401, 404]).toContain(post.status());
+    expect((await request.delete("/api/push/subscribe", { data: body })).status()).toBe(401);
+  });
 });

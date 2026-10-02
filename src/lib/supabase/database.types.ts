@@ -47,6 +47,7 @@ export type Database = {
           id: number
           is_live: boolean
           not_before_text: string | null
+          notified_at: string | null
           player1_country: string | null
           player1_game_score: string | null
           player1_id: number | null
@@ -81,6 +82,7 @@ export type Database = {
           id?: never
           is_live?: boolean
           not_before_text?: string | null
+          notified_at?: string | null
           player1_country?: string | null
           player1_game_score?: string | null
           player1_id?: number | null
@@ -115,6 +117,7 @@ export type Database = {
           id?: never
           is_live?: boolean
           not_before_text?: string | null
+          notified_at?: string | null
           player1_country?: string | null
           player1_game_score?: string | null
           player1_id?: number | null
@@ -390,6 +393,33 @@ export type Database = {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: number
+          p256dh: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: never
+          p256dh: string
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: never
+          p256dh?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       rankings: {
         Row: {
           movement: number | null
@@ -618,6 +648,10 @@ export type Database = {
       immutable_unaccent: { Args: { value: string }; Returns: string }
       player_favorite_count: { Args: { p_player_id: number }; Returns: number }
       ranking_dates: { Args: { p_tour: string }; Returns: string[] }
+      save_push_subscription: {
+        Args: { p_auth: string; p_endpoint: string; p_p256dh: string }
+        Returns: undefined
+      }
       search_normalize: { Args: { value: string }; Returns: string }
       search_players: {
         Args: { p_limit?: number; p_query: string }

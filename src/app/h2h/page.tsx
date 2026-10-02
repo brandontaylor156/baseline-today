@@ -4,10 +4,11 @@ import Link from "next/link";
 import { H2HPickers } from "@/components/h2h-pickers";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { PlayerResults } from "@/components/player-results";
+import { RankRaceChart } from "@/components/rank-race-chart";
 import { WikiCredit } from "@/components/wiki-credit";
 import { getHeadToHead } from "@/lib/data/h2h";
 import { predictPair } from "@/lib/data/predictions";
-import { getPlayer, type PlayerDetail } from "@/lib/data/tennis";
+import { getPlayer, getRankingDates, type PlayerDetail } from "@/lib/data/tennis";
 import { TOUR_LABEL } from "@/lib/format";
 
 const id = (v: string | string[] | undefined) => (typeof v === "string" && /^\d+$/.test(v) ? Number(v) : null);
@@ -79,6 +80,19 @@ export default async function H2HPage({ searchParams }: PageProps<"/h2h">) {
               </dl>
             )}
           </section>
+
+          {(a.history.length > 1 || b.history.length > 1) && (
+            <section aria-labelledby="race-heading" className="rounded-xl border border-border bg-surface p-4 sm:p-5">
+              <h2 id="race-heading" className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">
+                Ranking race
+              </h2>
+              <RankRaceChart
+                a={{ name: a.fullName, history: a.history }}
+                b={{ name: b.fullName, history: b.history }}
+                tourDates={await getRankingDates(a.tour)}
+              />
+            </section>
+          )}
 
           {predictions.some((x) => x.p) && (
             <section aria-labelledby="model-heading" className="rounded-xl border border-border bg-surface p-4 sm:p-5">

@@ -22,7 +22,11 @@ export default function PrivacyPage() {
         <p>Sign-in uses Google through our authentication provider, Supabase. We receive and store:</p>
         <ul className="list-disc space-y-1 pl-5">
           <li>your Google account’s name, email address and profile picture link, used only to identify your account;</li>
-          <li>the players you favorite.</li>
+          <li>the players you favorite;</li>
+          <li>
+            if you turn on result notifications, your browser’s push address for this site (issued by your browser’s push
+            service, such as Google or Apple), used only to send those notifications.
+          </li>
         </ul>
         <p>We never see or store your Google password, and we don’t send you email.</p>
       </Section>
@@ -45,13 +49,14 @@ export default function PrivacyPage() {
         <p>
           Account data and favorites are stored with Supabase (United States). The site is hosted on Vercel, which keeps
           short-lived request logs (such as IP addresses) for operating the service. Player photos load directly from
-          Wikimedia Commons.
+          Wikimedia Commons. Notifications are delivered through your browser’s push service; their content is
+          encrypted so only your browser can read it.
         </p>
       </Section>
 
       <Section title="Deleting your data">
         <p>
-          Removing a favorite deletes it immediately. To delete your account and everything linked to it, contact the
+          Removing a favorite, or turning notifications off, deletes it immediately. To delete your account and everything linked to it, contact the
           site owner through the{" "}
           <a href={REPO} className="underline underline-offset-2">
             project’s GitHub page

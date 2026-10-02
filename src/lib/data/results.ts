@@ -127,8 +127,12 @@ export function sortGroups(groups: ResultsGroup[], today: string): ResultsGroup[
 }
 
 /** Confirmed results of tournaments in play or finished in the last three days. */
-export async function getRecentResults(now = new Date()): Promise<{ groups: ResultsGroup[]; refreshedAt: string | null }> {
-  const db = createPublicClient({ cached: false });
+export async function getRecentResults(
+  now = new Date(),
+  { cached = false }: { cached?: boolean } = {},
+): Promise<{ groups: ResultsGroup[]; refreshedAt: string | null }> {
+  // The Results page reads fresh; cached pages (the homepage) pass cached: true.
+  const db = createPublicClient({ cached });
   const [{ data, error }, state] = await Promise.all([
     db
       .from("matches")

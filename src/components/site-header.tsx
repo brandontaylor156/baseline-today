@@ -28,6 +28,9 @@ export function SiteHeader() {
           <Link href="/odds" className="rounded-md px-2 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground sm:px-2.5">
             Odds
           </Link>
+          <Link href="/stats" className="rounded-md px-2 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground sm:px-2.5">
+            Stats
+          </Link>
           <Link href="/rankings/atp" className="rounded-md px-2 py-1.5 sm:px-2.5 text-muted hover:bg-surface-muted hover:text-foreground">
             ATP
           </Link>
@@ -35,11 +38,11 @@ export function SiteHeader() {
             WTA
           </Link>
         </nav>
-        {/* Phones: logo and links on the first row, search and sign-in share the second. */}
-        <div className="order-9 min-w-0 flex-1 basis-48 sm:order-none sm:ml-auto sm:w-64 sm:flex-none sm:basis-auto">
-          <SearchBox />
-        </div>
-        <div className="order-10 sm:order-last">
+        {/* Below lg: logo and links on the first row, search and sign-in share the second. */}
+        <div className="flex basis-full items-center gap-3 lg:ml-auto lg:basis-auto lg:gap-6">
+          <div className="min-w-0 flex-1 lg:w-48 lg:flex-none">
+            <SearchBox />
+          </div>
           <AuthButton />
         </div>
       </div>

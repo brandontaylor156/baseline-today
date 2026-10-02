@@ -5,9 +5,11 @@ import { notFound } from "next/navigation";
 import { FavoriteButton } from "@/components/favorite-button";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { PlayerResults } from "@/components/player-results";
+import { PlayerStatsSection } from "@/components/player-stats";
 import { RankChart } from "@/components/rank-chart";
 import { WikiCredit } from "@/components/wiki-credit";
 import { getPlayerResults } from "@/lib/data/results";
+import { getPlayerStats } from "@/lib/data/stats";
 import { getPlayer, getRankingDates } from "@/lib/data/tennis";
 import { bestRank, formatDate, formatHeight, formatPlays, formatPoints, formatWeight, TOUR_LABEL } from "@/lib/format";
 
@@ -42,7 +44,12 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
   const player = await load(params);
   if (!player) notFound();
 
-  const [results, tourDates] = await Promise.all([getPlayerResults(player.id), getRankingDates(player.tour)]);
+  const year = new Date().getUTCFullYear();
+  const [results, tourDates, stats] = await Promise.all([
+    getPlayerResults(player.id),
+    getRankingDates(player.tour),
+    getPlayerStats(player.id, year),
+  ]);
   const latest = player.history.at(-1);
   const best = bestRank(player.history);
   // The provider's birthplace is often just the country; don't repeat it.
@@ -136,6 +143,8 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
             ))}
         </dl>
       </section>
+
+      <PlayerStatsSection season={stats.season} all={stats.all} year={year} since={stats.since} />
 
       {results.recent.length > 0 && (
         <section aria-labelledby="results-heading" className="rounded-xl border border-border bg-surface p-4 sm:p-5">

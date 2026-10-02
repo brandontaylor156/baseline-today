@@ -4,11 +4,13 @@ import Link from "next/link";
 import { Flag } from "@/components/flag";
 import { Movement } from "@/components/movement";
 import { PlayerAvatar } from "@/components/player-avatar";
+import { PushToggle } from "@/components/push-toggle";
 import { SignInPrompt } from "@/components/sign-in-prompt";
 import { WikiCredit } from "@/components/wiki-credit";
 import { RESULT_SELECT, titleFromUrl, toResult, type Result, type ResultRow } from "@/lib/data/results";
 import { formatPoints, TOUR_LABEL } from "@/lib/format";
 import type { Tour } from "@/lib/provider/types";
+import { pushConfig } from "@/lib/push/config";
 import { createClient } from "@/lib/supabase/server";
 import { roundRank } from "@/lib/wiki/rows";
 
@@ -71,12 +73,16 @@ export default async function MyPlayersPage() {
     }
   }
 
+  const push = pushConfig();
+
   return (
     <section className="space-y-4">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">My players</h1>
         <p className="text-sm text-muted">Your favorites, where they stand this week, and how their last match went.</p>
       </div>
+
+      {rows.length > 0 && push && <PushToggle publicKey={push.publicKey} />}
 
       {rows.length === 0 ? (
         <div className="rounded-xl border border-border bg-surface p-6 text-center">

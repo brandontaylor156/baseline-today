@@ -36,6 +36,11 @@ begin
   select count(*) into n from public.favorites;
   if n <> 1 then raise exception 'FAIL: A cannot see own favorite (%)', n; end if;
   checks := checks + 1;
+
+  perform public.save_push_subscription('https://push.test.invalid/a', 'key', 'secret');
+  select count(*) into n from public.push_subscriptions where user_id = user_a;
+  if n <> 1 then raise exception 'FAIL: A cannot save or see own push subscription (%)', n; end if;
+  checks := checks + 1;
   reset role;
 
   -- User B sees nothing of A's and cannot act as A.
@@ -57,6 +62,23 @@ begin
   delete from public.favorites where user_id = user_a;
   get diagnostics n = row_count;
   if n <> 0 then raise exception 'FAIL: B deleted A''s favorite'; end if;
+  checks := checks + 1;
+
+  select count(*) into n from public.push_subscriptions;
+  if n <> 0 then raise exception 'FAIL: B can read A''s push subscriptions'; end if;
+  checks := checks + 1;
+
+  delete from public.push_subscriptions;
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'FAIL: B deleted A''s push subscription'; end if;
+  checks := checks + 1;
+
+  denied := false;
+  begin
+    insert into public.push_subscriptions (user_id, endpoint, p256dh, auth) values (user_a, 'https://push.test.invalid/b', 'key', 'secret');
+  exception when insufficient_privilege then denied := true;
+  end;
+  if not denied then raise exception 'FAIL: B inserted a push subscription directly'; end if;
   checks := checks + 1;
 
   select count(*) into n from public.profiles;
@@ -121,6 +143,14 @@ begin
   exception when insufficient_privilege then denied := true;
   end;
   if not denied then raise exception 'FAIL: anon can take the sync lock'; end if;
+  checks := checks + 1;
+
+  denied := false;
+  begin
+    perform public.save_push_subscription('https://push.test.invalid/anon', 'key', 'secret');
+  exception when insufficient_privilege then denied := true;
+  end;
+  if not denied then raise exception 'FAIL: anon can save a push subscription'; end if;
   checks := checks + 1;
 
   if public.player_favorite_count(player) <> 1 then raise exception 'FAIL: anon favorite count'; end if;
