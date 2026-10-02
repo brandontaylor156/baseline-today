@@ -4,12 +4,14 @@ import { notFound } from "next/navigation";
 
 import { MatchCard } from "@/components/match-card";
 import { MatchupRow } from "@/components/matchup-row";
+import { BracketChallenge } from "@/components/bracket-challenge";
 import { DrawExplorer } from "@/components/draw-explorer";
 import { TitleHistory } from "@/components/title-history";
 import { WikiCredit } from "@/components/wiki-credit";
 import { getUpcoming } from "@/lib/data/predictions";
 import { getDrawModel, getTitleHistory } from "@/lib/data/title-odds";
 import { titleChances } from "@/lib/draw-model";
+import { createPublicClient } from "@/lib/supabase/public";
 import { dateRange, displayName, getTournament } from "@/lib/data/tournaments";
 import { TOUR_LABEL } from "@/lib/format";
 
@@ -36,9 +38,10 @@ export async function generateMetadata({ params }: PageProps<"/tournaments/[id]"
 export default async function TournamentPage({ params }: PageProps<"/tournaments/[id]">) {
   const t = await load(params);
   if (!t) notFound();
-  const [{ matchups }, model] = await Promise.all([
+  const [{ matchups }, model, open] = await Promise.all([
     getUpcoming(new Date(), { cached: true, tournamentId: t.id }),
     t.champion ? null : getDrawModel(t.id),
+    t.champion ? false : createPublicClient().rpc("bracket_open", { p_tournament_id: t.id }).then((r) => r.data === true),
   ]);
   // The explorer only while the title is still open.
   const live = model && titleChances(model) ? model : null;
@@ -74,7 +77,13 @@ export default async function TournamentPage({ params }: PageProps<"/tournaments
         </div>
       )}
 
-      {live && <DrawExplorer model={live}>{history && <TitleHistory series={history.series} times={history.times} />}</DrawExplorer>}
+      {live && open && <BracketChallenge model={live} open />}
+      {live && !open && (
+        <>
+          <DrawExplorer model={live}>{history && <TitleHistory series={history.series} times={history.times} />}</DrawExplorer>
+          <BracketChallenge model={live} open={false} />
+        </>
+      )}
 
       {matchups.length > 0 && (
         <section aria-labelledby="next-heading" className="space-y-2">

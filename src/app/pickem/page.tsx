@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { connection } from "next/server";
 
 import { PickemBoard, type PickemMatch } from "@/components/pickem-board";
@@ -77,6 +78,12 @@ export default async function PickemPage() {
           Pick the winner of upcoming matches and see if you can beat our model
           {modelRate ? `, which picks the favorite and gets about ${Math.round(modelRate * 100)}% right` : ""}. Just for fun: no prizes, no
           money.
+        </p>
+        <p className="mt-1 text-sm">
+          <Link href="/leagues" className="font-medium text-accent hover:underline">
+            Private leagues →
+          </Link>{" "}
+          <span className="text-muted">· Bracket Challenge opens on each tournament page before the first result.</span>
         </p>
       </div>
 

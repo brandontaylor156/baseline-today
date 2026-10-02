@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Flag } from "@/components/flag";
+import { pickStats, type PickStats } from "@/lib/badges";
 
 import { loadClient, signInWithGoogle, useUser } from "./use-user";
 
@@ -29,6 +30,7 @@ export function PickemBoard({ matches, weekStart, seasonStart }: { matches: Pick
   const [busy, setBusy] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mine, setMine] = useState<{ week: Row | null; season: Row | null } | null>(null);
+  const [stats, setStats] = useState<PickStats | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -36,12 +38,18 @@ export function PickemBoard({ matches, weekStart, seasonStart }: { matches: Pick
     (async () => {
       const supabase = await loadClient();
       const ids = matches.map((m) => m.id);
-      const [{ data }, week, season] = await Promise.all([
+      const [{ data }, week, season, history] = await Promise.all([
         ids.length ? supabase.from("picks").select("match_id, side").in("match_id", ids) : Promise.resolve({ data: [] }),
         supabase.rpc("pickem_leaderboard", { p_since: weekStart }),
         supabase.rpc("pickem_leaderboard", { p_since: seasonStart }),
+        supabase.rpc("my_pick_history"),
       ]);
       if (cancelled) return;
+      setStats(
+        pickStats(
+          (history.data ?? []).map((h) => ({ side: h.side as 1 | 2, winner: h.winner_side as 1 | 2, p1: h.pre_match_p1, settledAt: h.settled_at })),
+        ),
+      );
       setPicks(new Map((data ?? []).map((p) => [p.match_id, p.side as 1 | 2])));
       setMine({ week: week.data?.find((r) => r.is_me) ?? null, season: season.data?.find((r) => r.is_me) ?? null });
     })();
@@ -78,6 +86,7 @@ export function PickemBoard({ matches, weekStart, seasonStart }: { matches: Pick
   return (
     <div className="space-y-5">
       {user && <MyRecord mine={mine} />}
+      {user && stats && <Badges stats={stats} />}
       {user && <LeaderboardName />}
       {user === null && (
         <p className="rounded-xl border border-border bg-surface p-4 text-sm">
@@ -222,5 +231,27 @@ function LeaderboardName() {
         </p>
       )}
     </form>
+  );
+}
+
+function Badges({ stats }: { stats: PickStats }) {
+  return (
+    <div className="rounded-xl border border-border bg-surface p-4 text-sm">
+      <p>
+        Current streak <span className="font-semibold tabular-nums">{stats.currentStreak}</span> · best{" "}
+        <span className="font-semibold tabular-nums">{stats.bestStreak}</span>
+      </p>
+      {stats.badges.length === 0 ? (
+        <p className="mt-1 text-xs text-muted">Badges appear here as your picks are settled: streaks, upset calls, perfect days.</p>
+      ) : (
+        <ul className="mt-2 flex flex-wrap gap-2">
+          {stats.badges.map((b) => (
+            <li key={b.id} title={b.description} className="rounded-full border border-accent/50 bg-accent-soft px-2.5 py-0.5 text-xs font-medium text-accent">
+              {b.name}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

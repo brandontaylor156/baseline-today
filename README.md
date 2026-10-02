@@ -56,6 +56,11 @@ search and favorites with Google sign-in. A ground-up rebuild of my 2022 Flask t
 - **Share cards and calendars:** head-to-head links unfurl as a card with the record and win
   chances; public iCalendar feeds per player and per tour (`/calendar/players/<id>.ics`,
   `/calendar/atp.ics`) for Google, Apple or Outlook calendars.
+- **Bracket Challenge, leagues, streaks:** fill a whole draw before the first result (scored by
+  the server after each update; locked by RLS once results arrive), private leagues joined by
+  invite code with nicknames only, and Pick'em streaks and badges.
+- **Match pages:** a preview or result page for every match (`/matches/<id>`) with chances,
+  title stakes, form, head-to-head and a share image.
 - **Up next:** model win chances for scheduled matches on each tournament page and for your
   favorites on "My players".
 - **Season timeline:** each player's tournaments this season: round reached, who stopped them, W-L.

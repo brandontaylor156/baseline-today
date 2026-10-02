@@ -15,9 +15,29 @@ const MATCH_REM = 4;
  * Title chances and the bracket for a tournament in progress. "What if": pick the winner of any
  * match whose players are known, and every chance updates (computed here in the browser).
  */
-export function DrawExplorer({ model, children }: { model: DrawModel; children?: ReactNode }) {
-  const [picks, setPicks] = useState<PlayedResult[]>([]);
-  const [showAll, setShowAll] = useState(false);
+export function DrawExplorer({
+  model,
+  children,
+  picks: controlled,
+  onPicksChange,
+  challenge = false,
+}: {
+  model: DrawModel;
+  children?: ReactNode;
+  /** Controlled picks (Bracket Challenge); otherwise "what if" picks live here. */
+  picks?: PlayedResult[];
+  onPicksChange?: (picks: PlayedResult[]) => void;
+  /** Bracket Challenge: every round shown, wording about your bracket. */
+  challenge?: boolean;
+}) {
+  const [local, setLocal] = useState<PlayedResult[]>([]);
+  const picks = controlled ?? local;
+  const setPicks = (update: (prev: PlayedResult[]) => PlayedResult[]) => {
+    const next = update(picks);
+    if (onPicksChange) onPicksChange(next);
+    else setLocal(next);
+  };
+  const [showAll, setShowAll] = useState(challenge);
   const byKey = useMemo(() => new Map(model.players.map((p) => [p.key, p])), [model]);
 
   const realReach = useMemo(() => drawChances(model), [model]);
@@ -65,7 +85,7 @@ export function DrawExplorer({ model, children }: { model: DrawModel; children?:
           </h2>
           <div className="flex items-center gap-2 text-sm">
             {picks.length > 0 && (
-              <button type="button" onClick={() => setPicks([])} className="rounded-md border border-border px-2.5 py-1 hover:bg-surface-muted">
+              <button type="button" onClick={() => setPicks(() => [])} className="rounded-md border border-border px-2.5 py-1 hover:bg-surface-muted">
                 Reset {picks.length} pick{picks.length === 1 ? "" : "s"}
               </button>
             )}
@@ -77,7 +97,9 @@ export function DrawExplorer({ model, children }: { model: DrawModel; children?:
           </div>
         </div>
         <p className="text-xs text-muted">
-          What if? Tap a player to have them win that match; title chances above update. Tap again to undo.
+          {challenge
+            ? "Your bracket: tap the winner of each match, round by round, through to the champion. Tap again to undo."
+            : "What if? Tap a player to have them win that match; title chances above update. Tap again to undo."}
         </p>
         {/* The bracket scrolls sideways on its own; the page never does. */}
         <div className="-mx-4 overflow-x-auto px-4 pb-2">

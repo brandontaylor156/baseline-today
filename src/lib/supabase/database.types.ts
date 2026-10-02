@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      bracket_entries: {
+        Row: {
+          max_score: number
+          picks: Json
+          score: number
+          tournament_id: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          max_score?: number
+          picks: Json
+          score?: number
+          tournament_id: number
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          max_score?: number
+          picks?: Json
+          score?: number
+          tournament_id?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bracket_entries_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           created_at: string
@@ -39,6 +74,59 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      league_members: {
+        Row: {
+          joined_at: string
+          league_id: string
+          nickname: string
+          user_id: string
+        }
+        Insert: {
+          joined_at?: string
+          league_id: string
+          nickname: string
+          user_id: string
+        }
+        Update: {
+          joined_at?: string
+          league_id?: string
+          nickname?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "league_members_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leagues: {
+        Row: {
+          created_at: string
+          id: string
+          invite_code: string
+          name: string
+          owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invite_code: string
+          name: string
+          owner_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invite_code?: string
+          name?: string
+          owner_id?: string
+        }
+        Relationships: []
       }
       matches: {
         Row: {
@@ -738,8 +826,47 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      bracket_leaderboard: {
+        Args: { p_tournament_id: number }
+        Returns: {
+          is_me: boolean
+          max_score: number
+          name: string
+          score: number
+        }[]
+      }
+      bracket_open: { Args: { p_tournament_id: number }; Returns: boolean }
+      create_league: {
+        Args: { p_name: string; p_nickname: string }
+        Returns: string
+      }
       immutable_unaccent: { Args: { value: string }; Returns: string }
+      is_league_member: { Args: { p_league_id: string }; Returns: boolean }
+      join_league: {
+        Args: { p_code: string; p_nickname: string }
+        Returns: string
+      }
+      league_standings: {
+        Args: { p_league_id: string; p_since: string }
+        Returns: {
+          bracket_points: number
+          correct: number
+          is_me: boolean
+          nickname: string
+          settled: number
+        }[]
+      }
       match_open_for_picks: { Args: { p_match_id: number }; Returns: boolean }
+      my_pick_history: {
+        Args: never
+        Returns: {
+          match_id: number
+          pre_match_p1: number
+          settled_at: string
+          side: number
+          winner_side: number
+        }[]
+      }
       pickem_leaderboard: {
         Args: { p_since: string }
         Returns: {

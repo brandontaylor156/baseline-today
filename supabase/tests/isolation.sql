@@ -11,6 +11,8 @@ declare
   tourney bigint;
   open_match bigint;
   done_match bigint;
+  tourney2 bigint;
+  league_code text;
 begin
   -- Setup as the owner (bypasses RLS).
   insert into auth.users (id, aud, role, email, raw_user_meta_data)
@@ -232,6 +234,75 @@ begin
   exception when insufficient_privilege then denied := true;
   end;
   if not denied then raise exception 'FAIL: anon can query picks'; end if;
+  checks := checks + 1;
+  reset role;
+
+  -- Bracket Challenge: an open draw (no results, starts in 3 days); the pick'em event is closed.
+  insert into public.tournaments (provider, tour, provider_id, name, start_date, season)
+  values ('test', 'atp', -2, 'Isolation Cup', current_date + 3, extract(year from current_date)::int) returning id into tourney2;
+  insert into public.wiki_draws (tournament_id, status, bracket) values (tourney2, 'found', '{"size": 4, "lines": []}'), (tourney, 'found', '{"size": 4, "lines": []}');
+
+  perform set_config('request.jwt.claims', json_build_object('sub', user_a, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  insert into public.bracket_entries (tournament_id, picks) values (tourney2, '[{"w":"a","l":"b"}]');
+  checks := checks + 1;
+
+  denied := false;
+  begin
+    insert into public.bracket_entries (tournament_id, picks) values (tourney, '[]');
+  exception when insufficient_privilege then denied := true;
+  end;
+  if not denied then raise exception 'FAIL: A entered a bracket after results'; end if;
+  checks := checks + 1;
+
+  denied := false;
+  begin
+    update public.bracket_entries set score = 999 where tournament_id = tourney2;
+  exception when insufficient_privilege then denied := true;
+  end;
+  if not denied then raise exception 'FAIL: A set their own bracket score'; end if;
+  checks := checks + 1;
+
+  league_code := public.create_league('Isolation League', 'Alice');
+  select count(*) into n from public.leagues;
+  if n <> 1 then raise exception 'FAIL: A cannot see own league (%)', n; end if;
+  checks := checks + 1;
+  reset role;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', user_b, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  select count(*) into n from public.bracket_entries;
+  if n <> 0 then raise exception 'FAIL: B can read A''s bracket'; end if;
+  checks := checks + 1;
+
+  select count(*) into n from public.leagues;
+  if n <> 0 then raise exception 'FAIL: B sees a league before joining'; end if;
+  checks := checks + 1;
+
+  perform public.join_league(lower(league_code), 'Bob');
+  select count(*) into n from public.league_members;
+  if n <> 2 then raise exception 'FAIL: B should see both members after joining (%)', n; end if;
+  checks := checks + 1;
+
+  delete from public.leagues;
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'FAIL: B deleted A''s league'; end if;
+  checks := checks + 1;
+
+  delete from public.league_members where nickname = 'Alice';
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'FAIL: B removed A from the league'; end if;
+  checks := checks + 1;
+  reset role;
+
+  perform set_config('request.jwt.claims', '{"role":"anon"}', true);
+  set local role anon;
+  denied := false;
+  begin
+    perform public.create_league('Anon League', 'Anon');
+  exception when insufficient_privilege then denied := true;
+  end;
+  if not denied then raise exception 'FAIL: anon created a league'; end if;
   checks := checks + 1;
   reset role;
 

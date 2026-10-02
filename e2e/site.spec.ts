@@ -363,3 +363,11 @@ test("match pages: preview from Up next, result from a result card", async ({ pa
   await expect(page.getByText("Result", { exact: true })).toBeVisible();
   expect((await request.get("/matches/999999999")).status()).toBe(404);
 });
+
+test("private leagues ask signed-out visitors to sign in, keeping the invite code", async ({ page }) => {
+  await page.goto("/pickem");
+  await page.getByRole("link", { name: "Private leagues →" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Private leagues" })).toBeVisible();
+  await page.goto("/leagues?join=ABCD1234");
+  await expect(page.getByText("code ABCD1234")).toBeVisible();
+});
