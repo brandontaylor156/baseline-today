@@ -125,3 +125,10 @@ test("credits list photo authors and licenses", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Player photos" })).toBeVisible();
   await expect(page.getByRole("link", { name: /^CC|Public domain/ }).first()).toBeVisible();
 });
+
+test("privacy page is linked from every page", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "Privacy" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Privacy" })).toBeVisible();
+  await expect(page.getByText("no analytics, advertising or third-party tracking cookies", { exact: false })).toBeVisible();
+});
