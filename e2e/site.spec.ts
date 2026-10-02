@@ -295,7 +295,15 @@ test("title chances on a tournament in progress", async ({ page }) => {
   test.skip((await card.count()) === 0, "no tournament in progress with a readable draw");
   await card.click();
   await expect(page).toHaveURL(/\/tournaments\/\d+$/);
-  await expect(page.getByRole("heading", { name: "Title chances" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Title chances", exact: true })).toBeVisible();
   const first = page.locator("#title-heading ~ div tbody tr").first();
   await expect(first).toContainText("%");
+  // What if: pick a winner, the table switches to the scenario; reset brings it back.
+  const pick = page.getByRole("button", { name: /^Pick .* to win$/ }).first();
+  if ((await pick.count()) > 0) {
+    await pick.click();
+    await expect(page.getByRole("heading", { name: /with your picks/ })).toBeVisible();
+    await page.getByRole("button", { name: /^Reset/ }).click();
+    await expect(page.getByRole("heading", { name: /with your picks/ })).toHaveCount(0);
+  }
 });

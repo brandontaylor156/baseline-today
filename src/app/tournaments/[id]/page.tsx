@@ -4,10 +4,12 @@ import { notFound } from "next/navigation";
 
 import { MatchCard } from "@/components/match-card";
 import { MatchupRow } from "@/components/matchup-row";
-import { TitleChances } from "@/components/title-chances";
+import { DrawExplorer } from "@/components/draw-explorer";
+import { TitleHistory } from "@/components/title-history";
 import { WikiCredit } from "@/components/wiki-credit";
 import { getUpcoming } from "@/lib/data/predictions";
-import { getTitleOdds } from "@/lib/data/title-odds";
+import { getDrawModel, getTitleHistory } from "@/lib/data/title-odds";
+import { titleChances } from "@/lib/draw-model";
 import { dateRange, displayName, getTournament } from "@/lib/data/tournaments";
 import { TOUR_LABEL } from "@/lib/format";
 
@@ -34,10 +36,13 @@ export async function generateMetadata({ params }: PageProps<"/tournaments/[id]"
 export default async function TournamentPage({ params }: PageProps<"/tournaments/[id]">) {
   const t = await load(params);
   if (!t) notFound();
-  const [{ matchups }, titleOdds] = await Promise.all([
+  const [{ matchups }, model] = await Promise.all([
     getUpcoming(new Date(), { cached: true, tournamentId: t.id }),
-    t.champion ? null : getTitleOdds(t.id),
+    t.champion ? null : getDrawModel(t.id),
   ]);
+  // The explorer only while the title is still open.
+  const live = model && titleChances(model) ? model : null;
+  const history = live ? await getTitleHistory(t.id, live) : null;
 
   const facts = [TOUR_LABEL[t.tour], t.category, t.location ? displayName(t.location.split(",")[0]) : null, t.surface, t.drawSize ? `${t.drawSize}-player draw` : null].filter(Boolean);
 
@@ -69,7 +74,7 @@ export default async function TournamentPage({ params }: PageProps<"/tournaments
         </div>
       )}
 
-      {titleOdds && <TitleChances odds={titleOdds} />}
+      {live && <DrawExplorer model={live}>{history && <TitleHistory series={history.series} times={history.times} />}</DrawExplorer>}
 
       {matchups.length > 0 && (
         <section aria-labelledby="next-heading" className="space-y-2">

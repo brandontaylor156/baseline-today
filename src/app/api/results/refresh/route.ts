@@ -3,6 +3,7 @@ import { revalidateTag } from "next/cache";
 import { notifyFavorites } from "@/lib/push/notify";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { TENNIS_TAG } from "@/lib/supabase/public";
+import { snapshotTitleOdds } from "@/lib/sync/title-snapshots";
 import { refreshResults } from "@/lib/sync/wiki-results";
 
 export const maxDuration = 120;
@@ -14,7 +15,9 @@ export async function GET() {
   const result = await refreshResults(db);
   // New or newly confirmed results: let cached player pages pick them up.
   if (result.status === "ok" && ((result.results ?? 0) > 0 || (result.confirmed ?? 0) > 0)) revalidateTag(TENNIS_TAG, "max");
+  // Title chances over time: a snapshot whenever results moved them.
+  const snapshots = result.status === "ok" ? await snapshotTitleOdds(db).catch((err: Error) => `error: ${err.message}`) : undefined;
   // Fans hear about newly confirmed results (no-op until push keys are set).
   const push = result.status === "skipped" ? undefined : await notifyFavorites(db);
-  return Response.json({ ...result, push }, { headers: { "Cache-Control": "no-store" } });
+  return Response.json({ ...result, snapshots, push }, { headers: { "Cache-Control": "no-store" } });
 }

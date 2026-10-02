@@ -482,6 +482,32 @@ export type Database = {
         }
         Relationships: []
       }
+      title_odds_snapshots: {
+        Row: {
+          odds: Json
+          taken_at: string
+          tournament_id: number
+        }
+        Insert: {
+          odds: Json
+          taken_at?: string
+          tournament_id: number
+        }
+        Update: {
+          odds?: Json
+          taken_at?: string
+          tournament_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "title_odds_snapshots_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournaments: {
         Row: {
           category: string | null

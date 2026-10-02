@@ -43,6 +43,9 @@ search and favorites with Google sign-in. A ground-up rebuild of my 2022 Flask t
 - **Title chances:** for every tournament in progress, each remaining player's chance to reach the
   semis, the final and win it, computed exactly from the bracket layout read off the draw page, the
   results so far and the model's chance for every possible match. The favorite shows on the homepage.
+- **Interactive draw with "what if":** the bracket with every player's chance in their slot; tap
+  who wins any match and all title chances update in the browser. A small-multiples chart shows
+  how each contender's chance moved as results came in.
 - **Up next:** model win chances for scheduled matches on each tournament page and for your
   favorites on "My players".
 - **Season timeline:** each player's tournaments this season: round reached, who stopped them, W-L.
