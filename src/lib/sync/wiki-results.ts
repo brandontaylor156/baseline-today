@@ -4,8 +4,17 @@ import type { Tour } from "@/lib/provider/types";
 import type { AdminClient } from "@/lib/supabase/admin";
 import type { Json, Tables } from "@/lib/supabase/database.types";
 import { isPlausibleResult, parseDraw } from "@/lib/wiki/draw-parse";
-import { latestRevisionIds, latestRevisions, pageUrl, searchDrawPages, type PageRevision } from "@/lib/wiki/client";
-import { drawSizeFits, editionMatches, levelFits, searchPhrases, titleScore, tourMentioned } from "@/lib/wiki/identity";
+import {
+  latestRevisionIds,
+  latestRevisions,
+  pageUrl,
+  searchDrawPages,
+  splitStoredTitle,
+  storedTitle,
+  type PageRevision,
+  type WikiLang,
+} from "@/lib/wiki/client";
+import { baseName, drawSizeFits, editionMatches, levelFits, levelInText, searchPhrases, titleScore, tourMentioned } from "@/lib/wiki/identity";
 import { normalizeName } from "@/lib/wiki/names";
 import {
   findPlayer,
@@ -52,11 +61,36 @@ async function loadIndex(db: AdminClient, tour: Tour, cache: Map<Tour, Map<strin
  * only confirms the tour, and a page already assigned to another tournament is never reused.
  */
 async function discover(db: AdminClient, t: Tournament, index: Map<string, number>, now: Date) {
+  // English first; Italian Wikipedia covers many WTA 125s English doesn't.
+  let found = await discoverIn("en", db, t, index);
+  if (!found) found = await discoverIn("it", db, t, index);
+
+  const { error } = await db.from("wiki_draws").upsert({
+    tournament_id: t.id,
+    status: found ? "found" : "not_found",
+    page_title: found ? storedTitle(found.rev.title, found.rev.lang) : null,
+    page_url: found ? pageUrl(found.rev.title, found.rev.lang) : null,
+    discovered_at: now.toISOString(),
+    note: found ? `${found.rev.lang}: title score ${found.score}, ${found.known} known players` : "no identifiable page (en, it)",
+  });
+  fail("save draw page", error);
+  return found?.rev ?? null;
+}
+
+async function discoverIn(lang: WikiLang, db: AdminClient, t: Tournament, index: Map<string, number>) {
   const season = t.season ?? Number(t.start_date?.slice(0, 4));
+  // Does the city also host numbered editions this season (ANTALYA 125 #1, #2…)?
+  const { data: sameCity } = await db
+    .from("tournaments")
+    .select("name")
+    .eq("tour", t.tour)
+    .eq("season", season)
+    .ilike("name", `${baseName(t.name).split(" ")[0]}%#%`);
+  const siblings = (sameCity ?? []).some((s) => s.name !== t.name);
   const scored = new Map<string, number>();
   for (const q of searchPhrases(t.name, t.location)) {
-    for (const title of await searchDrawPages(season, q)) {
-      if (scored.has(title) || !titleFitsTour(title, t.tour as Tour) || !editionMatches(t.name, title)) continue;
+    for (const title of await searchDrawPages(season, q, lang)) {
+      if (scored.has(title) || !titleFitsTour(title, t.tour as Tour) || !editionMatches(t.name, title, siblings)) continue;
       const score = titleScore(title, t.name, t.location, t.tour as Tour);
       if (score > 0) scored.set(title, score);
     }
@@ -67,8 +101,8 @@ async function discover(db: AdminClient, t: Tournament, index: Map<string, numbe
     .select("page_title")
     .eq("status", "found")
     .neq("tournament_id", t.id)
-    .in("page_title", [...scored.keys()].length ? [...scored.keys()] : [""]);
-  const takenTitles = new Set((taken ?? []).map((r) => r.page_title));
+    .in("page_title", [...scored.keys()].length ? [...scored.keys()].map((title) => storedTitle(title, lang)) : [""]);
+  const takenTitles = new Set((taken ?? []).map((r) => splitStoredTitle(r.page_title ?? "").title));
   const candidates = [...scored.entries()]
     .filter(([title]) => !takenTitles.has(title))
     .sort((a, b) => b[1] - a[1])
@@ -76,40 +110,26 @@ async function discover(db: AdminClient, t: Tournament, index: Map<string, numbe
     .map(([title]) => title);
 
   let best: { rev: PageRevision; known: number; score: number } | null = null;
-  const revs = await latestRevisions(candidates);
+  const revs = await latestRevisions(candidates, lang);
   for (const title of candidates) {
     const rev = revs.get(title);
     if (!rev) continue;
     const parsed = parseDraw(rev.content, normalizeName);
     const pagePlayers = new Set(parsed.flatMap((m) => [normalizeName(m.p1.name), normalizeName(m.p2.name)])).size;
-    // Right tour (WTA vs ATP mentions) and a draw that fits the tournament's size.
-    if (
-      !tourMentioned(rev.content, t.tour as Tour) ||
-      !levelFits(rev.categories, t.tour as Tour, t.category) ||
-      !drawSizeFits(pagePlayers, t.draw_size)
-    ) {
-      continue;
-    }
+    // Right tour (WTA vs ATP mentions), right level (English: categories; Italian: the text),
+    // and a draw that fits the tournament's size.
+    const levelOk = lang === "en" ? levelFits(rev.categories, t.tour as Tour, t.category) : levelInText(rev.content, t.category);
+    if (!tourMentioned(rev.content, t.tour as Tour) || !levelOk || !drawSizeFits(pagePlayers, t.draw_size)) continue;
     const known = knownPlayers(parsed, index);
     const score = scored.get(title)!;
     if (!best || score > best.score || (score === best.score && known > best.known)) best = { rev, known, score };
   }
-
-  const { error } = await db.from("wiki_draws").upsert({
-    tournament_id: t.id,
-    status: best ? "found" : "not_found",
-    page_title: best?.rev.title ?? null,
-    page_url: best ? pageUrl(best.rev.title) : null,
-    discovered_at: now.toISOString(),
-    note: best ? `title score ${best.score}, ${best.known} known players` : `no identifiable page among ${scored.size} candidates`,
-  });
-  fail("save draw page", error);
-  return best?.rev ?? null;
+  return best;
 }
 
 /** Stores a page's finished results, applying the plausibility and stability safeguards. */
 async function applyDraw(db: AdminClient, t: Tournament, rev: PageRevision, index: Map<string, number>, now: Date) {
-  const sourceUrl = pageUrl(rev.title);
+  const sourceUrl = pageUrl(rev.title, rev.lang);
   const pageStable = Date.parse(rev.timestamp) <= now.getTime() - STABLE_MINUTES * 60 * 1000;
   const parsed = parseDraw(rev.content, normalizeName).filter((m) => m.winner !== null && isPlausibleResult(m, bestOf(t)));
 
@@ -212,21 +232,34 @@ async function processTournaments(db: AdminClient, list: Tournament[], now: Date
       const applied = await applyDraw(db, t, rev, await loadIndex(db, t.tour as Tour, cache), now);
       summary.pagesChanged++;
       summary.results += applied.results;
-      drawFor.set(t.id, { ...(d ?? ({} as Tables<"wiki_draws">)), tournament_id: t.id, status: "found", page_title: rev.title, last_revid: rev.revid, last_rev_at: rev.timestamp } as Tables<"wiki_draws">);
+      drawFor.set(t.id, { ...(d ?? ({} as Tables<"wiki_draws">)), tournament_id: t.id, status: "found", page_title: storedTitle(rev.title, rev.lang), last_revid: rev.revid, last_rev_at: rev.timestamp } as Tables<"wiki_draws">);
     }
   }
 
   // 2. For known pages, download only those with new revisions.
   const found = list.filter((t) => drawFor.get(t.id)?.status === "found" && drawFor.get(t.id)?.page_title);
-  const revIds = await latestRevisionIds(found.map((t) => drawFor.get(t.id)!.page_title!));
-  const changed = found.filter((t) => {
-    const d = drawFor.get(t.id)!;
-    const latest = revIds.get(d.page_title!);
-    return latest && latest.revid !== d.last_revid;
-  });
-  const revs = await latestRevisions(changed.map((t) => drawFor.get(t.id)!.page_title!));
+  const pageOf = (t: Tournament) => splitStoredTitle(drawFor.get(t.id)!.page_title!);
+  const changed: Tournament[] = [];
+  const revs = new Map<number, PageRevision>();
+  for (const lang of ["en", "it"] as const) {
+    const inLang = found.filter((t) => pageOf(t).lang === lang);
+    if (inLang.length === 0) continue;
+    const revIds = await latestRevisionIds(inLang.map((t) => pageOf(t).title), lang);
+    const changedInLang = inLang.filter((t) => {
+      const latest = revIds.get(pageOf(t).title);
+      return latest && latest.revid !== drawFor.get(t.id)!.last_revid;
+    });
+    const contents = await latestRevisions(changedInLang.map((t) => pageOf(t).title), lang);
+    for (const t of changedInLang) {
+      const rev = contents.get(pageOf(t).title);
+      if (rev) {
+        changed.push(t);
+        revs.set(t.id, rev);
+      }
+    }
+  }
   for (const t of changed) {
-    const rev = revs.get(drawFor.get(t.id)!.page_title!);
+    const rev = revs.get(t.id);
     if (!rev) continue;
     const applied = await applyDraw(db, t, rev, await loadIndex(db, t.tour as Tour, cache), now);
     summary.pagesChanged++;

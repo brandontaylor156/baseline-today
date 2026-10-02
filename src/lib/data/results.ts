@@ -110,7 +110,9 @@ export interface ResultsGroup {
 }
 
 export function titleFromUrl(url: string): string {
-  return decodeURIComponent(url.split("/wiki/")[1] ?? url).replace(/_/g, " ");
+  const title = decodeURIComponent(url.split("/wiki/")[1] ?? url).replace(/_/g, " ");
+  // Credit non-English pages with their edition of Wikipedia.
+  return url.startsWith("https://it.wikipedia.org/") ? `${title} (Italian Wikipedia)` : title;
 }
 
 /** Tournaments still in play first, then the most recently finished; ties by latest result. */

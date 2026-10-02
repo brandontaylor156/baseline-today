@@ -33,7 +33,7 @@ export interface WikiMatch {
 /** Text of the level-2 "Draw" section (up to the next level-2 heading). */
 export function drawSection(wikitext: string): string {
   const lines = wikitext.split("\n");
-  const start = lines.findIndex((l) => /^==\s*Draw\s*==\s*$/i.test(l.trim()));
+  const start = lines.findIndex((l) => /^==\s*(Draw|Tabellone)\s*==\s*$/i.test(l.trim()));
   if (start < 0) return "";
   const end = lines.findIndex((l, i) => i > start && /^==[^=].*[^=]==\s*$/.test(l.trim()));
   return lines.slice(start + 1, end < 0 ? undefined : end).join("\n");
@@ -42,7 +42,8 @@ export function drawSection(wikitext: string): string {
 /** Splits text into bracket template bodies (handles nested {{…}} inside). */
 export function bracketBodies(text: string): string[] {
   const bodies: string[] = [];
-  const re = /\{\{\s*\d+TeamBracket[^|}]*/g;
+  // English {{16TeamBracket-…}}; Italian {{torneo-tennis-4 colonne}} and {{Torneo semifinali 3-3}}.
+  const re = /\{\{\s*(?:\d+TeamBracket|torneo[- ]tennis|Torneo semifinali)[^|}]*/gi;
   let m: RegExpExecArray | null;
   while ((m = re.exec(text))) {
     let depth = 0;
@@ -84,7 +85,8 @@ interface Score {
 export function parseScore(raw: string): Score {
   const text = raw.replace(/'''/g, "").trim();
   if (/w\/o|walkover/i.test(text)) return { games: null, tiebreak: null, retired: false, walkover: true };
-  const retired = /<sup>\s*r(et)?\s*<\/sup>|\bret\.?\b/i.test(text);
+  // "1<sup>r</sup>", "3 ret.", "rit.", or a lone "r" in the next set's field.
+  const retired = /<sup>\s*(r|ret|rit)\.?\s*<\/sup>|\bret\.?(?=\s|$)|\brit\.?(?=\s|$)|^r\.?$/i.test(text);
   const games = text.match(/^(\d+)/);
   const tb = text.match(/<sup>\s*(\d+)\s*<\/sup>/);
   return { games: games ? Number(games[1]) : null, tiebreak: tb ? Number(tb[1]) : null, retired, walkover: false };
@@ -118,7 +120,7 @@ export function parseBracket(body: string): WikiMatch[] {
     if (kind === "team") {
       s.team = value;
       s.bold = /'''/.test(value);
-      s.country = value.match(/\{\{\s*flag(?:icon|athlete)?\s*\|\s*([A-Za-z]{3})/i)?.[1]?.toUpperCase() ?? null;
+      s.country = value.match(/\{\{\s*(?:flag(?:icon|athlete)?|bandiera)\s*\|\s*([A-Za-z]{3})/i)?.[1]?.toUpperCase() ?? null;
     } else if (kind === "seed") {
       s.seed = value.replace(/'''/g, "").trim() || null;
     } else if (setStr) {
@@ -146,10 +148,12 @@ export function parseBracket(body: string): WikiMatch[] {
       }
       const walkover = [...a.scores, ...b.scores].some((s) => s?.walkover);
       const retired = [...a.scores, ...b.scores].some((s) => s?.retired);
-      const winner: 1 | 2 | null = a.bold && !b.bold ? 1 : b.bold && !a.bold ? 2 : null;
+      // English pages bold the winner; Italian pages don't, so fall back to the score.
+      const winner: 1 | 2 | null =
+        a.bold && !b.bold ? 1 : b.bold && !a.bold ? 2 : !a.bold && !b.bold ? winnerFromScore(a.scores, b.scores, sets) : null;
 
       matches.push({
-        round: labels[rd] ?? rd,
+        round: englishRound(labels[rd] ?? rd),
         p1: { name: n1, country: a.country ?? null, seed: a.seed ?? null },
         p2: { name: n2, country: b.country ?? null, seed: b.seed ?? null },
         winner,
@@ -159,6 +163,44 @@ export function parseBracket(body: string): WikiMatch[] {
     }
   }
   return matches;
+}
+
+const ITALIAN_ROUNDS: [RegExp, string][] = [
+  [/^primo turno$/i, "First round"],
+  [/^secondo turno$/i, "Second round"],
+  [/^terzo turno$/i, "Third round"],
+  [/^(quarto turno|ottavi di finale)$/i, "Fourth round"],
+  [/^quarti di finale$/i, "Quarterfinals"],
+  [/^semifinal[ei]$/i, "Semifinals"],
+  [/^finale$/i, "Final"],
+];
+
+/** Round labels in English whatever the page language (so pages dedupe and sort alike). */
+export function englishRound(label: string): string {
+  for (const [re, english] of ITALIAN_ROUNDS) if (re.test(label.trim())) return english;
+  return label;
+}
+
+/**
+ * Winner from the set scores, for pages that don't bold winners: the side whose opponent retired,
+ * or the side that won the majority of completed sets (the plausibility check verifies the rest).
+ */
+function winnerFromScore(a: Score[], b: Score[], sets: WikiSet[]): 1 | 2 | null {
+  if (a.some((s) => s?.retired)) return 2;
+  if (b.some((s) => s?.retired)) return 1;
+  let p1 = 0;
+  let p2 = 0;
+  for (const s of sets) {
+    if (s.p1 === null || s.p2 === null) return null;
+    const hi = Math.max(s.p1, s.p2);
+    const lo = Math.min(s.p1, s.p2);
+    const complete = (hi === 6 && lo <= 4) || (hi === 7 && (lo === 5 || lo === 6));
+    if (!complete) return null; // match still in progress
+    if (s.p1 > s.p2) p1++;
+    else p2++;
+  }
+  if (Math.max(p1, p2) < 2 || p1 === p2) return null;
+  return p1 > p2 ? 1 : 2;
 }
 
 const roundKey = (round: string) => round.toLowerCase().replace(/[^a-z0-9]/g, "");

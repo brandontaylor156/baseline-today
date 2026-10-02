@@ -1,8 +1,9 @@
-// Re-checks every stored tournament → draw page pairing against the category level rule.
+// Re-checks every stored tournament → draw page pairing against the level rule
+// (English pages: categories; Italian pages: the level named in the text).
 //   npm run audit:draws            (report only)
 //   npm run audit:draws -- --fix   (hide results of failing pairings and queue rediscovery)
 import { createAdminClient } from "@/lib/supabase/admin";
-import { levelFits } from "@/lib/wiki/identity";
+import { levelFits, levelInText } from "@/lib/wiki/identity";
 
 const fix = process.argv.includes("--fix");
 const db = createAdminClient();
@@ -14,18 +15,35 @@ const { data: draws, error } = await db
   .eq("status", "found");
 if (error) throw new Error(error.message);
 
-const rows = (draws ?? []) as unknown as { tournament_id: number; page_title: string; tournaments: { tour: "atp" | "wta"; name: string; category: string | null; season: number } }[];
-const categories = new Map<string, string[]>();
-for (let i = 0; i < rows.length; i += 50) {
-  const titles = rows.slice(i, i + 50).map((r) => r.page_title);
-  const params = new URLSearchParams({ action: "query", prop: "categories", cllimit: "max", titles: titles.join("|"), format: "json", formatversion: "2", maxlag: "5" });
-  const res = await fetch(`https://en.wikipedia.org/w/api.php?${params}`, { headers: { "User-Agent": UA } });
-  const body = (await res.json()) as { query?: { pages?: { title: string; categories?: { title: string }[] }[] } };
-  for (const p of body.query?.pages ?? []) categories.set(p.title, (p.categories ?? []).map((c) => c.title.replace(/^Category:/, "")));
+type Row = { tournament_id: number; page_title: string; tournaments: { tour: "atp" | "wta"; name: string; category: string | null; season: number } };
+const rows = (draws ?? []) as unknown as Row[];
+const english = rows.filter((r) => !r.page_title.startsWith("it:"));
+const italian = rows.filter((r) => r.page_title.startsWith("it:"));
+
+async function query(lang: string, params: Record<string, string>) {
+  const qs = new URLSearchParams({ action: "query", format: "json", formatversion: "2", maxlag: "5", ...params });
+  const res = await fetch(`https://${lang}.wikipedia.org/w/api.php?${qs}`, { headers: { "User-Agent": UA } });
+  return (await res.json()) as { query?: { pages?: { title: string; categories?: { title: string }[]; revisions?: { slots: { main: { content: string } } }[] }[] } };
 }
 
-const failing = rows.filter((r) => !levelFits(categories.get(r.page_title) ?? [], r.tournaments.tour, r.tournaments.category));
-console.log(`checked ${rows.length} pairings, ${failing.length} fail the level rule`);
+const categories = new Map<string, string[]>();
+for (let i = 0; i < english.length; i += 50) {
+  const body = await query("en", { prop: "categories", cllimit: "max", titles: english.slice(i, i + 50).map((r) => r.page_title).join("|") });
+  for (const p of body.query?.pages ?? []) categories.set(p.title, (p.categories ?? []).map((c) => c.title.replace(/^Category:/, "")));
+}
+const italianText = new Map<string, string>();
+for (const r of italian) {
+  const title = r.page_title.slice(3);
+  const body = await query("it", { prop: "revisions", rvprop: "content", rvslots: "main", titles: title });
+  italianText.set(r.page_title, body.query?.pages?.[0]?.revisions?.[0]?.slots.main.content ?? "");
+}
+
+const failing = rows.filter((r) =>
+  r.page_title.startsWith("it:")
+    ? !levelInText(italianText.get(r.page_title) ?? "", r.tournaments.category)
+    : !levelFits(categories.get(r.page_title) ?? [], r.tournaments.tour, r.tournaments.category),
+);
+console.log(`checked ${rows.length} pairings (${italian.length} Italian), ${failing.length} fail the level rule`);
 for (const r of failing) {
   const level = (categories.get(r.page_title) ?? []).filter((c) => /Tour|125/.test(c)).join(", ");
   console.log(`  ${r.tournaments.season} ${r.tournaments.tour} ${r.tournaments.name} (${r.tournaments.category}) -> ${r.page_title} [${level}]`);

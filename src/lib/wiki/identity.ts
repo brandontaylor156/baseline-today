@@ -59,6 +59,7 @@ export const ALIASES: Record<string, string[]> = {
   "sao paulo": ["SP Open", "São Paulo Open"],
   // Full names win over the shared city key (ROME 125 is not the WTA 1000 in Rome).
   "rome 125": ["Roma Open"],
+  vic: ["Catalonia Open"],
   "united cup": [],
   "laver cup": [],
 };
@@ -76,9 +77,23 @@ export function tokens(text: string): string[] {
     .filter((t) => t.length >= 3 && !STOP.has(t) && !/^\d+$/.test(t));
 }
 
-/** "2026 China Open – Women's singles" → "China Open". */
+/**
+ * "2026 China Open – Women's singles" → "China Open";
+ * Italian "Parma Ladies Open 2026 - Singolare" → "Parma Ladies Open".
+ */
 export function eventName(title: string): string {
-  return title.replace(/^\d{4}\s+/, "").split(/\s+[–-]\s+/)[0].trim();
+  if (/^\d{4}\s/.test(title)) return title.replace(/^\d{4}\s+/, "").split(/\s+[–-]\s+/)[0].trim();
+  return title.split(/\s+\d{4}\s+[–-]\s+/)[0].trim();
+}
+
+/**
+ * Italian pages carry no level categories, so their text must name the event's level
+ * ("…un torneo … WTA 125 …"). English pages are checked by categories instead.
+ */
+export function levelInText(content: string, eventCategory: string | null): boolean {
+  const level = eventCategory?.match(/(WTA|ATP)\s*\d+/i)?.[0];
+  if (!level) return true;
+  return new RegExp(level.replace(/\s+/, "\\s*"), "i").test(content);
 }
 
 /** Provider name without level/numbering noise: "ANTALYA 125 #2" → "antalya". */
@@ -99,9 +114,19 @@ export function aliasesFor(name: string): string[] | undefined {
   return ALIASES[full] ?? ALIASES[baseName(name)];
 }
 
-/** Numbered editions ("#2") must match "2"/"II" in the title; unnumbered ones must not carry 2+. */
-export function editionMatches(name: string, title: string): boolean {
+/**
+ * Numbered editions ("#2") must match "2"/"II" in the title; unnumbered ones must not carry 2+.
+ * `hasNumberedSiblings`: the city also hosts numbered editions (ANTALYA 125 #1–#3), so an
+ * unnumbered event there (ANTALYA 125 (ATIK)) must not take a numbered page at all.
+ * Indoor/outdoor in the name must not contradict the title (OUTDOOR #2 ≠ "Oeiras Indoor 2").
+ */
+export function editionMatches(name: string, title: string, hasNumberedSiblings = false): boolean {
   const n = edition(name);
+  const nameText = normalizeName(name);
+  const titleText = normalizeName(eventName(title));
+  if ((/\boutdoor\b/.test(nameText) && /\bindoors?\b/.test(titleText)) || (/\bindoor\b/.test(nameText) && /\boutdoors?\b/.test(titleText))) {
+    return false;
+  }
   // Numerals that are part of the tournament's own name ("Grand Prix Hassan II") aren't editions.
   const own = new Set(normalizeName(name.replace(/#\s*\d+/g, " ")).split(/\s+/));
   const words = normalizeName(eventName(title))
@@ -110,7 +135,7 @@ export function editionMatches(name: string, title: string): boolean {
   // Editions are small numbers (#1–#4); "Open 35 de Saint-Malo" or "Grand Est Open 88" are names.
   const titleNumber = words.map((w) => (/^[1-4]$/.test(w) ? Number(w) : Object.entries(ROMAN).find(([, r]) => r === w)?.[0])).find(Boolean);
   const titleN = titleNumber ? Number(titleNumber) : null;
-  if (n === null) return titleN === null || titleN === 1;
+  if (n === null) return titleN === null || (titleN === 1 && !hasNumberedSiblings);
   return titleN === n || (n === 1 && titleN === null);
 }
 

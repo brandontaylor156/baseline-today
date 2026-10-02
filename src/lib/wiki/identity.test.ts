@@ -98,6 +98,13 @@ describe("gap-fill aliases", () => {
     expect(editionMatches("Grand Prix Hassan II", "2026 Grand Prix Hassan II – Singles")).toBe(true);
     expect(editionMatches("SAINT MALO 125", "2026 L'Open 35 de Saint-Malo – Singles")).toBe(true);
     expect(editionMatches("CONTREXEVILLE 125", "2026 Grand Est Open 88 – Singles")).toBe(true);
+  });
+
+  it("keeps indoor/outdoor and unnumbered siblings apart (the Oeiras and Antalya mistakes)", () => {
+    expect(editionMatches("OEIRAS 125 OUTDOOR #2", "Oeiras Indoor 2 2026 - Singolare")).toBe(false);
+    expect(editionMatches("OEIRAS 125 INDOOR #2", "Oeiras Indoor 2 2026 - Singolare")).toBe(true);
+    expect(editionMatches("ANTALYA 125 (ATIK)", "Antalya Open 1 2026 - Singolare", true)).toBe(false);
+    expect(editionMatches("BEIJING", "2026 China Open – Women's singles", false)).toBe(true);
     expect(editionMatches("ANTALYA 125 #2", "2026 Antalya Challenger 1 – Singles")).toBe(false);
   });
 });

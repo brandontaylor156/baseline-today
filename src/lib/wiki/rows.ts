@@ -95,8 +95,9 @@ export function resultSignature(r: { winner_side: number | null; score: string |
 /** Excludes pages for the other tour's draw at combined events. */
 export function titleFitsTour(title: string, tour: Tour): boolean {
   const t = title.toLowerCase();
-  if (tour === "atp") return !t.includes("women's singles");
-  return !/(^|[^o])men's singles/.test(t);
+  // English "Men's/Women's singles"; Italian "Singolare maschile/femminile".
+  if (tour === "atp") return !t.includes("women's singles") && !t.includes("singolare femminile");
+  return !/(^|[^o])men's singles/.test(t) && !t.includes("singolare maschile");
 }
 
 const ROUND_RANK: [RegExp, number][] = [

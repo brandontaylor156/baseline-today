@@ -75,6 +75,31 @@ ${bracket("Adolfo Daniel Vallejo")}
   });
 });
 
+describe("Italian Wikipedia pages", () => {
+  const ms = parseDraw(fixture("it-parma-ladies-open-2026-singolare"), normalizeName);
+
+  it("reads the Tabellone section with Italian templates and translated rounds", () => {
+    expect(ms.filter((m) => m.round === "First round")).toHaveLength(16);
+    expect(ms.filter((m) => m.round === "Semifinals")).toHaveLength(2); // half + finals brackets merged
+    expect(ms.filter((m) => m.round === "Final")).toHaveLength(1);
+    expect(new Set(ms.map((m) => m.round))).toEqual(new Set(["First round", "Second round", "Quarterfinals", "Semifinals", "Final"]));
+  });
+
+  it("infers winners from scores (no bold) and keeps flags", () => {
+    const semi = find(ms, "Camila Osorio", "Barbora Krejčíková")!;
+    expect(semi.winner).toBe(2); // 2-6 6-1 7-5 from Krejčíková's side
+    expect(semi.p1.country).toBe("COL");
+    expect(isPlausibleResult(semi)).toBe(true);
+    const tb = find(ms, "Dajana Jastrems'ka", "Jéssica Bouzas Maneiro")!;
+    expect(tb.winner).toBe(1); // 7-6 6-7 7-6
+  });
+
+  it("finds a result for every finished match", () => {
+    expect(ms.filter((m) => m.winner !== null).every((m) => isPlausibleResult(m))).toBe(true);
+    expect(ms.filter((m) => m.winner !== null).length).toBe(31);
+  });
+});
+
 describe("parseScore", () => {
   it("handles bold, tiebreaks, retirements and walkovers", () => {
     expect(parseScore("'''7<sup>7</sup>'''")).toEqual({ games: 7, tiebreak: 7, retired: false, walkover: false });
