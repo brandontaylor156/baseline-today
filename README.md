@@ -85,6 +85,10 @@ real result's set scores, with win chances, calls and chat) ·
   Finals): chances of qualifying, year-end No. 1 and the top 10, daily. Backtested from three 2025
   dates against the real qualifiers (Wikipedia's seeds list): beat "the current top 8 qualify" five
   times of six and had the year-end No. 1 right each time.
+- **What decides matches:** layoffs, tiredness within an event, long last matches, a deep run the
+  week before, surface changes, home soil and inexperience, each measured in rating points on top
+  of the model (logistic regression on 48,000 matches, 95% intervals) and tested on a 2023+ holdout.
+  Layoffs and inexperience matter on both tours; the home advantage and back-to-back fatigue don't show up.
 - **Career comparables:** each player's last two years matched against every earlier player at the
   same age (birth dates for 1,600+ draw-only players from Wikidata), with a range for the next two
   years. Backtested from 2021 with only past data: the range holds 58% of outcomes against a 60% aim,

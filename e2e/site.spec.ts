@@ -654,6 +654,7 @@ test("daily puzzle: a wrong guess gets feedback, the answer stays on the server"
 });
 
 test("research lab: luck, time machine, aging and the explorer", async ({ page, request }) => {
+  test.setTimeout(120_000); // many pages in one walk
   await page.goto("/");
   await page.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "Research lab" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Tennis, replayed" })).toBeVisible();
@@ -703,6 +704,10 @@ test("research lab: luck, time machine, aging and the explorer", async ({ page, 
   await page.goto("/lab/season");
   await expect(page.getByRole("heading", { level: 1, name: "Season simulator" })).toBeVisible();
   await expect(page.getByRole("table", { name: /season simulator/ }).locator("tbody tr")).not.toHaveCount(0);
+
+  await page.goto("/lab/factors");
+  await expect(page.getByRole("heading", { level: 1, name: "What decides matches" })).toBeVisible();
+  await expect(page.getByRole("table").locator("tbody tr")).toHaveCount(7);
 
   await page.goto("/lab/forecast?tour=wta&surface=clay");
   await expect(page.getByRole("heading", { level: 1, name: "If a Grand Slam started today" })).toBeVisible();

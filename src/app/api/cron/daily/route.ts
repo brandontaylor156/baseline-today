@@ -10,6 +10,7 @@ import { provider } from "@/lib/provider";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { TENNIS_TAG } from "@/lib/supabase/public";
 import { runDailySync } from "@/lib/sync/daily";
+import { computeFactors } from "@/lib/sync/factors";
 import { computeForecast } from "@/lib/sync/forecast";
 import { freshPages } from "@/lib/sync/fresh-pages";
 import { computeLab } from "@/lib/sync/lab";
@@ -45,6 +46,8 @@ export async function GET(request: Request) {
   }
   // Research lab (rebuilds every draw; about a minute): Mondays, after the week's events finish.
   const lab = now.getUTCDay() === 1 ? await computeLab(db).catch((err: Error) => `error: ${err.message}`) : "weekly";
+  // What decides matches (about 30 seconds): Wednesdays, a quiet day for the other weekly jobs.
+  const factors = now.getUTCDay() === 3 ? await computeFactors(db, now).catch((err: Error) => `error: ${err.message}`) : "weekly";
   // Career comparables (about a minute, from the lab's ratings): Tuesdays, after new players' birth dates.
   const projections =
     now.getUTCDay() === 2
@@ -68,5 +71,5 @@ export async function GET(request: Request) {
     .catch((err: Error) => `error: ${err.message}`);
   // Bluesky: the upset of the day and, on Mondays, last week's recap (off until the account is set).
   const bluesky = await runBluesky(db, now).catch((err: Error) => `error: ${err.message}`);
-  return Response.json({ ...result, records, lab, projections, season, forecast, digest, indexnow, bluesky }, { status: result.status === "error" ? 500 : 200 });
+  return Response.json({ ...result, records, lab, factors, projections, season, forecast, digest, indexnow, bluesky }, { status: result.status === "error" ? 500 : 200 });
 }
