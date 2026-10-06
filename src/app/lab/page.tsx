@@ -23,6 +23,11 @@ const TOOLS = [
     text: "Every draw replayed without each contender: how many titles Alcaraz cost Sinner, Djokovic cost Medvedev, Swiatek cost Sabalenka, and who cost the whole field the most.",
   },
   {
+    href: "/lab/clutch",
+    title: "Clutch index",
+    text: "Tiebreaks and deciding sets won against what a point-level model expected for each matchup, over every match since 2015.",
+  },
+  {
     href: "/lab/explorer",
     title: "Results explorer",
     text: "Any player’s matches filtered by opponent, surface, season, round, event, favourite or underdog, deciding sets and tiebreaks, with splits and CSV export.",

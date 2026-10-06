@@ -75,6 +75,12 @@ export type Database = {
           },
         ]
       }
+      lab_clutch: {
+        Row: { dec_expected: number; dec_n: number; dec_variance: number; dec_won: number; player_id: number | null; player_key: string; tb_expected: number; tb_n: number; tb_variance: number; tb_won: number; tour: string }
+        Insert: { dec_expected: number; dec_n: number; dec_variance: number; dec_won: number; player_id?: number | null; player_key: string; tb_expected: number; tb_n: number; tb_variance: number; tb_won: number; tour: string }
+        Update: { dec_expected?: number; dec_n?: number; dec_variance?: number; dec_won?: number; player_id?: number | null; player_key?: string; tb_expected?: number; tb_n?: number; tb_variance?: number; tb_won?: number; tour?: string }
+        Relationships: []
+      }
       lab_denied: {
         Row: { gain: number; other_id: number | null; other_key: string; player_id: number | null; player_key: string; tour: string }
         Insert: { gain: number; other_id?: number | null; other_key: string; player_id?: number | null; player_key: string; tour: string }

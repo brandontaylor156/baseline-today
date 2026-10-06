@@ -672,4 +672,8 @@ test("research lab: luck, time machine, aging and the explorer", async ({ page, 
   await expect(page.getByRole("heading", { name: "The biggest obstacles" })).toBeVisible();
   await page.locator('section[aria-labelledby="pairs-heading"] a').first().click();
   await expect(page.getByText("Titles they cost others")).toBeVisible();
+
+  await page.goto("/lab/clutch?tour=wta");
+  await expect(page.getByRole("heading", { name: "Tiebreaks: above expectation" })).toBeVisible();
+  await expect(page.getByRole("table", { name: "Deciding sets: above expectation" }).locator("tbody tr")).not.toHaveCount(0);
 });
