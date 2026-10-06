@@ -18,6 +18,7 @@ import { getPlayerStats } from "@/lib/data/stats";
 import { getPlayer, getRankingDates } from "@/lib/data/tennis";
 import { bestRank, formatDate, formatHeight, formatPlays, formatPoints, formatWeight, TOUR_LABEL } from "@/lib/format";
 import { SITE_URL } from "@/lib/site";
+import { createPublicClient } from "@/lib/supabase/public";
 import { playerLd } from "@/lib/structured-data";
 import { seasonTimeline } from "@/lib/timeline";
 
@@ -53,13 +54,18 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
   if (!player) notFound();
 
   const year = new Date().getUTCFullYear();
-  const [results, tourDates, stats, seasonMatches, ratingWeeks] = await Promise.all([
+  const [results, tourDates, stats, seasonMatches, ratingWeeks, { data: traits }] = await Promise.all([
     getPlayerResults(player.id),
     getRankingDates(player.tour),
     getPlayerStats(player.id, year),
     getSeasonMatches(player.tour, year),
     getRatingWeeks(player.id),
+    createPublicClient().from("player_traits").select("hand, backhand, height_cm, source, article, wikidata_id").eq("player_key", `id:${player.id}`).maybeSingle(),
   ]);
+  // Where the provider leaves gaps: hand, backhand and height as Wikidata (or the Wikipedia infobox) records them.
+  const traitPlays = !formatPlays(player.plays) && traits?.hand ? `${traits.hand === "left" ? "Left" : "Right"}-handed` : null;
+  const traitHeight = !player.heightCm && traits?.height_cm ? formatHeight(traits.height_cm) : null;
+  const usedTraits = Boolean(traitPlays || traitHeight || traits?.backhand);
   const latest = player.history.at(-1);
   const best = bestRank(player.history);
   // The provider's birthplace is often just the country; don't repeat it.
@@ -67,8 +73,9 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
   const facts: [string, string | null][] = [
     ["Country", player.countryName ?? player.countryCode],
     ["Born", [player.birthDate && formatDate(player.birthDate), birthPlace].filter(Boolean).join(" · ") || null],
-    ["Plays", formatPlays(player.plays)],
-    ["Height", formatHeight(player.heightCm)],
+    ["Plays", formatPlays(player.plays) ?? traitPlays],
+    ["Backhand", traits?.backhand ? (traits.backhand === "one" ? "One-handed" : "Two-handed") : null],
+    ["Height", formatHeight(player.heightCm) ?? traitHeight],
     ["Weight", formatWeight(player.weightKg)],
     ["Turned pro", player.turnedPro ? String(player.turnedPro) : null],
   ];
@@ -205,6 +212,23 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
               </div>
             ))}
         </dl>
+        {usedTraits && traits && (
+          <p className="mt-3 text-xs text-muted">
+            Backhand{traitPlays ? ", hand" : ""}{traitHeight ? " and height" : ""} from{" "}
+            <a href={`https://www.wikidata.org/wiki/${traits.wikidata_id}`} className="underline hover:text-foreground">
+              Wikidata
+            </a>
+            {traits.source === "wikipedia" && traits.article && (
+              <>
+                {" "}and the player’s{" "}
+                <a href={`https://en.wikipedia.org/wiki/${encodeURIComponent(traits.article.replace(/ /g, "_"))}`} className="underline hover:text-foreground">
+                  Wikipedia article
+                </a>
+              </>
+            )}
+            .
+          </p>
+        )}
       </section>
 
       <PlayerStatsSection season={stats.season} all={stats.all} year={year} since={stats.since} />
