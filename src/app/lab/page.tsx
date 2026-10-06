@@ -13,6 +13,11 @@ export const metadata: Metadata = {
 
 const TOOLS = [
   {
+    href: "/lab/forecast",
+    title: "If a Grand Slam started today",
+    text: "Hundreds of 128-player draws made with real seeding rules, each solved exactly: every player's chance on hard, clay and grass, updated daily.",
+  },
+  {
     href: "/lab/luck",
     title: "Expected vs actual titles",
     text: "Every draw since 2015 rebuilt from its results and replayed with the ratings of that week. Who won more titles than their chances said, and the most improbable champions.",

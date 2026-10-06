@@ -128,3 +128,16 @@ export function reachChances(node: Node, p: (a: string, b: string) => number): M
   step(R, L);
   return out;
 }
+
+/** A bracket from leaves in line order (neighbours meet in the first round). */
+export function lineBracket(leaves: string[]): Node | null {
+  const n = leaves.length;
+  if (n < 2 || (n & (n - 1)) !== 0) return null;
+  let level: Node[] = leaves.map((leaf) => ({ leaf }));
+  while (level.length > 1) {
+    const next: Node[] = [];
+    for (let i = 0; i < level.length; i += 2) next.push({ left: level[i], right: level[i + 1], winner: "" });
+    level = next;
+  }
+  return level[0];
+}
