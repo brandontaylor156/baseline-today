@@ -12,6 +12,7 @@ import { TENNIS_TAG } from "@/lib/supabase/public";
 import { runDailySync } from "@/lib/sync/daily";
 import { computeFactors } from "@/lib/sync/factors";
 import { computeForecast } from "@/lib/sync/forecast";
+import { computeFragility } from "@/lib/sync/fragility";
 import { freshPages } from "@/lib/sync/fresh-pages";
 import { computeLab } from "@/lib/sync/lab";
 import { syncPeople } from "@/lib/sync/people";
@@ -48,7 +49,12 @@ export async function GET(request: Request) {
   // Research lab (rebuilds every draw; about a minute): Mondays, after the week's events finish.
   const lab = now.getUTCDay() === 1 ? await computeLab(db).catch((err: Error) => `error: ${err.message}`) : "weekly";
   // What decides matches (about 30 seconds): Wednesdays, a quiet day for the other weekly jobs.
-  const factors = now.getUTCDay() === 3 ? await computeFactors(db, now).catch((err: Error) => `error: ${err.message}`) : "weekly";
+  const factors =
+    now.getUTCDay() === 3
+      ? await computeFactors(db, now)
+          .then(async (f) => ({ ...f, fragility: await computeFragility(db, now) }))
+          .catch((err: Error) => `error: ${err.message}`)
+      : "weekly";
   // Scoreline checks (a few minutes): Thursdays.
   const scorelineCheck = now.getUTCDay() === 4 ? await computeScorelines(db, now).catch((err: Error) => `error: ${err.message}`) : "weekly";
   // Career comparables (about a minute, from the lab's ratings): Tuesdays, after new players' birth dates.

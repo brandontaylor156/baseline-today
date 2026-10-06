@@ -33,6 +33,11 @@ const TOOLS = [
     text: "Every match's chance of each set score, a tiebreak and the total games, played out point by point with form on the day, and checked against 47,000 results.",
   },
   {
+    href: "/lab/fragility",
+    title: "Fragile favourites: trait or myth?",
+    text: "Do some favourites keep letting matches drift into deciding sets, and does it predict upsets? Measured against the scoreline model: it doesn't last, and it doesn't predict.",
+  },
+  {
     href: "/lab/forecast",
     title: "If a Grand Slam started today",
     text: "Hundreds of 128-player draws made with real seeding rules, each solved exactly: every player's chance on hard, clay and grass, updated daily.",

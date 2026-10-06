@@ -101,6 +101,9 @@ real result's set scores, with win chances, calls and chat) ·
   the quarter of death and the most open quarter, every seed's draw luck against 200 random draws
   with the real seeding rules and byes, the likeliest quarterfinals and finals, and the dark horses.
   New draws are announced to search engines the day they appear.
+- **Fragile favourites: trait or myth?** Deciding sets as favourite against the scoreline model.
+  The verdict is a myth: it doesn't persist from 2016–2020 to 2021+ (r ≈ 0) and doesn't predict
+  upsets out of sample. The page says so and shows the lists as what chance looks like.
 - **Career comparables:** each player's last two years matched against every earlier player at the
   same age (birth dates for 1,600+ draw-only players from Wikidata), with a range for the next two
   years. Backtested from 2021 with only past data: the range holds 58% of outcomes against a 60% aim,
