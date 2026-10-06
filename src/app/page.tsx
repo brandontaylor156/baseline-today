@@ -5,6 +5,7 @@ import { MatchCard } from "@/components/match-card";
 import { Movers } from "@/components/movers";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { WikiCredit } from "@/components/wiki-credit";
+import { getFinalsOnDay } from "@/lib/data/insights";
 import { getRecentResults } from "@/lib/data/results";
 import { getSeasonMatches } from "@/lib/data/season";
 import { getTitleOdds } from "@/lib/data/title-odds";
@@ -63,7 +64,7 @@ export default async function Home() {
   const rankings = { atp: rest[0] as RankingRow[], wta: rest[1] as RankingRow[] };
   const seasonMatches = [...(rest[2] as Awaited<ReturnType<typeof getSeasonMatches>>), ...(rest[3] as Awaited<ReturnType<typeof getSeasonMatches>>)];
   const { now: thisWeek } = calendarSections(tournaments, today);
-  const record = await getTrackRecord();
+  const [record, onThisDay] = await Promise.all([getTrackRecord(), getFinalsOnDay(now.getUTCMonth() + 1, now.getUTCDate())]);
   const favorites = new Map(
     await Promise.all(thisWeek.map(async (t) => [t.id, t.champion ? null : ((await getTitleOdds(t.id))?.players[0] ?? null)] as const)),
   );
@@ -166,6 +167,38 @@ export default async function Home() {
             })}
           </ul>
           <p className="text-xs text-muted">The winner’s chance according to our model before the match.</p>
+        </section>
+      )}
+
+      {onThisDay.length > 0 && (
+        <section aria-labelledby="otd-heading" className="space-y-2">
+          <h2 id="otd-heading" className="text-sm font-semibold uppercase tracking-wide text-muted">
+            On this day
+          </h2>
+          <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface text-sm">
+            {onThisDay.slice(0, 4).map((f) => (
+              <li key={f.matchId} className="flex flex-wrap items-baseline gap-x-2 gap-y-1 px-4 py-3">
+                <span className="w-12 shrink-0 font-semibold tabular-nums text-accent">{f.season}</span>
+                <span className="min-w-0 flex-1">
+                  {f.winner.id !== null ? (
+                    <Link href={`/players/${f.winner.id}`} className="font-medium hover:underline">
+                      {f.winner.name}
+                    </Link>
+                  ) : (
+                    <span className="font-medium">{f.winner.name}</span>
+                  )}{" "}
+                  won{" "}
+                  <Link href={`/tournaments/${f.tournamentId}`} className="hover:underline">
+                    {displayName(f.tournament)}
+                  </Link>
+                  , beating {f.loser.name}
+                </span>
+                <Link href={`/matches/${f.matchId}`} className="font-mono text-xs text-muted tabular-nums hover:underline">
+                  {f.score || "final"}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 

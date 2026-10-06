@@ -6,6 +6,7 @@ import { Flag } from "@/components/flag";
 import { JsonLd } from "@/components/json-ld";
 import { MarketHistory } from "@/components/market-history";
 import { MatchCard } from "@/components/match-card";
+import { ModelExplainer } from "@/components/model-explainer";
 import { StartParty } from "@/components/party/start-party";
 import { WikiCredit } from "@/components/wiki-credit";
 import { getMatchPreview, type PreviewSide } from "@/lib/data/match-preview";
@@ -156,6 +157,8 @@ export default async function MatchPage({ params }: PageProps<"/matches/[id]">) 
           </span>
         </p>
       )}
+
+      {m.explain && <ModelExplainer e={m.explain} nameA={a.name} nameB={b.name} />}
 
       {m.recap && (
         <section aria-labelledby="recap-heading" className="space-y-2">

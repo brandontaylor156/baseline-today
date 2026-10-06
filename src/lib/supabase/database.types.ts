@@ -106,6 +106,7 @@ export type Database = {
       }
       leagues: {
         Row: {
+          is_public: boolean
           created_at: string
           id: string
           invite_code: string
@@ -113,6 +114,7 @@ export type Database = {
           owner_id: string
         }
         Insert: {
+          is_public?: boolean
           created_at?: string
           id?: string
           invite_code: string
@@ -120,6 +122,7 @@ export type Database = {
           owner_id: string
         }
         Update: {
+          is_public?: boolean
           created_at?: string
           id?: string
           invite_code?: string
@@ -159,6 +162,7 @@ export type Database = {
       }
       matches: {
         Row: {
+          preview_notified_at: string | null
           confirmed: boolean
           duration: string | null
           id: number
@@ -194,6 +198,7 @@ export type Database = {
           winner_side: number | null
         }
         Insert: {
+          preview_notified_at?: string | null
           confirmed?: boolean
           duration?: string | null
           id?: never
@@ -229,6 +234,7 @@ export type Database = {
           winner_side?: number | null
         }
         Update: {
+          preview_notified_at?: string | null
           confirmed?: boolean
           duration?: string | null
           id?: never
@@ -1004,6 +1010,23 @@ export type Database = {
         Args: { p_match_id: number; p_nickname: string }
         Returns: string
       }
+      finals_on_day: {
+        Args: { p_day: number; p_month: number }
+        Returns: {
+          category: string | null
+          loser: string | null
+          loser_id: number | null
+          match_id: number
+          season: number | null
+          set_scores: Json
+          tour: string
+          tournament: string
+          tournament_id: number
+          winner: string | null
+          winner_id: number | null
+          winner_side: number
+        }[]
+      }
       hide_stray_wiki_results: { Args: never; Returns: number }
       immutable_unaccent: { Args: { value: string }; Returns: string }
       is_league_member: { Args: { p_league_id: string }; Returns: boolean }
@@ -1027,6 +1050,20 @@ export type Database = {
         }[]
       }
       match_open_for_picks: { Args: { p_match_id: number }; Returns: boolean }
+      model_accuracy: {
+        Args: never
+        Returns: {
+          brier: number
+          correct: number
+          matches: number
+          ranked: number
+          ranked_model_correct: number
+          ranked_rank_correct: number
+          season: number
+          surface: string
+          tour: string
+        }[]
+      }
       my_pick_history: {
         Args: never
         Returns: {
@@ -1048,6 +1085,10 @@ export type Database = {
         }[]
       }
       player_favorite_count: { Args: { p_player_id: number }; Returns: number }
+      public_leagues: {
+        Args: never
+        Returns: { created_at: string; invite_code: string; members: number; name: string }[]
+      }
       ranking_dates: { Args: { p_tour: string }; Returns: string[] }
       sample_league_standings: {
         Args: { p_season: number }
@@ -1073,6 +1114,7 @@ export type Database = {
           tour: string
         }[]
       }
+      set_league_public: { Args: { p_league_id: string; p_public: boolean }; Returns: undefined }
       set_pre_match_probs: { Args: { p_rows: Json }; Returns: number }
       stray_wiki_results: {
         Args: never
@@ -1096,6 +1138,10 @@ export type Database = {
       try_acquire_sync_lock: {
         Args: { p_key: string; p_ttl_seconds: number }
         Returns: boolean
+      }
+      upset_rates: {
+        Args: { p_from_season?: number }
+        Returns: { dimension: string; favorite_chance: number; key: string; matches: number; upsets: number }[]
       }
     }
     Enums: {

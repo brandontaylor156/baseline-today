@@ -287,6 +287,37 @@ begin
   if n <> 0 then raise exception 'FAIL: B read a league''s standings before joining (%)', n; end if;
   checks := checks + 1;
 
+  -- Public leagues: only the owner can list a league; the directory shows listed ones only.
+  select count(*) into n from public.public_leagues() where invite_code = league_code;
+  if n <> 0 then raise exception 'FAIL: a private league is in the public directory'; end if;
+  denied := false;
+  begin
+    perform public.set_league_public(league, true);
+  exception when insufficient_privilege then denied := true;
+  end;
+  if not denied then raise exception 'FAIL: B listed A''s league publicly'; end if;
+  checks := checks + 1;
+  reset role;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', user_a, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  perform public.set_league_public(league, true);
+  reset role;
+  perform set_config('request.jwt.claims', '{"role":"anon"}', true);
+  set local role anon;
+  select count(*) into n from public.public_leagues() where invite_code = league_code;
+  if n <> 1 then raise exception 'FAIL: a listed league is missing from the directory (%)', n; end if;
+  begin
+    select count(*) into n from public.leagues;
+  exception when insufficient_privilege then n := 0;
+  end;
+  if n <> 0 then raise exception 'FAIL: anon reads the leagues table directly'; end if;
+  checks := checks + 1;
+  reset role;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', user_b, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+
   perform public.join_league(lower(league_code), 'Bob');
   select count(*) into n from public.league_members;
   if n <> 2 then raise exception 'FAIL: B should see both members after joining (%)', n; end if;

@@ -1,0 +1,530 @@
+[
+ {
+  "hash": "7b7a30e",
+  "date": "2026-10-06",
+  "subject": "Push notifications on; guided setup CLI for the account-based switches",
+  "bullets": [
+   "VAPID keys generated (scripts/push-keys.mjs) and production redeployed; scripts/push-check.mts confirms the toggle with a throwaway account",
+   "npm run setup: opens each page, takes pasted values without echoing them, validates them (webhook test message, Bluesky login, Discord bot token), saves to .env.local and Vercel, labels the Bluesky profile, optionally posts and pins the intro, guides Bing and the Discord bot, redeploys once",
+   "Bluesky: intro post (says it's automated) and pin, npm run bluesky:intro"
+  ]
+ },
+ {
+  "hash": "875ddd9",
+  "date": "2026-10-06",
+  "subject": "Search Console CLI: default to the baseline-today quota project; no shell args",
+  "bullets": []
+ },
+ {
+  "hash": "dbeb9b8",
+  "date": "2026-10-06",
+  "subject": "Search Console CLI: run gcloud via cmd.exe so the \"Cloud SDK\" path works",
+  "bullets": []
+ },
+ {
+  "hash": "880e1e5",
+  "date": "2026-10-06",
+  "subject": "Search Console CLI: verify, add the property, submit the sitemap, report",
+  "bullets": []
+ },
+ {
+  "hash": "45dc721",
+  "date": "2026-10-05",
+  "subject": "Credit travels with the data; the Bluesky bot labels itself as automated",
+  "bullets": [
+   "Downloads: every row carries its Wikipedia draw page (source) and the license; JSON adds the full attribution; CSV served as an attachment with a rel=\"license\" link. /data states the source, license and share-alike terms up front with a suggested credit line",
+   "Wording: results come from English Wikipedia and, for ~1%, Italian Wikipedia",
+   "Bluesky: profile set to \"Baseline Today (bot)\" with an automated-account description before any post (npm run bluesky:profile at setup)"
+  ]
+ },
+ {
+  "hash": "c2c6f62",
+  "date": "2026-10-05",
+  "subject": "Sitemap: page the rivalries past PostgREST's 1,000-row cap",
+  "bullets": []
+ },
+ {
+  "hash": "3e02a2f",
+  "date": "2026-10-05",
+  "subject": "Get found and get shared: SEO, weekly recaps, open data, RSS, Bluesky bot, case study",
+  "bullets": [
+   "Readable head-to-head URLs (/h2h/<a>-vs-<b>-<id>-<id>) with canonical redirects, a \"Biggest rivalries\" list and 1,269 top-100 rivalries in the sitemap (top_rivalries migration)",
+   "schema.org JSON-LD: WebSite search action, Person, SportsEvent (matches and tournaments); more specific match titles",
+   "Optional Google/Bing verification tags; daily IndexNow pings for changed pages",
+   "Week in tennis (/week, /week/<monday>): champions and finals, upsets, ranking movers and the model's record, linked from home and in the sitemap",
+   "Open data (/data): results since 2015 and model ratings as CSV/JSON under CC BY-SA 4.0, Wikipedia results only, never provider rankings",
+   "RSS feed (/feed.xml) of results and weekly recaps",
+   "Bluesky bot (off until BLUESKY_HANDLE/APP_PASSWORD): upset of the day and the Monday recap with share cards, deduplicated; npm run bluesky:preview",
+   "/about case study; docs/launch.md drafts; scripts/set-env.mjs for setup"
+  ]
+ },
+ {
+  "hash": "93d0093",
+  "date": "2026-10-05",
+  "subject": "Pick'em: render the signed-out view on the server",
+  "bullets": []
+ },
+ {
+  "hash": "ec7e6f2",
+  "date": "2026-10-05",
+  "subject": "Label demo replays as simulated; webhook setup helper; no heavy runs on prod",
+  "bullets": [
+   "Demo watch party and match replays say plainly that only the set scores are real: banner, header, \"simulated chance to win\", momentum caption, match page link and metadata",
+   "scripts/webhook-env.mjs saves DIGEST_WEBHOOK_URLS to Vercel without printing it and posts one test message",
+   "CLAUDE.md: Lighthouse, screenshots and full test suites run against a local build or a Vercel preview, never production"
+  ]
+ },
+ {
+  "hash": "d366f4c",
+  "date": "2026-10-05",
+  "subject": "Retry a season-matches page cancelled by a statement timeout",
+  "bullets": []
+ },
+ {
+  "hash": "612223d",
+  "date": "2026-10-05",
+  "subject": "README: watch party screenshot",
+  "bullets": []
+ },
+ {
+  "hash": "200c047",
+  "date": "2026-10-05",
+  "subject": "README rewrite, fresh screenshots; status page works without the server key",
+  "bullets": [
+   "README: \"try it without signing in\" links, grouped feature overview, updated architecture, ops, tests (211 unit, 43 browser flows, axe, 55 RLS checks) and switches; new home, Pick'em and tournament screenshots",
+   "/status skips the server-only stray-results audit when SUPABASE_SECRET_KEY is absent (CI), instead of failing the page",
+   "Lighthouse heading order on Pick'em and Rankings; watch-party reactions float at the top center so they no longer cover the game score"
+  ]
+ },
+ {
+  "hash": "574e538",
+  "date": "2026-10-05",
+  "subject": "Automated accessibility checks (axe, WCAG 2.2 AA) and target-size fixes",
+  "bullets": []
+ },
+ {
+  "hash": "284694d",
+  "date": "2026-10-05",
+  "subject": "Isolation test: league standings, party calls and channel access for outsiders",
+  "bullets": []
+ },
+ {
+  "hash": "47f3d5a",
+  "date": "2026-10-05",
+  "subject": "Try it without an account: demo watch party, sample league, guest Pick'em",
+  "bullets": [
+   "/party/demo replays a real recent result point by point (set scores real, point order simulated and verified to replay to them) with three bots that chat, react and make calls; any finished match page links to its replay",
+   "Watch-party room UI split into PartyRoom, shared by real and demo parties",
+   "Leagues: a sample league of four strategy bots scored on this season's results (sample_league_standings migration)",
+   "Pick'em: signed-out visitors pick as guests in the browser, see their guest record, and open picks move into their account on sign-in"
+  ]
+ },
+ {
+  "hash": "4619acd",
+  "date": "2026-10-05",
+  "subject": "Status page, job failure alerts, and cookieless analytics",
+  "bullets": [
+   "/status: health of the results, daily and model jobs, ranking weeks, latest result, matches behind the ratings and the stray-results audit",
+   "Jobs alert a chat webhook (OPS_WEBHOOK_URLS, else the digest webhooks) on failure and recovery; the daily job also watches the 10-minute results job",
+   "Vercel Web Analytics and Speed Insights; privacy page explains them"
+  ]
+ },
+ {
+  "hash": "931f423",
+  "date": "2026-10-02",
+  "subject": "Party UI test can target production (PARTY_BASE_URL)",
+  "bullets": []
+ },
+ {
+  "hash": "4cc1c44",
+  "date": "2026-10-02",
+  "subject": "Watch parties: private rooms with live chat, reactions, scorekeeping and win chances",
+  "bullets": [
+   "parties, party_members, party_calls (migration): invite-code rooms with nicknames; host-only score updates; members-only calls; host can remove guests or end the party; 12-hour rooms",
+   "Private Realtime channels per party with RLS on realtime.messages (members only); chat and reactions are broadcast, never stored; heartbeat \"who's here\"",
+   "Tennis scoring engine from a point log (deuce, advantage, tiebreak serve order; tested) drives the scoreboard, the live win chance and a point-by-point momentum chart; live provider scores take over when available",
+   "\"Call it\": match and set winners, room leaderboard",
+   "Start from any upcoming or live match page; /party/<code> join flow",
+   "Verified end to end with throwaway accounts (deleted after): guest receives host chat and score, outsider is refused by the channel policy",
+   "Header fits signed-in users on one row at desktop widths; isolation test: 50 checks"
+  ]
+ },
+ {
+  "hash": "69c7683",
+  "date": "2026-10-02",
+  "subject": "Index season queries (fixes build timeout after the history import)",
+  "bullets": []
+ },
+ {
+  "hash": "00d05f8",
+  "date": "2026-10-02",
+  "subject": "Paid extras behind switches: in-match win chance, odds movement, AI recaps",
+  "bullets": [
+   "Live win chance: point-level model (serve strengths solved so 0-0 reproduces the pre-match chance, best of 3 or 5, tiebreaks, advantage) from the live scoreboard; bar under live scores",
+   "odds_history (migration): a row per bookmaker price change; match pages chart the market's margin-free chance against the model",
+   "match_recaps (migration): Claude Haiku recaps of recent finals and semifinals from the page's facts only, labelled as AI-written; off unless ANTHROPIC_API_KEY and RECAPS_ENABLED=1, capped per day (RECAPS_DAILY_LIMIT, default 10)",
+   "README: optional switches table; runbook: turn on odds and check the live extras in the trial; credits page explains recaps"
+  ]
+ },
+ {
+  "hash": "7481079",
+  "date": "2026-10-02",
+  "subject": "History since 2015, best-of-5 model, stray-result audit",
+  "bullets": [
+   "Imported 2015–2023 (34,000+ results from 649 draw pages); all 1,179 pairings pass the level audit, which now pages past 1,000 rows",
+   "New audit rule (and SQL helpers): visible results must come from the tournament's current draw page; 147 leftovers from replaced pairings (5 events, 2024–25) hidden",
+   "Men's Grand Slams use a best-of-5 conversion of the set-level chance; backtest on men's Slams improved log loss in 2024 and 2026 (neutral in 2025); applied to stored pre-match chances, upcoming matches, match pages and title odds",
+   "With the longer history the season backtest improved: ATP 65.2% / log loss 0.627, WTA 63.9% / 0.626 (from 63.6% / 0.633 and 63.3% / 0.633)",
+   "Wording: head-to-heads and ratings now say \"since 2015\""
+  ]
+ },
+ {
+  "hash": "da60c06",
+  "date": "2026-10-02",
+  "subject": "Embeddable widgets, Discord bot, daily digests, and the history import script",
+  "bullets": [
+   "/embed/rankings/<tour> and /embed/title/<id>: self-contained HTML, light/dark, frameable (CSP frame-ancestors *, nothing else allowed); /widgets with copy-paste iframe code",
+   "/api/discord: Ed25519-verified interactions for /odds, /rankings, /results (404 until DISCORD_PUBLIC_KEY is set); scripts/discord-register.mjs registers the commands",
+   "Daily digest to Discord/Slack webhooks from DIGEST_WEBHOOK_URLS (hosts allow-listed)",
+   "scripts/import-history.mts: past seasons' tournaments and Wikipedia results (2015–2023 run)"
+  ]
+ },
+ {
+  "hash": "3131960",
+  "date": "2026-10-02",
+  "subject": "Draw difficulty and Finals qualification chances",
+  "bullets": [
+   "Path rating: for each favorite, the average rating of the opponents they'd most likely meet round by round, measured on the draw at the start (tested); shown on tournament pages",
+   "Finals chance on the season race: 4,000 seeded simulations; events in progress end by the title-odds chances, then each player keeps their season rate and resamples their own event points until the week before the Finals (cutoff from our calendar)",
+   "Bracket Challenge section hides when closed with nothing to show"
+  ]
+ },
+ {
+  "hash": "26ead32",
+  "date": "2026-10-02",
+  "subject": "Bracket Challenge, private leagues, Pick'em streaks and badges",
+  "bullets": [
+   "bracket_entries (migration): private entries, insert/change only while bracket_open() (draw readable, no result yet, first day not over); scores written by the server after each results refresh (equal-weight rounds, conflicting picks cancel); standings for named players",
+   "leagues and league_members: create/join by invite code via security-definer RPCs, members see nicknames and records only; league_standings combines Pick'em and bracket points",
+   "my_pick_history() feeds streaks and badges (upset caller, perfect day, beat the model…)",
+   "Draw explorer can be controlled; challenge mode shows every round",
+   "Isolation test: 42 checks; privacy page covers entries and league nicknames"
+  ]
+ },
+ {
+  "hash": "97f8af2",
+  "date": "2026-10-02",
+  "subject": "Match preview and result pages with share cards",
+  "bullets": [
+   "/matches/<id>: win chances (today, or before the match for results), title stakes from the draw model (chance now vs with a win), by-surface chances, bookmaker odds when stored, form, head-to-head, Wikipedia credit; ISR with share image per match",
+   "Shared MatchupCard for share images (head-to-head card refactored onto it)",
+   "Linked from result cards, Up next and odds rows, Pick'em; scheduled matches in the sitemap"
+  ]
+ },
+ {
+  "hash": "8f08818",
+  "date": "2026-10-02",
+  "subject": "Season race, matchup share cards and calendar feeds",
+  "bullets": [
+   "Points race: our per-category points table (tested), banked points from tracked results (robust to gaps and byes) plus projections for events in progress from title-odds reach; /race with the qualifying line and clear estimate notes",
+   "/h2h/card: share image with the record and today's win chances; head-to-head pages set it as their Open Graph and Twitter image",
+   "iCalendar writer (escaping, folding, all-day and timed events; tested) and public feeds: /calendar/players/<id>.ics and /calendar/<atp|wta>.ics, linked from player and tournament pages"
+  ]
+ },
+ {
+  "hash": "8582bfd",
+  "date": "2026-10-02",
+  "subject": "Model rating history on player pages and the model's weekly track record",
+  "bullets": [
+   "player_rating_history (migration): weekly rating per linked player, written by the daily model job through a per-match hook in runElo",
+   "Rating chart (crosshair, arrow keys, table view) on player pages",
+   "Track record: this week's model record by tournament dates, wins against the ranking, biggest misses; on the ratings page and as a line on the homepage",
+   "Fix: track-record cards could push /ratings sideways on phones"
+  ]
+ },
+ {
+  "hash": "60d9403",
+  "date": "2026-10-02",
+  "subject": "Pick'em game with leaderboards; header fits the new link",
+  "bullets": [
+   "picks (migration): owner-only RLS, insert/change/delete only while the match is open (match_open_for_picks); optional public leaderboard_name with format and uniqueness checks",
+   "pickem_leaderboard(): named players plus the caller's own row, with the model's record on the same matches; isolation test grows to 32 checks",
+   "/pickem: open matches with model chances, your week/season record, leaderboard name form",
+   "Header: one \"Rankings\" link (the page has the ATP/WTA switch); phone link row scrolls in place",
+   "Privacy page covers picks and leaderboard names"
+  ]
+ },
+ {
+  "hash": "48fdeff",
+  "date": "2026-10-02",
+  "subject": "Interactive draw with \"what if\" picks, and title chances over time",
+  "bullets": [
+   "Pure draw model (shared by server and browser): bracket rounds, byes, real vs picked results",
+   "Draw explorer on tournament pages: bracket with chances per slot; tap a winner to rerun the title odds in the browser, with changes shown against the real chances",
+   "title_odds_snapshots (migration): a snapshot after each results refresh when chances move; one-off backfill replays this week's results; small-multiples chart with a table view"
+  ]
+ },
+ {
+  "hash": "6e2a240",
+  "date": "2026-10-02",
+  "subject": "Title chances for tournaments in progress",
+  "bullets": [
+   "parseDrawLines reads each player's place in the draw from the section brackets (byes from later rounds); tested on five real pages: every match's players meet in the labeled round",
+   "wiki_draws.bracket (migration) stored with each page update; active draws backfill once",
+   "Exact title odds (no simulation) from the bracket, results so far and calibrated Elo",
+   "Tournament pages show semis/final/title chances; homepage cards show each event's favorite"
+  ]
+ },
+ {
+  "hash": "65b1408",
+  "date": "2026-10-02",
+  "subject": "Model ratings page, Up next predictions, season timeline, sitemap",
+  "bullets": [
+   "/ratings: Elo table for active players by surface, model-vs-ranking disagreements, and a calibration table from this season's out-of-sample predictions",
+   "player_ratings.last_played (migration) and calibration buckets in the model summary",
+   "Up next with model win chances on tournament pages and My players (shared MatchupRow)",
+   "Player pages list this season's tournaments: round reached, who ended the run, W-L",
+   "sitemap.xml and robots.txt"
+  ]
+ },
+ {
+  "hash": "0b2692b",
+  "date": "2026-10-02",
+  "subject": "This-week homepage, stats, countries, rank race, installable app, push notifications",
+  "bullets": [
+   "Homepage: events in play, latest results, upsets, ranking movers, top 10s",
+   "Stats page: season leaderboards and biggest upsets by pre-match model chance",
+   "Player stats (surface, tiebreaks, deciding sets, comebacks, form) and rank race on head-to-head",
+   "Country pages with top-100 players, season record and recent results",
+   "PWA: manifest, icons, offline page, service worker caching only build assets",
+   "Web push for favorites: owner-only push_subscriptions, atomic notified_at claim after each results check, VAPID keys via scripts/push-keys.mjs (off until set)",
+   "Header keeps search and sign-in together below lg"
+  ]
+ },
+ {
+  "hash": "3706cd9",
+  "date": "2026-10-02",
+  "subject": "Win-probability model, odds comparison and upcoming matchups",
+  "bullets": [
+   "Elo model with surface ratings over all ~18k results, calibrated on the previous season (2026 backtest: favourite wins ~63-64%, calibrated); daily job stores ratings and every match's pre-match probability",
+   "/odds (\"Odds\" in nav): upcoming matchups with model probabilities; with BALLDONTLIE odds (GOAT tier / trial, ODDS_ENABLED): best price per side, margin-free market probability, and where model and market disagree. Clear \"estimates, not betting advice\" note, 18+, problem-gambling help",
+   "Upcoming pairings stored from Wikipedia draws (status scheduled)",
+   "Head-to-head shows \"if they played today\" by surface",
+   "Provider odds endpoint mapped from the documented format; odds saved during the schedule refresh, never failing it"
+  ]
+ },
+ {
+  "hash": "1cb6e9b",
+  "date": "2026-10-02",
+  "subject": "Italian Wikipedia fallback for result gaps; edition and indoor/outdoor rules",
+  "bullets": [
+   "Parser reads Italian draw pages (Tabellone section, torneo-tennis templates, Bandiera flags, Italian round names, winners inferred from scores, lone \"r\" retirements); tested on a real page",
+   "Discovery tries English, then Italian (level checked in the page text); stored titles carry an \"it:\" prefix; credit says \"Italian Wikipedia\"",
+   "Unnumbered events in a city with numbered editions can't take a numbered page; indoor/outdoor must not contradict",
+   "audit:draws covers Italian pairings; 430 pairings, 0 failures"
+  ]
+ },
+ {
+  "hash": "514617b",
+  "date": "2026-10-02",
+  "subject": "Fill result gaps: aliases for sponsor-named WTA 125s, edition-number fixes",
+  "bullets": []
+ },
+ {
+  "hash": "e31b235",
+  "date": "2026-10-02",
+  "subject": "Runbook: check whether paid WTA data covers WTA 125 matches",
+  "bullets": []
+ },
+ {
+  "hash": "6d551f1",
+  "date": "2026-10-02",
+  "subject": "Head-to-head, older seasons, per-season tournaments, audits and speed fixes",
+  "bullets": [
+   "Head-to-head page (/h2h): record, surface split and every meeting, linked from player pages; 2024 and 2025 Wikipedia draws imported (16,625 results across three seasons) and results relinked to players",
+   "Fix: BALLDONTLIE reuses tournament ids every season, so tournaments are now keyed by (provider, tour, id, season); repaired in place by moving results to their source year's edition",
+   "Discovery: Wikipedia categories must match the event level (no ATP Challenger or WTA 125/tour mix-ups); audit:draws re-checks every pairing",
+   "Speed: Supabase client loads only for signed-in visitors or on click; Results shows 6 per tournament; Wikimedia images load without cookies (Best Practices 77 -> 100, accessibility 100 on audited pages)",
+   "Browser tests for calendar, tournament pages, chart, share card, H2H; README features and screenshots refreshed"
+  ]
+ },
+ {
+  "hash": "27efe87",
+  "date": "2026-10-02",
+  "subject": "Add tournament pages and season calendar",
+  "bullets": [
+   "/tournaments: this week, coming up, recently finished (with champions) and the full season by month; \"Events\" in the navigation",
+   "/tournaments/[id]: event details, champion, and finished matches by round side by side like a bracket (own horizontal scroll), credited",
+   "Result groups and player results link to their tournament"
+  ]
+ },
+ {
+  "hash": "4d16d85",
+  "date": "2026-10-02",
+  "subject": "Add ranking history charts, historical rankings backfill and share cards",
+  "bullets": [
+   "Provider: rankings for a past date (free tier); backfill script stores weekly top-100 snapshots since January 2025, paced for 5 requests/min",
+   "Player pages: rank-over-time chart (rank 1 on top, line breaks outside the top 100, crosshair + tooltip, arrow keys, table view), validated chart color per theme (dataviz checks)",
+   "Share cards via next/og: site card and per-player card with photo, rank, points and season record; player metadata descriptions; metadataBase"
+  ]
+ },
+ {
+  "hash": "c656d59",
+  "date": "2026-10-02",
+  "subject": "Runbook: remove ESPN code and data even if the trial is skipped",
+  "bullets": []
+ },
+ {
+  "hash": "a9d499c",
+  "date": "2026-10-01",
+  "subject": "Add Results from Wikipedia draw pages, with credit and safeguards",
+  "bullets": [
+   "Bracket parser for Wikipedia tennis draw templates (3/5 sets, byes, tiebreaks, retirements, walkovers), main draw only, tested on real pages",
+   "Discovery matches tournaments to pages by title (distinctive words or curated aliases), tour (WTA vs ATP mentions), draw size and edition number; one page per tournament (unique index)",
+   "Safeguards: plausibility check per result, shown only after the page is unchanged for 10 minutes, results removed from the page are hidden",
+   "Refresh every 10 min via Supabase cron (lock-bounded, only changed revisions downloaded); season backfill script",
+   "/results (\"Results\" in nav; live page renamed \"Live\"), recent results and season record on player pages, last result on My players",
+   "Credit line with page links and CC BY-SA 4.0 wherever results appear; credits page and footer updated"
+  ]
+ },
+ {
+  "hash": "862584b",
+  "date": "2026-10-01",
+  "subject": "Runbook: commit to removing the ESPN reference after the trial report",
+  "bullets": []
+ },
+ {
+  "hash": "d38ed48",
+  "date": "2026-10-01",
+  "subject": "Compare match scores with sorted JSON keys; add trial runbook",
+  "bullets": []
+ },
+ {
+  "hash": "32f0721",
+  "date": "2026-10-01",
+  "subject": "Phase B part 1: matches, scores page, refresh-on-visit and trial collector",
+  "bullets": [
+   "Migration: tournaments and matches (public read), private trial measurement tables; isolation test extended to 18 checks",
+   "Provider: tournaments (free), matches by tournament and live matches (paid), mapped from the documented match object; 401 handled as \"unauthorized\" so the free tier degrades cleanly",
+   "refreshTour: schedule refresh every 15 min (tournaments in play) or a live-only refresh, one provider call per tour per 20s via the DB lock, score_changed_at stamped only on real changes, dropped live matches trigger a full refresh",
+   "/scores (behind LIVE_SCORES_ENABLED): grouped by tournament, live first, serving dot, tiebreaks, local start times; stale data refreshes after the response; auto-refresh every 60s while visible",
+   "Trial: TRIAL_SAMPLING records provider and ESPN (timing reference only) observations; pg_cron start/stop scripts poll every 20s in Supabase; npm run trial:report computes cadence, lag and coverage",
+   "Integration tests for the sync against a local Supabase in CI"
+  ]
+ },
+ {
+  "hash": "75b585c",
+  "date": "2026-10-01",
+  "subject": "Link the live site and allow e2e runs against a deployment",
+  "bullets": []
+ },
+ {
+  "hash": "ed35856",
+  "date": "2026-10-01",
+  "subject": "Declare the Next.js framework for Vercel",
+  "bullets": []
+ },
+ {
+  "hash": "72462e7",
+  "date": "2026-10-01",
+  "subject": "Add privacy page, README, .env.example and Vercel env script",
+  "bullets": [
+   "/privacy describes exactly what sign-in stores; linked in the footer",
+   "README with features, architecture, tests and screenshots",
+   "scripts/vercel-env.mjs copies production env vars from .env.local to Vercel over stdin and generates CRON_SECRET, printing no values"
+  ]
+ },
+ {
+  "hash": "14ffe9e",
+  "date": "2026-10-01",
+  "subject": "Add Playwright browser tests and the RLS isolation test to CI",
+  "bullets": [
+   "e2e: rankings, tour switch, 404s, no horizontal scroll at 360px, player page, photo credits, live and accent-insensitive search, signed-out prompts, auth callback and cron protection; desktop + mobile",
+   "CI isolation job runs supabase/tests/isolation.sql against a throwaway local Supabase with our migrations, never the real project",
+   "Rankings get a loading skeleton for instant tour switches; the tour is validated in a layout so unknown tours keep a real 404 status"
+  ]
+ },
+ {
+  "hash": "364c62a",
+  "date": "2026-10-01",
+  "subject": "Add credited Wikimedia photos, country flags and the credits page",
+  "bullets": [
+   "Wikidata lookup by name (with family-name-first retry), filtered to tennis players of the tour's sex; stores Wikidata id, birth date and a Commons thumbnail with author, license and source",
+   "Only CC BY, CC BY-SA, CC0 and public-domain images; 429 backoff",
+   "Daily job checks 40 players (monthly rotation), best effort; npm run sync:photos backfills. Coverage: 191/200 photos, 200/200 matched",
+   "flag-icons (MIT) with an IOC to ISO map; no flag for neutral athletes",
+   "Avatar: 120px thumbs in lists, 330px with a flag badge on player pages",
+   "/credits lists every photo credit; names collapse stray whitespace"
+  ]
+ },
+ {
+  "hash": "b352bac",
+  "date": "2026-10-01",
+  "subject": "Add Google sign-in, favorites and My players",
+  "bullets": [
+   "@supabase/ssr session refresh in proxy.ts (getClaims), skipped for visitors without a session cookie; no-store headers on cookie writes",
+   "/auth/callback exchanges the code with an open-redirect-safe next",
+   "Header sign-in/out and a favorite toggle as client islands, so player and rankings pages stay cached; writes go straight to favorites under RLS",
+   "/my-players: per-request page listing favorites with current rank"
+  ]
+ },
+ {
+  "hash": "edb939b",
+  "date": "2026-10-01",
+  "subject": "Add rankings, player and search pages",
+  "bullets": [
+   "Rankings per tour with movement, snapshot date selector and a mobile-first table; home shows ATP",
+   "Player pages: profile, current and best tracked rank, favorite count, credited photo or initials avatar; cached per player (ISR)",
+   "Live search combobox backed by the search_players RPC, plus a /search results page for no-JS and Enter",
+   "Public reads go through the Next data cache (tag \"tennis\", hourly); the daily job revalidates the tag after a successful sync",
+   "Migration: ranking_dates() and accent-insensitive search_players()",
+   "Light/dark theme tokens, skip link, 404 page, credits placeholder"
+  ]
+ },
+ {
+  "hash": "e711a0d",
+  "date": "2026-10-01",
+  "subject": "Add the daily sync job: rankings, new players and profile refresh",
+  "bullets": [
+   "runDailySync: top 100 per tour as a dated snapshot, inserts new players without clobbering profiles, refreshes stale profiles 100 per call, guarded by the sync lock and recorded in sync_state",
+   "/api/cron/daily behind a constant-time CRON_SECRET check; vercel.json schedules it at 06:00 UTC",
+   "Generated Supabase types, server-only admin client, npm run sync:daily"
+  ]
+ },
+ {
+  "hash": "f92907c",
+  "date": "2026-10-01",
+  "subject": "Fix accent-insensitive search for Đ and add RLS isolation test",
+  "bullets": [
+   "search_normalize(): Đ/đ map to \"dj\" (unaccent gives \"d\"), written as chr(272)/chr(273) so the function is immune to client encoding",
+   "supabase/tests/isolation.sql: 15 checks covering cross-user favorites and profiles, anon access, write protection, favorite count and the sync lock; always rolls back"
+  ]
+ },
+ {
+  "hash": "5ae0929",
+  "date": "2026-10-01",
+  "subject": "Add Supabase schema with RLS and the BALLDONTLIE provider adapter",
+  "bullets": [
+   "supabase/migrations: players, rankings, player_images, sync_state, profiles, favorites; public-read tennis data, owner-only user data, favorite-count and sync-lock functions, accent-insensitive search_name",
+   "src/lib/provider: our own types, a server-only BALLDONTLIE client with 429 backoff, and unit-tested response mapping"
+  ]
+ },
+ {
+  "hash": "be85b45",
+  "date": "2026-10-01",
+  "subject": "Generate Next route types before type checking",
+  "bullets": []
+ },
+ {
+  "hash": "a239940",
+  "date": "2026-10-01",
+  "subject": "Normalize line endings to LF",
+  "bullets": []
+ },
+ {
+  "hash": "7bceb0d",
+  "date": "2026-10-01",
+  "subject": "Initial Next.js app with plan, CLAUDE.md and CI",
+  "bullets": []
+ }
+]

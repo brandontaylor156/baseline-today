@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { resultMessage, winnerScore, type NotifyMatch } from "./message";
+import { nextMatchMessage, resultMessage, winnerScore, type NotifyMatch } from "./message";
 
 const set = (p1: number, p2: number, p1Tiebreak: number | null = null, p2Tiebreak: number | null = null) => ({ set: 0, p1, p2, p1Tiebreak, p2Tiebreak });
 
@@ -48,5 +48,16 @@ describe("resultMessage", () => {
     expect(resultMessage({ ...match, resultDetail: "retired", sets: [set(6, 1), set(2, 0)] }, 10).body).toBe(
       "Beat Carlos Alcaraz 6-1 2-0 ret. · China Open, Final",
     );
+  });
+});
+
+describe("nextMatchMessage", () => {
+  const m = { id: 9, round: "Quarterfinals", tournament: "CHINA OPEN", p1: { id: 1, name: "Jannik Sinner" }, p2: { id: 2, name: "Holger Rune" }, chanceP1: 0.71 };
+  it("speaks from the followed player's side, with the model chance", () => {
+    expect(nextMatchMessage(m, 1)).toEqual({ title: "Next: Jannik Sinner vs Holger Rune", body: "China Open, Quarterfinals · Model: Sinner 71%", url: "/matches/9", tag: "next-9" });
+    expect(nextMatchMessage(m, 2).body).toBe("China Open, Quarterfinals · Model: Rune 29%");
+  });
+  it("leaves the chance out when unknown", () => {
+    expect(nextMatchMessage({ ...m, chanceP1: null }, 2).body).toBe("China Open, Quarterfinals");
   });
 });

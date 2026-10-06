@@ -2,6 +2,7 @@ import { revalidateTag } from "next/cache";
 
 import { sendAlert } from "@/lib/digest";
 import { alertFor } from "@/lib/ops";
+import { notifyNextMatches } from "@/lib/push/next-match";
 import { notifyFavorites } from "@/lib/push/notify";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { TENNIS_TAG } from "@/lib/supabase/public";
@@ -32,5 +33,7 @@ export async function GET() {
   const recaps = result.status === "ok" ? await generateRecaps(db).catch((err: Error) => `error: ${err.message}`) : undefined;
   // Fans hear about newly confirmed results (no-op until push keys are set).
   const push = result.status === "skipped" ? undefined : await notifyFavorites(db);
-  return Response.json({ ...result, snapshots, brackets, recaps, push }, { headers: { "Cache-Control": "no-store" } });
+  // Fans hear when their player's next opponent is set.
+  const nextMatches = result.status === "skipped" ? undefined : await notifyNextMatches(db);
+  return Response.json({ ...result, snapshots, brackets, recaps, push, nextMatches }, { headers: { "Cache-Control": "no-store" } });
 }

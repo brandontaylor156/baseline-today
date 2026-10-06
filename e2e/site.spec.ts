@@ -522,3 +522,49 @@ test("open data downloads, RSS feed, IndexNow key and the case study", async ({ 
   await page.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "About" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "How Baseline Today is built" })).toBeVisible();
 });
+
+test("upset map and model accuracy, linked from stats", async ({ page }) => {
+  await page.goto("/stats");
+  await page.getByRole("link", { name: "Upset map →" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "How often favorites lose" })).toBeVisible();
+  for (const h of ["By round", "By surface", "By tour", "By season"]) await expect(page.getByRole("heading", { name: h })).toBeVisible();
+  await page.getByRole("link", { name: "accuracy over time" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Model accuracy" })).toBeVisible();
+  await expect(page.getByText("Model vs the ranking")).toBeVisible();
+  await expect(page.getByRole("img", { name: /by season, ATP and WTA/ })).toBeVisible();
+});
+
+test("rivals page: record against every opponent, linked to head-to-heads", async ({ page }) => {
+  await page.goto("/rankings/atp");
+  await page.locator("tbody tr").first().getByRole("link").click();
+  await page.getByRole("link", { name: "All rivals" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: /against every opponent/ })).toBeVisible();
+  await expect(page.getByText("vs today’s top 10", { exact: true })).toBeVisible();
+  const first = page.locator("tbody tr").first().locator('a[href^="/h2h/"]');
+  await expect(first).toBeVisible();
+});
+
+test("upcoming match pages explain the model's chance", async ({ page }) => {
+  await page.goto("/odds");
+  const preview = page.locator('a[href^="/matches/"]', { hasText: "Preview" }).first();
+  test.skip((await preview.count()) === 0, "no upcoming matches right now");
+  await preview.click();
+  const why = page.getByRole("heading", { name: /^Why the model says \d+%–\d+%$/ });
+  if ((await why.count()) > 0) {
+    await expect(why).toBeVisible();
+    await expect(page.getByText("From overall ratings")).toBeVisible();
+  }
+});
+
+test("changelog, new widgets and on-this-day finals", async ({ page, request }) => {
+  await page.goto("/");
+  await page.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "Changelog" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Changelog" })).toBeVisible();
+  await expect(page.locator("main li").first()).toBeVisible();
+  for (const path of ["/embed/upsets", "/embed/player/4", "/embed/h2h/jannik-sinner-vs-carlos-alcaraz-4-6"]) {
+    const res = await request.get(path);
+    expect(res.status(), path).toBe(200);
+    expect(res.headers()["content-type"]).toContain("text/html");
+  }
+  expect((await request.get("/embed/h2h/nope")).status()).toBe(404);
+});

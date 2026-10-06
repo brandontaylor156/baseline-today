@@ -24,7 +24,8 @@
     "bluesky:profile": "tsx --env-file=.env.local --conditions=react-server scripts/bluesky-profile.mts",
     "search": "node scripts/search-console.mjs",
     "bluesky:intro": "tsx --env-file=.env.local --conditions=react-server scripts/bluesky-intro.mts",
-    "setup": "node scripts/setup.mjs"
+    "setup": "node scripts/setup.mjs",
+    "changelog": "node scripts/changelog.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
@@ -49,6 +50,7 @@
     "@types/web-push": "^3.6.4",
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
+    "postgres": "^3.4.9",
     "supabase": "^2.119.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",

@@ -20,6 +20,9 @@ export function SiteFooter() {
           <Link href="/about" className="underline-offset-2 hover:underline">
             About
           </Link>
+          <Link href="/changelog" className="underline-offset-2 hover:underline">
+            Changelog
+          </Link>
           <Link href="/widgets" className="underline-offset-2 hover:underline">
             Widgets
           </Link>

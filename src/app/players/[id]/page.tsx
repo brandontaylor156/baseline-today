@@ -121,6 +121,12 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
             >
               Head-to-head
             </Link>
+            <Link
+              href={`/players/${player.id}/rivals`}
+              className="inline-flex items-center rounded-lg border border-border bg-surface px-3.5 py-1.5 text-sm font-medium hover:bg-surface-muted"
+            >
+              All rivals
+            </Link>
             <a
               href={`${SITE_URL.replace(/^https:/, "webcal:")}/calendar/players/${player.id}.ics`}
               className="inline-flex items-center rounded-lg border border-border bg-surface px-3.5 py-1.5 text-sm font-medium hover:bg-surface-muted"

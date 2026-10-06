@@ -3,7 +3,7 @@ import "server-only";
 import { cache } from "react";
 
 import { titleChances } from "@/lib/draw-model";
-import { bestOfFive, calibrate, newRating, normalizeSurface, winProbability, type Rating } from "@/lib/model/elo";
+import { bestOfFive, calibrate, expected, newRating, normalizeSurface, winProbability, type Rating } from "@/lib/model/elo";
 import { playerKey } from "@/lib/model/load";
 import { summarizeMarket, type MarketSummary } from "@/lib/model/odds";
 import type { Tour } from "@/lib/provider/types";
@@ -43,6 +43,22 @@ export interface MatchPreview {
   marketHistory: { at: string; p: number }[];
   /** AI-written recap (finals and semifinals, when enabled). */
   recap: { body: string; model: string } | null;
+  /** How the model reached chanceA (scheduled matches with both players rated). */
+  explain: ModelExplain | null;
+}
+
+export interface ModelExplain {
+  surface: "hard" | "clay" | "grass" | null;
+  a: { overall: number; onSurface: number | null; matches: number; surfaceMatches: number | null };
+  b: { overall: number; onSurface: number | null; matches: number; surfaceMatches: number | null };
+  /** A's chance from overall ratings, from surface ratings, and the 50/50 blend before calibration. */
+  overallP: number;
+  surfaceP: number | null;
+  blendedP: number;
+  /** After calibration (and the best-of-five adjustment at Grand Slams for men). */
+  finalP: number;
+  calibration: number;
+  fiveSets: boolean;
 }
 
 type RatingRow = { player_key: string; elo: number; elo_hard: number; elo_clay: number; elo_grass: number; matches: number; hard_matches: number; clay_matches: number; grass_matches: number };
@@ -152,7 +168,28 @@ export const getMatchPreview = cache(async (matchId: number): Promise<MatchPrevi
     title,
   });
 
+  let explain: ModelExplain | null = null;
+  if (scheduled && ra && rb) {
+    const A = toRating(ra);
+    const B = toRating(rb);
+    const sf = normalizeSurface(surface);
+    const overallP = expected(A.overall, B.overall);
+    const surfaceP = sf ? expected(A.surface[sf], B.surface[sf]) : null;
+    explain = {
+      surface: sf,
+      a: { overall: A.overall, onSurface: sf ? A.surface[sf] : null, matches: A.matches, surfaceMatches: sf ? A.surfaceMatches[sf] : null },
+      b: { overall: B.overall, onSurface: sf ? B.surface[sf] : null, matches: B.matches, surfaceMatches: sf ? B.surfaceMatches[sf] : null },
+      overallP,
+      surfaceP,
+      blendedP: winProbability(A, B, sf),
+      finalP: p(surface),
+      calibration: c,
+      fiveSets,
+    };
+  }
+
   return {
+    explain,
     match,
     tour,
     surface,

@@ -5,7 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 
 import { loadClient, signInWithGoogle, useUser } from "./use-user";
 
-type League = { id: string; name: string; invite_code: string; owner_id: string };
+type League = { id: string; name: string; invite_code: string; owner_id: string; is_public: boolean };
+export type PublicLeague = { name: string; invite_code: string; members: number };
 type Row = { nickname: string; is_me: boolean; correct: number; settled: number; bracket_points: number };
 export type SampleRow = { nickname: string; strategy: string; correct: number; settled: number };
 
@@ -20,7 +21,7 @@ function errorText(message: string): string {
 }
 
 /** Create, join and follow private leagues (members see nicknames only). */
-export function LeaguesClient({ seasonStart, sample }: { seasonStart: string; sample: SampleRow[] }) {
+export function LeaguesClient({ seasonStart, sample, directory }: { seasonStart: string; sample: SampleRow[]; directory: PublicLeague[] }) {
   const user = useUser();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -33,7 +34,7 @@ export function LeaguesClient({ seasonStart, sample }: { seasonStart: string; sa
 
   const fetchAll = useCallback(async () => {
     const supabase = await loadClient();
-    const { data } = await supabase.from("leagues").select("id, name, invite_code, owner_id").order("created_at");
+    const { data } = await supabase.from("leagues").select("id, name, invite_code, owner_id, is_public").order("created_at");
     const list = (data ?? []) as League[];
     const entries = await Promise.all(
       list.map(async (l) => [l.id, ((await supabase.rpc("league_standings", { p_league_id: l.id, p_since: seasonStart })).data ?? []) as Row[]] as const),
@@ -83,6 +84,14 @@ export function LeaguesClient({ seasonStart, sample }: { seasonStart: string; sa
     void refresh();
   }
 
+  async function setPublic(l: League, value: boolean) {
+    const supabase = await loadClient();
+    const { error } = await supabase.rpc("set_league_public", { p_league_id: l.id, p_public: value });
+    if (error) return setMessage(errorText(error.message));
+    setMessage(value ? `“${l.name}” is listed in the public directory.` : `“${l.name}” is private again.`);
+    void refresh();
+  }
+
   async function leave(l: League) {
     const supabase = await loadClient();
     const mine = l.owner_id === user?.id;
@@ -102,6 +111,7 @@ export function LeaguesClient({ seasonStart, sample }: { seasonStart: string; sa
           </button>{" "}
           to create or join a league{code ? ` (code ${code})` : ""}.
         </p>
+        <Directory leagues={directory} onJoin={(c) => signInWithGoogle(`${pathname}?join=${encodeURIComponent(c)}`)} />
         <SampleLeague rows={sample} />
       </div>
     );
@@ -148,6 +158,15 @@ export function LeaguesClient({ seasonStart, sample }: { seasonStart: string; sa
       </div>
       <p className="text-xs text-muted">Nicknames: {NICK_HELP} League members see each other’s nicknames and records, nothing else.</p>
 
+      <Directory
+        leagues={directory.filter((d) => !leagues?.some((l) => l.invite_code === d.invite_code))}
+        onJoin={(c) => {
+          setCode(c);
+          setMessage(`Code ${c} filled in: choose your nickname and press Join.`);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
+
       {leagues?.length === 0 && (
         <>
           <p className="text-sm text-muted">You’re not in any leagues yet. Here’s what one looks like:</p>
@@ -171,6 +190,14 @@ export function LeaguesClient({ seasonStart, sample }: { seasonStart: string; sa
                 Copy invite link
               </button>{" "}
               ·{" "}
+              {l.owner_id === user.id && (
+                <>
+                  <button type="button" className="hover:text-foreground hover:underline" onClick={() => setPublic(l, !l.is_public)}>
+                    {l.is_public ? "Make private" : "List publicly"}
+                  </button>{" "}
+                  ·{" "}
+                </>
+              )}
               <button type="button" className="hover:text-foreground hover:underline" onClick={() => leave(l)}>
                 {l.owner_id === user.id ? "Delete league" : "Leave"}
               </button>
@@ -264,6 +291,31 @@ function SampleLeague({ rows }: { rows: SampleRow[] }) {
           </tbody>
         </table>
       </div>
+    </section>
+  );
+}
+
+/** Leagues their owners chose to list; anyone can join with the code. */
+function Directory({ leagues, onJoin }: { leagues: PublicLeague[]; onJoin: (code: string) => void }) {
+  if (leagues.length === 0) return null;
+  return (
+    <section aria-labelledby="directory-heading" className="space-y-2">
+      <h2 id="directory-heading" className="text-base font-semibold">
+        Public leagues
+      </h2>
+      <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface text-sm">
+        {leagues.map((l) => (
+          <li key={l.invite_code} className="flex items-center gap-3 px-4 py-2.5">
+            <span className="min-w-0 flex-1 truncate font-medium">{l.name}</span>
+            <span className="shrink-0 text-xs text-muted tabular-nums">
+              {l.members} {l.members === 1 ? "member" : "members"}
+            </span>
+            <button type="button" onClick={() => onJoin(l.invite_code)} className="shrink-0 rounded-lg border border-accent px-3 py-1 text-xs font-medium text-accent hover:bg-accent-soft">
+              Join
+            </button>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 
-import { LeaguesClient, type SampleRow } from "@/components/leagues-client";
+import { LeaguesClient, type PublicLeague, type SampleRow } from "@/components/leagues-client";
 import { createPublicClient } from "@/lib/supabase/public";
 
 export const metadata: Metadata = {
@@ -11,12 +11,13 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export const revalidate = 3600;
+export const revalidate = 300;
 
 export default async function LeaguesPage() {
   const season = new Date().getUTCFullYear();
   const seasonStart = `${season}-01-01`;
-  const { data: sample } = await createPublicClient().rpc("sample_league_standings", { p_season: season });
+  const db = createPublicClient();
+  const [{ data: sample }, { data: directory }] = await Promise.all([db.rpc("sample_league_standings", { p_season: season }), db.rpc("public_leagues")]);
   return (
     <div className="space-y-6">
       <div>
@@ -30,7 +31,7 @@ export default async function LeaguesPage() {
         </p>
       </div>
       <Suspense>
-        <LeaguesClient seasonStart={seasonStart} sample={(sample ?? []) as SampleRow[]} />
+        <LeaguesClient seasonStart={seasonStart} sample={(sample ?? []) as SampleRow[]} directory={(directory ?? []) as PublicLeague[]} />
       </Suspense>
     </div>
   );

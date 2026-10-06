@@ -39,12 +39,17 @@ export default async function WidgetsPage() {
       <div className="grid gap-4 md:grid-cols-2">
         <Snippet title="ATP top 10" path="/embed/rankings/atp" height={380} />
         <Snippet title="WTA top 10" path="/embed/rankings/wta" height={380} />
+        <Snippet title="Upsets this week" path="/embed/upsets" height={300} />
+        <Snippet title="Player card (Jannik Sinner)" path="/embed/player/4" height={230} />
+        <Snippet title="Head-to-head card" path="/embed/h2h/jannik-sinner-vs-carlos-alcaraz-4-6" height={260} />
         {live.map((t) => (
           <Snippet key={t.id} title={`${displayName(t.name)} title chances`} path={`/embed/title/${t.id}`} height={340} />
         ))}
       </div>
       <p className="text-xs text-muted">
-        For another tournament, use <code className="font-mono">/embed/title/&lt;id&gt;</code> with the number from its page address.
+        For another tournament, use <code className="font-mono">/embed/title/&lt;id&gt;</code> with the number from its page address. For any
+        player, <code className="font-mono">/embed/player/&lt;id&gt;</code>; for any pair, <code className="font-mono">/embed/h2h/</code> plus the
+        end of their head-to-head page address.
       </p>
     </div>
   );

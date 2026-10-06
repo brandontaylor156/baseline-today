@@ -56,3 +56,27 @@ export function resultMessage(m: NotifyMatch, fanOf: number): PushPayload {
     tag: `match-${m.id}`,
   };
 }
+
+export interface NextMatch {
+  id: number;
+  round: string | null;
+  tournament: string;
+  p1: { id: number | null; name: string };
+  p2: { id: number | null; name: string };
+  /** Model chance that player 1 wins, when known. */
+  chanceP1: number | null;
+}
+
+/** The notification a fan of `fanOf` gets when their player's next opponent is known. */
+export function nextMatchMessage(m: NextMatch, fanOf: number): PushPayload {
+  const mine = m.p2.id === fanOf ? m.p2 : m.p1;
+  const other = mine === m.p1 ? m.p2 : m.p1;
+  const chance = m.chanceP1 === null ? null : mine === m.p1 ? m.chanceP1 : 1 - m.chanceP1;
+  const where = [titleCase(m.tournament), m.round].filter(Boolean).join(", ");
+  return {
+    title: `Next: ${mine.name} vs ${other.name}`,
+    body: `${where}${chance === null ? "" : ` · Model: ${mine.name.split(" ").at(-1)} ${Math.round(chance * 100)}%`}`,
+    url: `/matches/${m.id}`,
+    tag: `next-${m.id}`,
+  };
+}

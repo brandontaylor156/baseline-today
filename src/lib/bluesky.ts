@@ -1,6 +1,7 @@
 import "server-only";
 
 import { clip300, facets } from "@/lib/bluesky-text";
+import { getFinalsOnDay } from "@/lib/data/insights";
 import { getWeekRecap } from "@/lib/data/weekly";
 import { displayName } from "@/lib/data/tournaments";
 import { SITE_URL } from "@/lib/site";
@@ -124,6 +125,19 @@ export async function botPosts(db: AdminClient, now = new Date()): Promise<BotPo
     });
   }
 
+  // On this day: the biggest final that ended on this date in an earlier season.
+  const finals = await getFinalsOnDay(now.getUTCMonth() + 1, now.getUTCDate());
+  const weight = (c: string | null) => (/grand slam/i.test(c ?? "") ? 0 : /1000/.test(c ?? "") ? 1 : /500/.test(c ?? "") ? 2 : /250/.test(c ?? "") ? 3 : 4);
+  const top = [...finals].sort((a, b) => weight(a.category) - weight(b.category) || (b.season ?? 0) - (a.season ?? 0))[0];
+  if (top && weight(top.category) <= 3) {
+    const event = displayName(top.tournament);
+    posts.push({
+      key: `otd:${now.toISOString().slice(0, 10)}`,
+      text: `On this day in ${top.season}: ${top.winner.name} beat ${top.loser.name}${top.score ? ` ${top.score}` : ""} to win ${event}. #tennis #OnThisDay`,
+      link: { path: `/matches/${top.matchId}`, title: `${top.winner.name} vs ${top.loser.name}, ${event} ${top.season} final`, description: "Result, pre-match chances and head-to-head", image: `/matches/${top.matchId}/opengraph-image` },
+    });
+  }
+
   if (now.getUTCDay() === 1) {
     const week = shiftWeek(mondayOf(now.toISOString().slice(0, 10)), -1);
     const recap = await getWeekRecap(week);
@@ -137,7 +151,7 @@ export async function botPosts(db: AdminClient, now = new Date()): Promise<BotPo
       posts.push({
         key: `week:${week}`,
         text: `The tennis week, ${weekLabel(week)}:\n${champs}${model}\n#tennis`,
-        link: { path: `/week/${week}`, title: `Week in tennis: ${weekLabel(week)}`, description: "Champions, biggest upsets, ranking movers and the model's record.", image: "/opengraph-image" },
+        link: { path: `/week/${week}`, title: `Week in tennis: ${weekLabel(week)}`, description: "Champions, biggest upsets, ranking movers and the model's record.", image: `/week/${week}/opengraph-image` },
       });
     }
   }
