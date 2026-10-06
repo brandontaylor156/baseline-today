@@ -7,8 +7,8 @@ parties). A ground-up rebuild of my 2022 Flask tennis forum, built on Next.js an
 **Live:** [baseline-today.vercel.app](https://baseline-today.vercel.app) · [![CI](https://github.com/brandontaylor156/baseline-today/actions/workflows/ci.yml/badge.svg)](https://github.com/brandontaylor156/baseline-today/actions/workflows/ci.yml)
 
 **Try it without signing in:**
-[watch parties](https://baseline-today.vercel.app/party/demo) (a simulated replay built from a
-real result's set scores, with win chances, calls and chat) ·
+[how watch parties work](https://baseline-today.vercel.app/party/demo) (with a real recent match,
+set by set) ·
 [Pick'em](https://baseline-today.vercel.app/pickem) (guest picks move into your account if you sign in) ·
 [sample league](https://baseline-today.vercel.app/leagues) ·
 [title chances](https://baseline-today.vercel.app/tournaments) ·
@@ -59,14 +59,12 @@ real result's set scores, with win chances, calls and chat) ·
 - **Pick'em** with weekly and season leaderboards compared against the model, streaks and badges.
   Visitors can play as guests; open picks move into their account when they sign in.
 - **Bracket Challenge**: fill a whole draw before the first result, scored by the server.
-- **Private leagues** joined by invite code with nicknames only. Signed-out visitors see a sample
-  league of four strategy bots (favorite, coin flip, alphabetical, underdog) scored on this
+- **Private leagues** joined by invite code with nicknames only. Signed-out visitors see benchmarks
+  to beat: how four simple strategies (favorite, coin flip, alphabetical, underdog) did on this
   season's real results.
 - **Watch parties**: private rooms with real-time chat and reactions over private Supabase Realtime
   channels (never stored), the host's point-by-point scorekeeping or live data, a momentum chart and
-  per-set "call it" predictions. The **demo** is a simulated replay: only the set scores are real. The
-  point order is simulated (and checked to replay to exactly those scores), so the win chance and
-  momentum chart are simulated too, and the page says so.
+  per-set "call it" predictions. Nothing is simulated: parties follow real matches.
 
 **Research lab** (`/lab`)
 - **The engine:** every result since 2015 replayed in order through the Elo model; at each
@@ -182,7 +180,7 @@ Wikipedia draws ─── Supabase cron, 10 min ──┘   (RLS everywhere)  �
 | Layer | What | Where |
 | --- | --- | --- |
 | Unit (Vitest) | 229 tests: provider mapping, Wikipedia parsing, Elo and title-chance math, the live model, scorekeeping, bracket scoring, the demo replay, job health, slugs, structured data, CSV export, Bluesky facets | `src/**/*.test.ts` |
-| Browser (Playwright) | 47 flows on desktop and mobile: every page type, 404s, no sideways scroll, signed-out flows, guest Pick'em, the demo party, canonical redirects, structured data, downloads and feeds, cron auth | `e2e/site.spec.ts` |
+| Browser (Playwright) | 47 flows on desktop and mobile: every page type, 404s, no sideways scroll, signed-out flows, guest Pick'em, the watch-party page, canonical redirects, structured data, downloads and feeds, cron auth | `e2e/site.spec.ts` |
 | Accessibility | axe (WCAG 2.2 AA) on 17 pages in light and dark mode, desktop and mobile | `e2e/a11y.spec.ts` |
 | Database | 55 row level security checks: cross-user reads and writes for every user table, locked picks and brackets, league and party membership, the realtime channel check, anon access | `supabase/tests/isolation.sql` |
 | Realtime | two throwaway accounts in a real watch party: live score, chat and reactions reach the guest | `scripts/party-ui-test.mts` |

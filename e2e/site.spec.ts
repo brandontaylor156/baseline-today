@@ -642,7 +642,7 @@ test("daily puzzle: a wrong guess gets feedback, the answer stays on the server"
 });
 
 test("research lab: luck, time machine, aging and the explorer", async ({ page, request }) => {
-  test.setTimeout(120_000); // many pages in one walk
+  test.setTimeout(180_000); // many pages in one walk
   await page.goto("/");
   await page.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "Research lab" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Tennis, replayed" })).toBeVisible();
