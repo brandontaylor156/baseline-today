@@ -26,7 +26,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getSeasonTournaments(season),
     getCountries(),
     getScheduledMatchIds(),
-    createPublicClient().rpc("top_rivalries", { p_min: 3, p_limit: 2000 }),
+    // PostgREST returns at most 1,000 rows per request: fetch the rivalries in pages.
+    Promise.all([0, 1000].map((from) => createPublicClient().rpc("top_rivalries", { p_min: 3, p_limit: 2000 }).range(from, from + 999))),
     getRecapWeeks(season),
   ]);
 
@@ -52,6 +53,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...tournaments.map((t) => page(`/tournaments/${t.id}`, "weekly", 0.5)),
     ...countries.map((c) => page(`/countries/${c.code}`, "weekly", 0.4)),
     ...upcoming.map((id) => page(`/matches/${id}`, "daily", 0.5)),
-    ...(rivalries.data ?? []).map((r) => page(h2hPath({ id: r.player_a, name: r.name_a }, { id: r.player_b, name: r.name_b }), "weekly", 0.5)),
+    ...rivalries.flatMap((r) => r.data ?? []).map((r) => page(h2hPath({ id: r.player_a, name: r.name_a }, { id: r.player_b, name: r.name_b }), "weekly", 0.5)),
   ];
 }
