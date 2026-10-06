@@ -58,6 +58,26 @@ export interface Prediction {
   p1: number; // model probability that player 1 wins, before the match updates ratings
 }
 
+/** Updates both players' overall (and surface, when known) ratings after one match. */
+export function updateRatings(a: Rating, b: Rating, winner: 1 | 2, surface: Surface | null): void {
+  const s1 = winner === 1 ? 1 : 0;
+  const eOverall = expected(a.overall, b.overall);
+  const kA = kFactor(a.matches);
+  const kB = kFactor(b.matches);
+  a.overall += kA * (s1 - eOverall);
+  b.overall += kB * (1 - s1 - (1 - eOverall));
+  a.matches++;
+  b.matches++;
+
+  if (surface) {
+    const eSurface = expected(a.surface[surface], b.surface[surface]);
+    a.surface[surface] += kFactor(a.surfaceMatches[surface]) * (s1 - eSurface);
+    b.surface[surface] += kFactor(b.surfaceMatches[surface]) * (1 - s1 - (1 - eSurface));
+    a.surfaceMatches[surface]++;
+    b.surfaceMatches[surface]++;
+  }
+}
+
 /**
  * Runs Elo over matches in chronological order. Returns final ratings and, for every match, the
  * pre-match prediction (used for backtesting and for "upsets at the time").
@@ -81,23 +101,7 @@ export function runElo(
     const p1 = winProbability(a, b, m.surface);
     predictions.push({ match: m, p1 });
 
-    const s1 = m.winner === 1 ? 1 : 0;
-    const eOverall = expected(a.overall, b.overall);
-    const kA = kFactor(a.matches);
-    const kB = kFactor(b.matches);
-    a.overall += kA * (s1 - eOverall);
-    b.overall += kB * (1 - s1 - (1 - eOverall));
-    a.matches++;
-    b.matches++;
-
-    if (m.surface) {
-      const sf = m.surface;
-      const eSurface = expected(a.surface[sf], b.surface[sf]);
-      a.surface[sf] += kFactor(a.surfaceMatches[sf]) * (s1 - eSurface);
-      b.surface[sf] += kFactor(b.surfaceMatches[sf]) * (1 - s1 - (1 - eSurface));
-      a.surfaceMatches[sf]++;
-      b.surfaceMatches[sf]++;
-    }
+    updateRatings(a, b, m.winner, m.surface);
     onMatch?.(m, a, b);
   }
   return { ratings, predictions };

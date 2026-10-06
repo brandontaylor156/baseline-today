@@ -127,6 +127,18 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
             >
               All rivals
             </Link>
+            <Link
+              href={`/lab/similar?p=${player.id}`}
+              className="inline-flex items-center rounded-lg border border-border bg-surface px-3.5 py-1.5 text-sm font-medium hover:bg-surface-muted"
+            >
+              Similar players
+            </Link>
+            <Link
+              href={`/lab/explorer?p=${player.id}`}
+              className="inline-flex items-center rounded-lg border border-border bg-surface px-3.5 py-1.5 text-sm font-medium hover:bg-surface-muted"
+            >
+              Explore matches
+            </Link>
             <a
               href={`${SITE_URL.replace(/^https:/, "webcal:")}/calendar/players/${player.id}.ics`}
               className="inline-flex items-center rounded-lg border border-border bg-surface px-3.5 py-1.5 text-sm font-medium hover:bg-surface-muted"

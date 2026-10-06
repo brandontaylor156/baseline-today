@@ -16,7 +16,29 @@ export interface SeasonSeries {
  * Up to two series of rates by season (e.g. ATP and WTA accuracy). Legend, direct end labels,
  * crosshair tooltip on hover, arrow keys when focused, and a table view.
  */
-export function SeasonLines({ series, label, format = (v) => `${(v * 100).toFixed(1)}%` }: { series: SeasonSeries[]; label: string; format?: (v: number) => string }) {
+const SCALES = {
+  /** 0–1 rates shown as percentages. */
+  rate: { step: 0.02, tick: (v: number) => `${Math.round(v * 100)}%`, format: (v: number) => `${(v * 100).toFixed(1)}%` },
+  /** Signed rating points. */
+  points: { step: 50, tick: (v: number) => `${v >= 0 ? "+" : "−"}${Math.abs(Math.round(v))}`, format: (v: number) => `${v >= 0 ? "+" : "−"}${Math.abs(Math.round(v))} points` },
+};
+
+export function SeasonLines({
+  series,
+  label,
+  scale = "rate",
+  axis = "season",
+}: {
+  series: SeasonSeries[];
+  label: string;
+  /** Plain values, not functions: this is a client component rendered from server pages. */
+  scale?: keyof typeof SCALES;
+  /** What the x values are: seasons (2016…) or ages. */
+  axis?: "season" | "age";
+}) {
+  const { step, tick, format } = SCALES[scale];
+  const xName = axis === "age" ? "Age" : "Season";
+  const xLabel = (x: number) => String(x);
   const boxRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(640);
   const [active, setActive] = useState<number | null>(null);
@@ -33,10 +55,10 @@ export function SeasonLines({ series, label, format = (v) => `${(v * 100).toFixe
   const seasons = [...new Set(series.flatMap((s) => s.points.map((p) => p.season)))].sort((a, b) => a - b);
   if (seasons.length < 2) return null;
   const values = series.flatMap((s) => s.points.map((p) => p.value));
-  const lo = Math.floor(Math.min(...values) * 50) / 50;
-  const hi = Math.ceil(Math.max(...values) * 50) / 50;
+  const lo = Math.floor(Math.min(...values) / step) * step;
+  const hi = Math.ceil(Math.max(...values) / step) * step;
   const ticks: number[] = [];
-  for (let v = lo; v <= hi + 1e-9; v += 0.02) ticks.push(Math.round(v * 100) / 100);
+  for (let v = lo; v <= hi + 1e-9; v += step) ticks.push(Math.round(v / step) * step);
   const innerW = width - M.left - M.right;
   const innerH = HEIGHT - M.top - M.bottom;
   const x = (s: number) => M.left + ((s - seasons[0]) / (seasons.at(-1)! - seasons[0])) * innerW;
@@ -83,14 +105,14 @@ export function SeasonLines({ series, label, format = (v) => `${(v * 100).toFixe
           <g key={v}>
             <line x1={M.left} x2={width - M.right} y1={y(v)} y2={y(v)} stroke="var(--border)" strokeWidth={1} />
             <text x={M.left - 6} y={y(v)} dy="0.32em" textAnchor="end" className="fill-muted text-[11px] tabular-nums">
-              {Math.round(v * 100)}%
+              {tick(v)}
             </text>
           </g>
         ))}
         {seasons.map((s, i) =>
           i % every === 0 || i === seasons.length - 1 ? (
             <text key={s} x={x(s)} y={HEIGHT - 6} textAnchor="middle" className="fill-muted text-[11px] tabular-nums">
-              {width < 480 ? `’${String(s).slice(2)}` : s}
+              {xName === "Season" && width < 480 ? `’${String(s).slice(2)}` : xLabel(s)}
             </text>
           ) : null,
         )}
@@ -134,7 +156,7 @@ export function SeasonLines({ series, label, format = (v) => `${(v * 100).toFixe
           className="pointer-events-none absolute top-6 w-44 rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs shadow-md"
           style={{ left: Math.min(Math.max(x(shown) - 88, 4), width - 180) }}
         >
-          <div className="text-muted">{shown}</div>
+          <div className="text-muted">{xLabel(shown)}</div>
           {series.map((s, i) => {
             const p = at(s, shown);
             return (
@@ -153,7 +175,7 @@ export function SeasonLines({ series, label, format = (v) => `${(v * 100).toFixe
           <caption className="sr-only">{label}</caption>
           <thead>
             <tr>
-              <th scope="col" className="py-1 font-medium">Season</th>
+              <th scope="col" className="py-1 font-medium">{xName}</th>
               {series.map((s) => (
                 <th key={s.name} scope="col" className="py-1 text-right font-medium">
                   {s.name}
@@ -164,7 +186,7 @@ export function SeasonLines({ series, label, format = (v) => `${(v * 100).toFixe
           <tbody>
             {[...seasons].reverse().map((season) => (
               <tr key={season} className="border-t border-border">
-                <td className="py-1">{season}</td>
+                <td className="py-1">{xLabel(season)}</td>
                 {series.map((s) => {
                   const p = at(s, season);
                   return (

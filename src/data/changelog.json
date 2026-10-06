@@ -1,5 +1,15 @@
 [
  {
+  "hash": "9e24fea",
+  "date": "2026-10-06",
+  "subject": "Daily games: Guess the player and Upset of the day; steadier builds",
+  "bullets": [
+   "/play: Guess the player (a tour's top 100, six guesses, feedback on country, age, rank, height and hand; answers chosen and checked on the server, shareable spoiler-free grid, local streaks) and Upset of the day (call the underdog against the model; the day's match is pinned on first view; local record)",
+   "Header: \"Play\" replaces \"Pick'em\" (linked from /play)",
+   "next.config: prerender 2 pages at a time and retry a page up to 3 times, so a busy moment on the shared free database no longer fails a build"
+  ]
+ },
+ {
   "hash": "3caef5a",
   "date": "2026-10-06",
   "subject": "Batch 2: records, tournament history, season reviews, race maths, betting maths, API",

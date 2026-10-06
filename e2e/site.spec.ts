@@ -640,3 +640,31 @@ test("daily puzzle: a wrong guess gets feedback, the answer stays on the server"
   await page.getByRole("button", { name: new RegExp(name, "i") }).first().click();
   await expect(page.getByRole("table", { name: /Your guesses/ })).toBeVisible();
 });
+
+test("research lab: luck, time machine, aging and the explorer", async ({ page, request }) => {
+  await page.goto("/");
+  await page.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "Research lab" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Tennis, replayed" })).toBeVisible();
+  await page.getByRole("link", { name: /Expected vs actual titles/ }).click();
+  await expect(page.getByRole("heading", { name: "Most improbable champions" })).toBeVisible();
+  await expect(page.locator("table").first().locator("tbody tr")).not.toHaveCount(0);
+
+  await page.goto("/lab/time-machine");
+  await expect(page.getByText(/chance to win/)).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByRole("heading", { name: "ATP peak ratings since 2015" })).toBeVisible();
+  expect((await request.get("/api/lab/ratings/4")).status()).toBe(200);
+
+  await page.goto("/lab/aging");
+  await expect(page.getByRole("img", { name: /cumulative rating change by age/ })).toBeVisible();
+
+  await page.goto("/lab/explorer?p=4&surface=Clay&stage=f");
+  await expect(page.getByRole("heading", { level: 1, name: "Results explorer" })).toBeVisible();
+  await expect(page.getByText("Model expected")).toBeVisible();
+  const csv = await request.get("/lab/explorer/csv?p=4&surface=Clay");
+  expect(csv.headers()["content-type"]).toContain("text/csv");
+  expect((await csv.text()).split("\r\n")[0]).toContain("model_chance");
+
+  await page.goto("/lab/similar?p=4");
+  await expect(page.getByRole("heading", { name: "Most similar" })).toBeVisible();
+  await expect(page.locator('section[aria-labelledby="sim-heading"] li')).toHaveCount(8);
+});

@@ -68,6 +68,10 @@ export default async function StatsPage({ searchParams }: PageProps<"/stats">) {
             ·{" "}
             <Link href={`/records?tour=${tour}`} className="font-medium text-accent hover:underline">
               All-time records →
+            </Link>{" "}
+            ·{" "}
+            <Link href="/lab" className="font-medium text-accent hover:underline">
+              Research lab →
             </Link>
           </p>
         </div>

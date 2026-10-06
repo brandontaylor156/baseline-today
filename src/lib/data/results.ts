@@ -133,14 +133,22 @@ export async function getRecentResults(
 ): Promise<{ groups: ResultsGroup[]; refreshedAt: string | null }> {
   // The Results page reads fresh; cached pages (the homepage) pass cached: true.
   const db = createPublicClient({ cached });
+  // Tournaments first, then their matches: filtering matches through the embedded tournament
+  // checks every stored result (52,000+) and can hit the statement timeout.
+  const { data: inWindow, error: tErr } = await db
+    .from("tournaments")
+    .select("id")
+    .gte("end_date", isoDate(new Date(now.getTime() - 3 * DAY)))
+    .lte("start_date", isoDate(new Date(now.getTime() + DAY)))
+    .limit(200);
+  if (tErr) throw new Error(`results: ${tErr.message}`);
   const [{ data, error }, state] = await Promise.all([
     db
       .from("matches")
       .select(RESULT_SELECT)
       .eq("status", "final")
       .eq("confirmed", true)
-      .gte("tournaments.end_date", isoDate(new Date(now.getTime() - 3 * DAY)))
-      .lte("tournaments.start_date", isoDate(new Date(now.getTime() + DAY)))
+      .in("tournament_id", (inWindow ?? []).map((t) => t.id).concat(-1))
       .limit(1000),
     db.from("sync_state").select("last_refreshed_at").eq("key", "results").maybeSingle(),
   ]);

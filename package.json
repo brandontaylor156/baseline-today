@@ -25,7 +25,8 @@
     "search": "node scripts/search-console.mjs",
     "bluesky:intro": "tsx --env-file=.env.local --conditions=react-server scripts/bluesky-intro.mts",
     "setup": "node scripts/setup.mjs",
-    "changelog": "node scripts/changelog.mjs"
+    "changelog": "node scripts/changelog.mjs",
+    "lab:compute": "tsx --env-file=.env.local --conditions=react-server scripts/lab-compute.mts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",

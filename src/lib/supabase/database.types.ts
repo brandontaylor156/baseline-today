@@ -75,6 +75,18 @@ export type Database = {
           },
         ]
       }
+      lab_ratings: {
+        Row: { clay: number; grass: number; hard: number; matches: number; overall: number; player_id: number | null; player_key: string; tour: string; week: string }
+        Insert: { clay: number; grass: number; hard: number; matches: number; overall: number; player_id?: number | null; player_key: string; tour: string; week: string }
+        Update: { clay?: number; grass?: number; hard?: number; matches?: number; overall?: number; player_id?: number | null; player_key?: string; tour?: string; week?: string }
+        Relationships: []
+      }
+      lab_title_chances: {
+        Row: { champion: boolean; chance: number; player_id: number | null; player_key: string; rating: number | null; tournament_id: number }
+        Insert: { champion: boolean; chance: number; player_id?: number | null; player_key: string; rating?: number | null; tournament_id: number }
+        Update: { champion?: boolean; chance?: number; player_id?: number | null; player_key?: string; rating?: number | null; tournament_id?: number }
+        Relationships: []
+      }
       league_members: {
         Row: {
           joined_at: string
@@ -1073,6 +1085,22 @@ export type Database = {
       join_party: {
         Args: { p_code: string; p_nickname: string }
         Returns: string
+      }
+      lab_aging: {
+        Args: { p_tour: string }
+        Returns: { age: number; delta: number; players: number }[]
+      }
+      lab_luck: {
+        Args: { p_since?: number; p_tour: string }
+        Returns: { country: string | null; entries: number; expected: number; finals_reached: number; name: string; player_id: number; titles: number }[]
+      }
+      lab_peaks: {
+        Args: { p_limit?: number; p_tour: string }
+        Returns: { clay: number; country: string | null; grass: number; hard: number; name: string; peak: number; player_id: number; week: string }[]
+      }
+      lab_title_extremes: {
+        Args: { p_champions: boolean; p_limit?: number; p_tour: string }
+        Returns: { category: string | null; chance: number; country: string | null; name: string; player_id: number | null; season: number; tournament: string; tournament_id: number }[]
       }
       league_standings: {
         Args: { p_league_id: string; p_since: string }

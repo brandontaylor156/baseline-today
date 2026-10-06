@@ -15,6 +15,8 @@ export const getTrackRecord = cache(async (days = 7): Promise<TrackRecord & { si
   const since = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
   const today = new Date().toISOString().slice(0, 10);
   const db = createPublicClient();
+  // Tournaments first, then their matches (an embedded date filter would check every stored result).
+  const { data: inWindow } = await db.from("tournaments").select("id").gte("end_date", since).lte("start_date", today).limit(300);
   const [{ data, error }, rankings] = await Promise.all([
     db
       .from("matches")
@@ -25,8 +27,7 @@ export const getTrackRecord = cache(async (days = 7): Promise<TrackRecord & { si
       .eq("confirmed", true)
       .not("pre_match_p1", "is", null)
       .not("winner_side", "is", null)
-      .gte("tournaments.end_date", since)
-      .lte("tournaments.start_date", today)
+      .in("tournament_id", (inWindow ?? []).map((t) => t.id).concat(-1))
       .limit(2000),
     Promise.all(
       TOURS.map(async (t) => {
