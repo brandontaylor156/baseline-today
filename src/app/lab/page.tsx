@@ -33,6 +33,11 @@ const TOOLS = [
     text: "Any player’s matches filtered by opponent, surface, season, round, event, favourite or underdog, deciding sets and tiebreaks, with splits and CSV export.",
   },
   {
+    href: "/lab/dream-draw",
+    title: "Dream draw",
+    text: "Any 8 or 16 players, today or at their peak, in a seeded draw on any surface: exact chances to reach every round.",
+  },
+  {
     href: "/lab/time-machine",
     title: "Time machine",
     text: "Two players at any point in their careers, on any surface: the model’s verdict. Plus every player’s peak rating since 2015.",

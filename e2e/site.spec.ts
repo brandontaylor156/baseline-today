@@ -676,4 +676,10 @@ test("research lab: luck, time machine, aging and the explorer", async ({ page, 
   await page.goto("/lab/clutch?tour=wta");
   await expect(page.getByRole("heading", { name: "Tiebreaks: above expectation" })).toBeVisible();
   await expect(page.getByRole("table", { name: "Deciding sets: above expectation" }).locator("tbody tr")).not.toHaveCount(0);
+
+  await page.goto("/lab/dream-draw");
+  const draw = page.getByRole("table", { name: "Chances to reach each round in this draw" });
+  await expect(draw.locator("tbody tr")).toHaveCount(8, { timeout: 20_000 });
+  await page.getByRole("button", { name: "ATP peaks · 16" }).click();
+  await expect(draw.locator("tbody tr")).toHaveCount(16, { timeout: 20_000 });
 });

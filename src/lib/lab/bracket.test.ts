@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { depth, entrants, reconstruct, winChances, type DrawMatch } from "./bracket";
+import { depth, entrants, reachChances, reconstruct, seededBracket, winChances, type DrawMatch } from "./bracket";
 
 // An 8-player draw: A beats B, C beats D, E beats F, G beats H; A beats C, E beats G; A beats E.
 const draw8: DrawMatch[] = [
@@ -58,5 +58,26 @@ describe("winChances", () => {
     expect(c.get("A")).toBeCloseTo(0.7 * 0.7);
     expect(c.get("B")).toBeCloseTo(0.3 * 0.5);
     expect([...c.values()].reduce((s, x) => s + x, 0)).toBeCloseTo(1);
+  });
+});
+
+describe("seededBracket and reachChances", () => {
+  it("seeds 1 v 8, 4 v 5, 2 v 7, 3 v 6 and keeps 1 and 2 apart until the final", () => {
+    const tree = seededBracket(["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"])!;
+    expect(entrants(tree)).toEqual(["S1", "S8", "S4", "S5", "S2", "S7", "S3", "S6"]);
+    expect(seededBracket(["A", "B", "C"])).toBeNull();
+  });
+
+  it("reach chances: certain at the start, consistent with winChances at the end", () => {
+    const tree = seededBracket(["A", "B", "C", "D"])!;
+    const p = (x: string, y: string) => (x === "A" ? 0.7 : y === "A" ? 0.3 : 0.5);
+    const reach = reachChances(tree, p);
+    const title = winChances(tree, p);
+    for (const [k, arr] of reach) {
+      expect(arr[0]).toBe(1);
+      expect(arr).toHaveLength(3);
+      expect(arr[2]).toBeCloseTo(title.get(k)!);
+    }
+    expect(reach.get("A")![1]).toBeCloseTo(0.7);
   });
 });

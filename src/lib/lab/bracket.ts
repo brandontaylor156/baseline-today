@@ -90,3 +90,41 @@ export function replaceLeaf(node: Node, key: string, by: string): Node {
   if ("leaf" in node) return node.leaf === key ? { leaf: by } : node;
   return { left: replaceLeaf(node.left, key, by), right: replaceLeaf(node.right, key, by), winner: node.winner };
 }
+
+/** Standard seeded bracket for a power-of-two field given in seed order (1 v 8, 4 v 5, 3 v 6, 2 v 7 …). */
+export function seededBracket(keys: string[]): Node | null {
+  const n = keys.length;
+  if (n < 2 || (n & (n - 1)) !== 0) return null;
+  // Seed positions: start with [1, 2] and expand each seed s into (s, size + 1 − s).
+  let order = [1, 2];
+  while (order.length < n) {
+    const size = order.length * 2;
+    order = order.flatMap((s) => [s, size + 1 - s]);
+  }
+  let level: Node[] = order.map((s) => ({ leaf: keys[s - 1] }));
+  while (level.length > 1) {
+    const next: Node[] = [];
+    for (let i = 0; i < level.length; i += 2) next.push({ left: level[i], right: level[i + 1], winner: "" });
+    level = next;
+  }
+  return level[0];
+}
+
+/** Each entrant's chance of winning at least r matches in this subtree (index 0 = 1, last = title). */
+export function reachChances(node: Node, p: (a: string, b: string) => number): Map<string, number[]> {
+  if ("leaf" in node) return new Map([[node.leaf, [1]]]);
+  const L = reachChances(node.left, p);
+  const R = reachChances(node.right, p);
+  const out = new Map<string, number[]>();
+  const step = (mine: Map<string, number[]>, other: Map<string, number[]>) => {
+    for (const [x, arr] of mine) {
+      const here = arr.at(-1)!;
+      let beat = 0;
+      for (const [y, yarr] of other) beat += yarr.at(-1)! * p(x, y);
+      out.set(x, [...arr, here * beat]);
+    }
+  };
+  step(L, R);
+  step(R, L);
+  return out;
+}
