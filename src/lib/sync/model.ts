@@ -1,6 +1,6 @@
 import "server-only";
 
-import { bestOfFive, calibrate, evaluate, fitCalibration, runElo } from "@/lib/model/elo";
+import { bestOfFive, calibrate, evaluate, fitCalibration, marginMultiplier, runElo } from "@/lib/model/elo";
 import { loadResults } from "@/lib/model/load";
 import type { AdminClient } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
@@ -55,7 +55,7 @@ export async function computeModel(db: AdminClient, now = new Date()) {
       if (!week) return;
       record(m.key1, week, a.overall);
       record(m.key2, week, b.overall);
-    });
+    }, (m) => marginMultiplier(m.winnerShare));
     const fitOn = predictions.filter((p) => seasonByOrder.get(p.match.order) === season - 1);
     const c = fitOn.length >= 200 ? fitCalibration(fitOn) : 1;
     calibration[tour] = Number(c.toFixed(4));

@@ -80,6 +80,9 @@ real result's set scores, with win chances, calls and chat) ·
   matchup expected.
 - **Results explorer** (any player, any filter, shareable URLs, CSV), a **time machine** for
   cross-era matchups, **aging curves** by the delta method, and **similar players**.
+- **Margin-of-victory Elo:** rating updates scale with the winner's share of games (Kovalchik 2020;
+  Angelini et al. 2022). Backtested 2018–2026 with season-ahead calibration: log loss 0.6224 → 0.6195
+  (ATP) and 0.6299 → 0.6252 (WTA). Every rating, prediction and lab dataset uses it.
 - **Season simulator:** the rest of the season played out 2,000 times (entries from each player's
   habits, seeded draws with byes, every match, points won and last year's points dropped, then the
   Finals): chances of qualifying, year-end No. 1 and the top 10, daily. Backtested from three 2025

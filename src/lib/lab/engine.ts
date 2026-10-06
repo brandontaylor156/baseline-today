@@ -2,7 +2,7 @@
 // model and, at the start of each tournament, rebuilds its draw and computes every entrant's exact
 // title chance from the ratings of that week. Also keeps weekly rating snapshots for every player.
 
-import { bestOfFive, calibrate, newRating, updateRatings, winProbability, type Rating, type Surface } from "@/lib/model/elo";
+import { bestOfFive, calibrate, marginMultiplier, newRating, updateRatings, winProbability, type Rating, type Surface } from "@/lib/model/elo";
 
 import { entrants, reconstruct, replaceLeaf, winChances } from "./bracket";
 
@@ -20,6 +20,8 @@ export interface LabMatch {
   bestOf: 3 | 5;
   /** Walkovers shape the draw but don't move ratings. */
   walkover: boolean;
+  /** The winner's share of games (completed matches), for margin-of-victory updates. */
+  winnerShare?: number | null;
 }
 
 export interface TitleChanceRow {
@@ -132,7 +134,7 @@ export function runLab(
         if (m.walkover) continue;
         const a = get(m.key1);
         const b = get(m.key2);
-        updateRatings(a, b, m.winner, m.surface);
+        updateRatings(a, b, m.winner, m.surface, marginMultiplier(m.winnerShare));
         const week = monday(m.startDate);
         for (const [key, r] of [
           [m.key1, a],

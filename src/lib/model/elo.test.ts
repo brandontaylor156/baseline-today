@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { bestOfFive, evaluate, expected, kFactor, newRating, normalizeSurface, runElo, winProbability, type EloMatch } from "./elo";
+import { bestOfFive, evaluate, expected, kFactor, marginMultiplier, newRating, normalizeSurface, runElo, winProbability, type EloMatch } from "./elo";
 
 const m = (key1: string, key2: string, winner: 1 | 2, order: string, surface: EloMatch["surface"] = "hard"): EloMatch => ({ key1, key2, winner, surface, order });
 
@@ -55,5 +55,19 @@ describe("bestOfFive", () => {
     expect(bestOfFive(0.7)).toBeGreaterThan(0.7);
     expect(bestOfFive(0.3)).toBeLessThan(0.3);
     expect(bestOfFive(0.7) + bestOfFive(0.3)).toBeCloseTo(1);
+  });
+});
+
+describe("marginMultiplier", () => {
+  it("scales updates with the winner's share of games", () => {
+    expect(marginMultiplier(0.5)).toBeCloseTo(0.65);
+    expect(marginMultiplier(null)).toBeCloseTo(0.65);
+    expect(marginMultiplier(0.75)).toBeGreaterThan(marginMultiplier(0.6));
+    expect(marginMultiplier(1)).toBeCloseTo(2.6);
+  });
+  it("moves ratings more after a rout", () => {
+    const close = runElo([{ ...m("a", "b", 1, "1"), winnerShare: 0.52 }], undefined, (x) => marginMultiplier(x.winnerShare));
+    const rout = runElo([{ ...m("a", "b", 1, "1"), winnerShare: 0.85 }], undefined, (x) => marginMultiplier(x.winnerShare));
+    expect(rout.ratings.get("a")!.overall).toBeGreaterThan(close.ratings.get("a")!.overall);
   });
 });

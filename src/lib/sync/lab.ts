@@ -25,6 +25,14 @@ type Row = {
   tournaments: { start_date: string | null; surface: string | null; category: string | null };
 };
 
+/** The winner's share of games for a completed match (null for retirements and walkovers). */
+function winnerShare(r: Row): number | null {
+  if (r.result_detail) return null;
+  const sets = ((Array.isArray(r.set_scores) ? r.set_scores : []) as { p1: number | null; p2: number | null }[]).filter((x) => x.p1 !== null && x.p2 !== null);
+  const games = sets.reduce((t, x) => t + x.p1! + x.p2!, 0);
+  return games > 0 ? sets.reduce((t, x) => t + (r.winner_side === 1 ? x.p1! : x.p2!), 0) / games : null;
+}
+
 /** Every confirmed result (walkovers included, for the draw shape) in engine form, plus the matches the clutch index scores. */
 async function loadLabMatches(db: AdminClient): Promise<{ matches: LabMatch[]; clutch: ClutchMatch[] }> {
   const out: LabMatch[] = [];
@@ -53,6 +61,7 @@ async function loadLabMatches(db: AdminClient): Promise<{ matches: LabMatch[]; c
         surface: normalizeSurface(r.tournaments.surface),
         bestOf: r.tour === "atp" && /grand slam/i.test(r.tournaments.category ?? "") ? 5 : 3,
         walkover: r.result_detail === "walkover",
+        winnerShare: winnerShare(r),
       };
       out.push(lab);
       // Clutch: completed matches the model predicted (retirements end early, so they're left out).

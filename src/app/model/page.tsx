@@ -47,7 +47,8 @@ export default async function ModelPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Model accuracy</h1>
         <p className="text-sm text-muted">
-          How often our surface-aware Elo model picked the winner, using only what it knew before each match. Walkovers excluded.{" "}
+          How often our surface-aware Elo model (which also weighs each win’s margin in games) picked the winner, using only what it
+          knew before each match. Walkovers excluded.{" "}
           <Link href="/ratings" className="underline underline-offset-2">
             Ratings and calibration
           </Link>

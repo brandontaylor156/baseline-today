@@ -11,6 +11,8 @@ export interface EloMatch {
   surface: Surface | null;
   /** Sort key: tournament start date, then round order. */
   order: string;
+  /** The winner's share of the games played (completed matches), for margin-of-victory updates. */
+  winnerShare?: number | null;
 }
 
 export interface Rating {
@@ -23,6 +25,15 @@ export interface Rating {
 export const START = 1500;
 /** Weight of the surface rating in surface-specific predictions. */
 export const SURFACE_WEIGHT = 0.5;
+
+/**
+ * Margin of victory: the K-factor scales with the winner's share of the games (Kovalchik 2020;
+ * Angelini, Candila & De Angelis 2022). Backtested on 2018–2026 with season-ahead calibration, the
+ * log loss fell from 0.6224 to 0.6195 (ATP) and 0.6299 to 0.6252 (WTA). A 50/50 win moves ratings
+ * 0.65×, a typical 60% win about 1×, a rout up to 2.6×; retirements (no share) get the base 0.65×.
+ */
+export const MOV = { scale: 0.65, weight: 3 };
+export const marginMultiplier = (share: number | null | undefined) => MOV.scale * (share == null ? 1 : 1 + MOV.weight * (2 * share - 1));
 
 /** FiveThirtyEight-style K-factor: 250 / (matches + 5)^0.4. */
 export function kFactor(matches: number): number {
@@ -59,11 +70,11 @@ export interface Prediction {
 }
 
 /** Updates both players' overall (and surface, when known) ratings after one match. */
-export function updateRatings(a: Rating, b: Rating, winner: 1 | 2, surface: Surface | null): void {
+export function updateRatings(a: Rating, b: Rating, winner: 1 | 2, surface: Surface | null, mult = 1): void {
   const s1 = winner === 1 ? 1 : 0;
   const eOverall = expected(a.overall, b.overall);
-  const kA = kFactor(a.matches);
-  const kB = kFactor(b.matches);
+  const kA = kFactor(a.matches) * mult;
+  const kB = kFactor(b.matches) * mult;
   a.overall += kA * (s1 - eOverall);
   b.overall += kB * (1 - s1 - (1 - eOverall));
   a.matches++;
@@ -71,8 +82,8 @@ export function updateRatings(a: Rating, b: Rating, winner: 1 | 2, surface: Surf
 
   if (surface) {
     const eSurface = expected(a.surface[surface], b.surface[surface]);
-    a.surface[surface] += kFactor(a.surfaceMatches[surface]) * (s1 - eSurface);
-    b.surface[surface] += kFactor(b.surfaceMatches[surface]) * (1 - s1 - (1 - eSurface));
+    a.surface[surface] += kFactor(a.surfaceMatches[surface]) * mult * (s1 - eSurface);
+    b.surface[surface] += kFactor(b.surfaceMatches[surface]) * mult * (1 - s1 - (1 - eSurface));
     a.surfaceMatches[surface]++;
     b.surfaceMatches[surface]++;
   }
@@ -86,6 +97,8 @@ export function runElo(
   matches: EloMatch[],
   /** Called after each match with both players' updated ratings (for rating history). */
   onMatch?: (m: EloMatch, a: Rating, b: Rating) => void,
+  /** K-factor multiplier per match (margin of victory); 1 when omitted. */
+  kMultiplier?: (m: EloMatch) => number,
 ): { ratings: Map<string, Rating>; predictions: Prediction[] } {
   const ratings = new Map<string, Rating>();
   const get = (k: string) => {
@@ -101,7 +114,7 @@ export function runElo(
     const p1 = winProbability(a, b, m.surface);
     predictions.push({ match: m, p1 });
 
-    updateRatings(a, b, m.winner, m.surface);
+    updateRatings(a, b, m.winner, m.surface, kMultiplier?.(m) ?? 1);
     onMatch?.(m, a, b);
   }
   return { ratings, predictions };

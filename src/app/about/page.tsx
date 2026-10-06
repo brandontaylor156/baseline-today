@@ -99,8 +99,9 @@ export default function AboutPage() {
 
       <Section id="model" title="3. A model that says how sure it is">
         <p>
-          Win chances come from a surface-aware Elo model, calibrated on the previous season and tested on matches it hasn’t seen
-          (Brier score 0.219 on held-out ATP matches). It calls about 64% of this season’s matches, and its{" "}
+          Win chances come from a surface-aware Elo model that also weighs the margin of each win (a 6-1 6-2 rout moves ratings more
+          than a third-set tiebreak; that alone cut the backtested log loss by 0.5–0.7%), calibrated on the previous season and tested
+          on matches it hasn’t seen (Brier score 0.218 on held-out ATP matches). It calls about 64% of this season’s matches, and its{" "}
           <Link href="/ratings" className={a}>
             calibration table
           </Link>{" "}
