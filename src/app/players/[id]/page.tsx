@@ -9,9 +9,9 @@ import { PlayerResults } from "@/components/player-results";
 import { PlayerStatsSection } from "@/components/player-stats";
 import { PlayerTimeline } from "@/components/player-timeline";
 import { RankChart } from "@/components/rank-chart";
-import { RatingChart } from "@/components/rating-chart";
+import { RatingArc } from "@/components/rating-arc";
 import { WikiCredit } from "@/components/wiki-credit";
-import { getRatingHistory } from "@/lib/data/ratings";
+import { getRatingWeeks } from "@/lib/data/lab";
 import { getPlayerResults } from "@/lib/data/results";
 import { getSeasonMatches } from "@/lib/data/season";
 import { getPlayerStats } from "@/lib/data/stats";
@@ -53,12 +53,12 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
   if (!player) notFound();
 
   const year = new Date().getUTCFullYear();
-  const [results, tourDates, stats, seasonMatches, ratingHistory] = await Promise.all([
+  const [results, tourDates, stats, seasonMatches, ratingWeeks] = await Promise.all([
     getPlayerResults(player.id),
     getRankingDates(player.tour),
     getPlayerStats(player.id, year),
     getSeasonMatches(player.tour, year),
-    getRatingHistory(player.id),
+    getRatingWeeks(player.id),
   ]);
   const latest = player.history.at(-1);
   const best = bestRank(player.history);
@@ -175,19 +175,19 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
         </section>
       )}
 
-      {ratingHistory.length > 1 && (
+      {ratingWeeks.length > 1 && (
         <section aria-labelledby="rating-heading" className="rounded-xl border border-border bg-surface p-4 sm:p-5">
           <h2 id="rating-heading" className="text-sm font-semibold uppercase tracking-wide text-muted">
             Model rating
           </h2>
           <p className="mb-3 text-xs text-muted">
-            Weekly Elo rating from tracked results; higher is stronger. Everyone starts at 1500 in January 2015, so 2015 is a
-            warm-up.{" "}
+            Weekly Elo rating from tracked results, overall or on one surface; higher is stronger. Everyone starts at 1500 in
+            January 2015, so 2015 is a warm-up.{" "}
             <Link href={`/ratings?tour=${player.tour}`} className="underline underline-offset-2">
               All ratings
             </Link>
           </p>
-          <RatingChart history={ratingHistory} />
+          <RatingArc weeks={ratingWeeks} />
         </section>
       )}
 

@@ -686,4 +686,12 @@ test("research lab: luck, time machine, aging and the explorer", async ({ page, 
   await page.goto("/lab/forecast?tour=wta&surface=clay");
   await expect(page.getByRole("heading", { level: 1, name: "If a Grand Slam started today" })).toBeVisible();
   await expect(page.getByRole("table", { name: /clay Grand Slam starting today, WTA/ }).locator("tbody tr")).toHaveCount(20);
+
+  await page.goto("/lab/form?days=90");
+  await expect(page.getByRole("table", { name: "Hot: winning more than expected" }).locator("tbody tr")).not.toHaveCount(0);
+
+  // Player pages chart ratings overall or per surface, for every player.
+  await page.goto("/players/4");
+  await page.getByRole("group", { name: "Surface" }).getByRole("button", { name: "Clay" }).click();
+  await expect(page.getByRole("group", { name: "Surface" }).getByRole("button", { name: "Clay" })).toHaveAttribute("aria-pressed", "true");
 });

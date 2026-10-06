@@ -18,6 +18,11 @@ const TOOLS = [
     text: "Hundreds of 128-player draws made with real seeding rules, each solved exactly: every player's chance on hard, clay and grass, updated daily.",
   },
   {
+    href: "/lab/form",
+    title: "Who’s in form",
+    text: "Wins over the last 30, 60 or 90 days against what the model expected from each matchup: the hottest and coldest players right now.",
+  },
+  {
     href: "/lab/luck",
     title: "Expected vs actual titles",
     text: "Every draw since 2015 rebuilt from its results and replayed with the ratings of that week. Who won more titles than their chances said, and the most improbable champions.",

@@ -1114,6 +1114,10 @@ export type Database = {
         Args: { p_easiest: boolean; p_limit?: number; p_tour: string }
         Returns: { chance: number; country: string | null; name: string; path_chance: number; player_id: number | null; season: number; tournament: string; tournament_id: number }[]
       }
+      lab_form: {
+        Args: { p_days?: number; p_min?: number; p_tour: string }
+        Returns: { country: string | null; expected: number; last_match: string; matches: number; name: string; player_id: number; wins: number }[]
+      }
       lab_luck: {
         Args: { p_since?: number; p_tour: string }
         Returns: { country: string | null; entries: number; expected: number; finals_reached: number; name: string; player_id: number; titles: number }[]
