@@ -803,6 +803,18 @@ export type Database = {
           },
         ]
       }
+      venues: {
+        Row: { checked_at: string; country_code: string | null; elevation: number | null; latitude: number | null; location: string; longitude: number | null; name: string | null; timezone: string | null }
+        Insert: { checked_at?: string; country_code?: string | null; elevation?: number | null; latitude?: number | null; location: string; longitude?: number | null; name?: string | null; timezone?: string | null }
+        Update: { checked_at?: string; country_code?: string | null; elevation?: number | null; latitude?: number | null; location?: string; longitude?: number | null; name?: string | null; timezone?: string | null }
+        Relationships: []
+      }
+      event_conditions: {
+        Row: { apparent_max: number | null; article: string | null; checked_at: string; indoor: boolean | null; precipitation: number | null; temp_max: number | null; tournament_id: number; wind_max: number | null }
+        Insert: { apparent_max?: number | null; article?: string | null; checked_at?: string; indoor?: boolean | null; precipitation?: number | null; temp_max?: number | null; tournament_id: number; wind_max?: number | null }
+        Update: { apparent_max?: number | null; article?: string | null; checked_at?: string; indoor?: boolean | null; precipitation?: number | null; temp_max?: number | null; tournament_id?: number; wind_max?: number | null }
+        Relationships: []
+      }
       player_traits: {
         Row: { article: string | null; backhand: string | null; checked_at: string; hand: string | null; height_cm: number | null; player_key: string; source: string; tour: string; wikidata_id: string }
         Insert: { article?: string | null; backhand?: string | null; checked_at?: string; hand?: string | null; height_cm?: number | null; player_key: string; source?: string; tour: string; wikidata_id: string }

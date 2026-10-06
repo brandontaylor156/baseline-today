@@ -24,6 +24,8 @@ export interface FactorMatch {
   /** Set scores [player 1, player 2]; empty for walkovers. */
   sets: [number, number][];
   walkover: boolean;
+  /** Ended in a retirement. */
+  retired?: boolean;
 }
 
 export const FACTORS = [

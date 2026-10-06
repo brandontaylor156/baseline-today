@@ -38,6 +38,9 @@
     "projections": "tsx --env-file=.env.local --conditions=react-server scripts/projections.mts",
     "draw:audit": "tsx --env-file=.env.local --conditions=react-server scripts/draw-audit.mts",
     "pythagorean": "tsx --env-file=.env.local --conditions=react-server scripts/pythagorean.mts",
+    "sync:conditions": "tsx --env-file=.env.local --conditions=react-server scripts/sync-conditions.mts",
+    "conditions": "tsx --env-file=.env.local --conditions=react-server scripts/conditions.mts",
+    "momentum": "tsx --env-file=.env.local --conditions=react-server scripts/momentum.mts",
     "traits": "tsx --env-file=.env.local --conditions=react-server scripts/traits.mts",
     "sync:traits": "tsx --env-file=.env.local --conditions=react-server scripts/sync-traits.mts",
     "sync:people": "tsx --env-file=.env.local --conditions=react-server scripts/sync-people.mts"

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { matchModel, serveModelFor } from "./live-prob";
 import { SCORELINE_PARAMS } from "./scorelines";
-import { lowestForWinner, setPath } from "./set-path";
+import { lowestForWinner, nextSetChance, setPath } from "./set-path";
 
 const P = SCORELINE_PARAMS.atp;
 
@@ -32,5 +32,14 @@ describe("setPath", () => {
   it("finds the winner's low point", () => {
     expect(lowestForWinner([0.7, 0.4, 0.75, 1], 1)).toBeCloseTo(0.4);
     expect(lowestForWinner([0.7, 0.4, 0.75, 0], 2)).toBeCloseTo(0.25);
+  });
+});
+
+describe("nextSetChance", () => {
+  it("rises after winning a set (form) and is symmetric", () => {
+    const before = nextSetChance(0.5, 3, P, []);
+    expect(before).toBeCloseTo(0.5, 3);
+    expect(nextSetChance(0.5, 3, P, [1])).toBeGreaterThan(0.5);
+    expect(nextSetChance(0.6, 3, P, [1])).toBeCloseTo(1 - nextSetChance(0.4, 3, P, [2]), 6);
   });
 });

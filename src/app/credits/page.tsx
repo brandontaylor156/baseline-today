@@ -48,6 +48,36 @@ export default async function CreditsPage() {
         </p>
       </section>
 
+      <section aria-labelledby="open-heading" className="space-y-2">
+        <h2 id="open-heading" className="text-lg font-semibold">
+          Open data in the research lab
+        </h2>
+        <ul className="list-disc space-y-1 pl-5 text-sm text-muted">
+          <li>
+            Birth dates, playing hand, backhand and height:{" "}
+            <a href="https://www.wikidata.org/" className="underline hover:text-foreground">
+              Wikidata
+            </a>{" "}
+            (CC0), with gaps filled from each player’s Wikipedia infobox (CC BY-SA 4.0).
+          </li>
+          <li>
+            Historical weather at each venue:{" "}
+            <a href="https://open-meteo.com/" className="underline hover:text-foreground">
+              Open-Meteo
+            </a>{" "}
+            historical archive, built on the ERA5 reanalysis from the Copernicus Climate Change Service (CC BY 4.0).
+          </li>
+          <li>
+            Venue coordinates, elevation and time zones: Open-Meteo’s geocoder, from{" "}
+            <a href="https://www.geonames.org/" className="underline hover:text-foreground">
+              GeoNames
+            </a>{" "}
+            (CC BY 4.0).
+          </li>
+          <li>Indoor or outdoor, season-finals results and seeds: the events’ Wikipedia articles (CC BY-SA 4.0).</li>
+        </ul>
+      </section>
+
       <section aria-labelledby="recaps-heading" className="space-y-2">
         <h2 id="recaps-heading" className="text-lg font-semibold">
           Match recaps

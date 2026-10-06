@@ -10,6 +10,8 @@ import { provider } from "@/lib/provider";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { TENNIS_TAG } from "@/lib/supabase/public";
 import { runDailySync } from "@/lib/sync/daily";
+import { syncConditions } from "@/lib/sync/conditions";
+import { computeConditions } from "@/lib/sync/conditions-analysis";
 import { computeDrawAudit } from "@/lib/sync/draw-audit";
 import { computeFactors } from "@/lib/sync/factors";
 import { computeForecast } from "@/lib/sync/forecast";
@@ -17,6 +19,7 @@ import { computeFragility } from "@/lib/sync/fragility";
 import { freshPages } from "@/lib/sync/fresh-pages";
 import { computeLab } from "@/lib/sync/lab";
 import { syncPeople } from "@/lib/sync/people";
+import { computeMomentum } from "@/lib/sync/momentum";
 import { computePace } from "@/lib/sync/pace";
 import { computeProjections } from "@/lib/sync/projections";
 import { computePythagorean } from "@/lib/sync/pythagorean";
@@ -82,7 +85,14 @@ export async function GET(request: Request) {
   const saturday =
     now.getUTCDay() === 6
       ? await computePace(db, now)
-          .then(async (pace) => ({ pace, deserved: await computePythagorean(db, now) }))
+          .then(async (pace) => ({ pace, deserved: await computePythagorean(db, now), momentum: await computeMomentum(db, now) }))
+          .catch((err: Error) => `error: ${err.message}`)
+      : "weekly";
+  // Real conditions (new venues, indoor flags and weather for last week's events) and their analysis: Sundays.
+  const sunday =
+    now.getUTCDay() === 0
+      ? await syncConditions(db, now, 200)
+          .then(async (sync) => ({ sync, analysis: await computeConditions(db, now) }))
           .catch((err: Error) => `error: ${err.message}`)
       : "weekly";
   // Rankings rebuilt from results (about 40 seconds): Fridays, incrementally.
@@ -106,5 +116,5 @@ export async function GET(request: Request) {
     .catch((err: Error) => `error: ${err.message}`);
   // Bluesky: the upset of the day and, on Mondays, last week's recap (off until the account is set).
   const bluesky = await runBluesky(db, now).catch((err: Error) => `error: ${err.message}`);
-  return Response.json({ ...result, records, lab, factors, scorelines: scorelineCheck, projections, season, rebuilt, saturday, forecast, digest, indexnow, bluesky }, { status: result.status === "error" ? 500 : 200 });
+  return Response.json({ ...result, records, lab, factors, scorelines: scorelineCheck, projections, season, rebuilt, saturday, sunday, forecast, digest, indexnow, bluesky }, { status: result.status === "error" ? 500 : 200 });
 }

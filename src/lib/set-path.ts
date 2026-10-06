@@ -65,3 +65,12 @@ export function lowestForWinner(path: number[], winner: 1 | 2): number {
   const theirs = path.slice(0, -1).map((p) => (winner === 1 ? p : 1 - p));
   return Math.min(...theirs);
 }
+
+/** A's chance to win the next set, after the sets so far (each reweighting the day's form). */
+export function nextSetChance(pre: number, bestOf: 3 | 5, params: { average: number; tau: number }, sets: (1 | 2)[]): number {
+  const ns = nodes(pre, bestOf, params);
+  const w = ns.map((n) => n.w);
+  for (const s of sets) ns.forEach((n, i) => (w[i] *= s === 1 ? n.set : 1 - n.set));
+  const total = w.reduce((a, b) => a + b, 0);
+  return ns.reduce((acc, n, i) => acc + (w[i] / total) * n.set, 0);
+}

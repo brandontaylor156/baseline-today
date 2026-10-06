@@ -63,6 +63,16 @@ const TOOLS = [
     text: "Wins a player’s share of games deserved, this season’s luckiest and unluckiest records, and whether games or wins predict next season better.",
   },
   {
+    href: "/lab/conditions",
+    title: "Heat, altitude and jet lag",
+    text: "Real weather for every outdoor event since 2015, venue elevation and time zones, joined to every match: what heat does to favourites and retirements, and whether thin air speeds courts up.",
+  },
+  {
+    href: "/lab/momentum",
+    title: "Does momentum exist?",
+    text: "Coin-flip tiebreaks as a natural experiment: winning one 8–6 doesn’t carry into the next set beyond what the score says; winning one comfortably does.",
+  },
+  {
     href: "/lab/forecast",
     title: "If a Grand Slam started today",
     text: "Hundreds of 128-player draws made with real seeding rules, each solved exactly: every player's chance on hard, clay and grass, updated daily.",

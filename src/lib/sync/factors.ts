@@ -122,6 +122,7 @@ export async function loadMatches(db: AdminClient): Promise<{ matches: Record<"a
         bestOf: r.tour === "atp" && /grand slam/i.test(r.tournaments.category ?? "") ? 5 : 3,
         sets,
         walkover: r.result_detail === "walkover",
+        retired: r.result_detail === "retired",
       });
     }
     if (!data || data.length < BATCH) break;

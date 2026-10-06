@@ -125,6 +125,13 @@ set by set) ·
 - **The deserved record:** tennis’s Pythagorean record (after Kovalchik 2016) from each
   player-season’s share of games; games predict next season slightly better than records
   (ATP r 0.716 vs 0.708, WTA 0.475 vs 0.444), and close-match luck carries over a little on the ATP only.
+- **Heat, altitude and jet lag:** real weather for 1,353 events (Open-Meteo / ERA5, CC BY 4.0),
+  257 venues geocoded (GeoNames), indoor flags from the events’ Wikipedia articles. Retirements rise
+  with heat (ATP 2.3% under 20 °C → 3.9% at 30–35 °C); the favourite’s edge softens a little in heat;
+  jet-lag and altitude effects don’t show up (and why).
+- **Does momentum exist?** Coin-flip tiebreaks (8–6 or later) as a natural experiment, against the
+  in-match model: winners take the next set 53% of the time, less than the model expects; clear
+  tiebreak wins carry; bouncing back isn’t a lasting trait.
 - **Career comparables:** each player's last two years matched against every earlier player at the
   same age (birth dates for 1,600+ draw-only players from Wikidata), with a range for the next two
   years. Backtested from 2021 with only past data: the range holds 58% of outcomes against a 60% aim,
