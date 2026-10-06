@@ -77,6 +77,28 @@ export default function DataPage() {
         </p>
       </section>
 
+      <section aria-labelledby="api-heading" className="space-y-3">
+        <h2 id="api-heading" className="text-lg font-semibold">
+          JSON API
+        </h2>
+        <p className="text-sm text-muted">Free, no key, CORS open, cached at the edge. Please cache on your side too, and credit as below.</p>
+        <ul className="space-y-2 text-sm">
+          {[
+            ["/api/v1/players?q=sinner", "Find player ids (accent-insensitive)."],
+            ["/api/v1/h2h?a=4&b=6", "Head-to-head: record, by surface, every meeting and the model’s chance on each surface."],
+            ["/api/v1/title-odds/<tournament id>", "Each remaining player’s chance to reach every round of a draw in progress."],
+            ["/api/v1/upsets?days=7&max=0.35", "Recent wins where our model gave the winner the smallest chance."],
+          ].map(([path, what]) => (
+            <li key={path} className="rounded-lg border border-border bg-surface px-3 py-2">
+              <a href={path.includes("<") ? undefined : path} className="font-mono text-xs text-accent hover:underline">
+                GET {path}
+              </a>
+              <span className="block text-muted">{what}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <section aria-labelledby="license-heading" className="space-y-2 text-sm">
         <h2 id="license-heading" className="text-lg font-semibold">
           License and credit

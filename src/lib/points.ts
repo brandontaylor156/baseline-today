@@ -51,3 +51,25 @@ export function expectedPoints(tour: Tour, category: string | null, rounds: numb
   }
   return total;
 }
+
+const EXIT = ["title", "final", "semifinal", "quarterfinal", "round of 16", "round of 32", "round of 64", "round of 128"];
+
+/**
+ * The smallest single result at each category still to play that is worth at least `gap` points,
+ * cheapest first: "what it takes" to close a gap in the race.
+ */
+export function resultsWorth(tour: Tour, gap: number, categories: string[]): { category: string; result: string; points: number }[] {
+  const out: { category: string; result: string; points: number }[] = [];
+  for (const category of [...new Set(categories)]) {
+    const ladder = TABLES[tour][category];
+    if (!ladder) continue;
+    // Walk from the earliest exit up to the title; the first step that covers the gap.
+    for (let i = ladder.length - 1; i >= 0; i--) {
+      if (ladder[i] >= gap && ladder[i] > 0) {
+        out.push({ category, result: EXIT[i], points: ladder[i] });
+        break;
+      }
+    }
+  }
+  return out.sort((a, b) => a.points - b.points);
+}

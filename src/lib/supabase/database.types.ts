@@ -773,6 +773,12 @@ export type Database = {
           },
         ]
       }
+      stat_cache: {
+        Row: { data: Json; key: string; updated_at: string }
+        Insert: { data: Json; key: string; updated_at?: string }
+        Update: { data?: Json; key?: string; updated_at?: string }
+        Relationships: []
+      }
       sync_state: {
         Row: {
           details: Json | null
@@ -1010,6 +1016,35 @@ export type Database = {
         Args: { p_match_id: number; p_nickname: string }
         Returns: string
       }
+      event_history: {
+        Args: { p_provider_id: number; p_tour: string }
+        Returns: {
+          category: string | null
+          draw_size: number | null
+          end_date: string | null
+          loser: string | null
+          loser_id: number | null
+          match_id: number | null
+          name: string
+          season: number
+          set_scores: Json | null
+          start_date: string | null
+          surface: string | null
+          tournament_id: number
+          winner: string | null
+          winner_chance: number | null
+          winner_id: number | null
+          winner_side: number | null
+        }[]
+      }
+      event_list: {
+        Args: never
+        Returns: { category: string | null; latest_id: number; latest_season: number; name: string; provider_id: number; seasons: number; surface: string | null; tour: string }[]
+      }
+      event_upsets: {
+        Args: { p_limit?: number; p_provider_id: number; p_tour: string }
+        Returns: { loser: string | null; loser_id: number | null; match_id: number; round: string | null; season: number; winner: string | null; winner_chance: number; winner_id: number | null }[]
+      }
       finals_on_day: {
         Args: { p_day: number; p_month: number }
         Returns: {
@@ -1090,6 +1125,7 @@ export type Database = {
         Returns: { created_at: string; invite_code: string; members: number; name: string }[]
       }
       ranking_dates: { Args: { p_tour: string }; Returns: string[] }
+      refresh_stat_cache: { Args: never; Returns: undefined }
       sample_league_standings: {
         Args: { p_season: number }
         Returns: {

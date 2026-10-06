@@ -38,6 +38,8 @@ export async function GET(request: Request) {
   if (resultsHealth === "stale" || resultsHealth === "never") {
     await sendAlert(`⚠️ Baseline Today: results refresh hasn't succeeded since ${results?.last_refreshed_at ?? "ever"}`);
   }
+  // All-time records (expensive): recomputed once a day into stat_cache.
+  const records = await db.rpc("refresh_stat_cache").then(({ error }) => (error ? `error: ${error.message}` : "ok"));
   // Serve fresh rankings on the next visit instead of waiting out the hourly revalidation.
   if (result.status === "ok") revalidateTag(TENNIS_TAG, "max");
   // Daily digest to chat webhooks, if any are configured.
@@ -48,5 +50,5 @@ export async function GET(request: Request) {
     .catch((err: Error) => `error: ${err.message}`);
   // Bluesky: the upset of the day and, on Mondays, last week's recap (off until the account is set).
   const bluesky = await runBluesky(db, now).catch((err: Error) => `error: ${err.message}`);
-  return Response.json({ ...result, digest, indexnow, bluesky }, { status: result.status === "error" ? 500 : 200 });
+  return Response.json({ ...result, records, digest, indexnow, bluesky }, { status: result.status === "error" ? 500 : 200 });
 }

@@ -14,6 +14,7 @@ import { getUpcoming } from "@/lib/data/predictions";
 import { getDrawModel, getTitleHistory } from "@/lib/data/title-odds";
 import { titleChances } from "@/lib/draw-model";
 import { createPublicClient } from "@/lib/supabase/public";
+import { eventSlug } from "@/lib/data/history";
 import { dateRange, displayName, getTournament } from "@/lib/data/tournaments";
 import { TOUR_LABEL } from "@/lib/format";
 import { tournamentLd } from "@/lib/structured-data";
@@ -50,6 +51,8 @@ export default async function TournamentPage({ params }: PageProps<"/tournaments
   const live = model && titleChances(model) ? model : null;
   const history = live ? await getTitleHistory(t.id, live) : null;
 
+  const { data: ident } = await createPublicClient().from("tournaments").select("provider, provider_id").eq("id", t.id).maybeSingle();
+  const historyPath = ident?.provider === "balldontlie" ? `/history/${eventSlug(t.tour, t.name, ident.provider_id)}` : null;
   const facts = [TOUR_LABEL[t.tour], t.category, t.location ? displayName(t.location.split(",")[0]) : null, t.surface, t.drawSize ? `${t.drawSize}-player draw` : null].filter(Boolean);
 
   return (
@@ -71,7 +74,17 @@ export default async function TournamentPage({ params }: PageProps<"/tournaments
       <header className="space-y-1">
         <p className="text-sm font-medium text-accent">{dateRange(t.startDate, t.endDate)}</p>
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{displayName(t.name)}</h1>
-        <p className="text-sm text-muted">{facts.join(" · ")}</p>
+        <p className="text-sm text-muted">
+          {facts.join(" · ")}
+          {historyPath && (
+            <>
+              {" · "}
+              <Link href={historyPath} className="font-medium text-accent hover:underline">
+                Past winners →
+              </Link>
+            </>
+          )}
+        </p>
       </header>
 
       {t.champion && (

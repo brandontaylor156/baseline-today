@@ -1,5 +1,30 @@
 [
  {
+  "hash": "7f951c6",
+  "date": "2026-10-06",
+  "subject": "Fix round labels with wiki markup (8 men's Grand Slam finals weren't titles)",
+  "bullets": []
+ },
+ {
+  "hash": "ed3d8d6",
+  "date": "2026-10-06",
+  "subject": "Batch 1: rivals, model explainer, upset map, model accuracy, on this day, more",
+  "bullets": [
+   "/players/<id>/rivals: record against every opponent since 2015, by surface, vs today's top 10 and top 100, linked to each head-to-head",
+   "Match pages: \"Why the model says X%\" with both ratings, the overall and surface chances, the blend and calibration (upcoming matches)",
+   "/upsets: how often favorites lose by round, surface, tour and season, and this week against the usual rate",
+   "/model: accuracy by season (ATP and WTA chart), by surface, Brier score, and the model against \"the higher-ranked player wins\" (65.1% vs 62.7% since 2025)",
+   "On this day: finals won on today's date in earlier seasons (homepage, bot)",
+   "Public leagues: owners can list a league; a directory anyone can join from",
+   "Widgets: upsets this week, player card, head-to-head card",
+   "Push: \"next match\" notifications when a favorite's next opponent is set",
+   "Share images for weekly recaps, upsets, model and rivals pages",
+   "/changelog from git history (npm run changelog)",
+   "scripts/db.mjs: run SQL with the password from Credential Manager",
+   "Isolation test: 57 checks (public league listing is owner-only)"
+  ]
+ },
+ {
   "hash": "7b7a30e",
   "date": "2026-10-06",
   "subject": "Push notifications on; guided setup CLI for the account-based switches",

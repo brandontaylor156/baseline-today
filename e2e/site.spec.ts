@@ -568,3 +568,55 @@ test("changelog, new widgets and on-this-day finals", async ({ page, request }) 
   }
   expect((await request.get("/embed/h2h/nope")).status()).toBe(404);
 });
+
+test("records and tournament history", async ({ page }) => {
+  await page.goto("/stats");
+  await page.getByRole("link", { name: "All-time records →" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: /records since 2015/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Most titles", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Longest winning streaks" })).toBeVisible();
+  await page.goto("/tournaments");
+  await page.getByRole("link", { name: "Past winners since 2015" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Tournament history" })).toBeVisible();
+  await page.locator('main a[href^="/history/"]').first().click();
+  await expect(page.getByRole("heading", { level: 1, name: /: past winners$/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Every final" })).toBeVisible();
+  expect((await page.request.get("/history/atp-nope-999999999")).status()).toBe(404);
+});
+
+test("season review from a player page", async ({ page }) => {
+  await page.goto("/rankings/atp");
+  await page.locator("tbody tr").first().getByRole("link").click();
+  const nav = page.getByRole("navigation", { name: "Season reviews" });
+  await nav.getByRole("link").nth(1).click();
+  await expect(page.getByRole("heading", { level: 1, name: /’s \d{4} season$/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Best wins" })).toBeVisible();
+  expect((await page.request.get("/players/4/season/1999")).status()).toBe(404);
+});
+
+test("race: what it takes; betting calculator maths", async ({ page }) => {
+  await page.goto("/race");
+  await expect(page.getByRole("heading", { level: 1, name: /season race/ })).toBeVisible();
+  await page.goto("/tools/betting");
+  await expect(page.getByRole("heading", { level: 1, name: "Betting maths calculator" })).toBeVisible();
+  await expect(page.getByText("Betting is for adults only")).toBeVisible();
+  await page.getByLabel(/Player A: odds/).fill("1.90");
+  await page.getByLabel(/Player B: odds/).fill("1.90");
+  await expect(page.getByText("5.3%").first()).toBeVisible(); // margin of a 1.90/1.90 market
+  await page.getByLabel("Leg 1 odds").fill("1.5");
+  await page.getByLabel("Leg 2 odds").fill("2");
+  await expect(page.getByText("3.00 · +200")).toBeVisible();
+});
+
+test("public JSON API", async ({ request }) => {
+  const players = await (await request.get("/api/v1/players?q=sinner")).json();
+  expect(players.license).toContain("CC BY-SA 4.0");
+  expect(players.data[0]).toMatchObject({ id: expect.any(Number), name: expect.stringContaining("Sinner") });
+  const h2h = await request.get("/api/v1/h2h?a=4&b=6");
+  expect(h2h.headers()["access-control-allow-origin"]).toBe("*");
+  const body = await h2h.json();
+  expect(body.data.wins.a + body.data.wins.b).toBeGreaterThan(5);
+  expect(body.data.modelChanceA.all).toBeGreaterThan(0);
+  expect((await request.get("/api/v1/h2h?a=4")).status()).toBe(400);
+  expect((await (await request.get("/api/v1/upsets?days=7")).json()).data).toBeInstanceOf(Array);
+});

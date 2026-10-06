@@ -64,6 +64,10 @@ export default async function StatsPage({ searchParams }: PageProps<"/stats">) {
             ·{" "}
             <Link href="/model" className="font-medium text-accent hover:underline">
               Model accuracy →
+            </Link>{" "}
+            ·{" "}
+            <Link href={`/records?tour=${tour}`} className="font-medium text-accent hover:underline">
+              All-time records →
             </Link>
           </p>
         </div>

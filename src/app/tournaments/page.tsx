@@ -69,7 +69,11 @@ export default async function TournamentsPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Tournaments</h1>
         <p className="text-sm text-muted">
-          {season} ATP and WTA singles calendar · Add to your calendar:{" "}
+          {season} ATP and WTA singles calendar ·{" "}
+          <Link href="/history" className="font-medium text-accent hover:underline">
+            Past winners since 2015
+          </Link>{" "}
+          · Add to your calendar:{" "}
           <a href={`${SITE_URL.replace(/^https:/, "webcal:")}/calendar/atp.ics`} className="font-medium text-accent hover:underline">
             ATP
           </a>{" "}

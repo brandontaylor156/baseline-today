@@ -4,6 +4,7 @@ import { getCountries } from "@/lib/data/countries";
 import { getScheduledMatchIds } from "@/lib/data/match-preview";
 import { getRankingDates, getRankings } from "@/lib/data/tennis";
 import { getSeasonTournaments } from "@/lib/data/tournaments";
+import { getEvents } from "@/lib/data/history";
 import { getRecapWeeks } from "@/lib/data/weekly";
 import { TOURS } from "@/lib/provider/types";
 import { SITE_URL } from "@/lib/site";
@@ -16,7 +17,7 @@ export const revalidate = 86400;
 // upcoming matches and the head-to-heads of top-100 rivals with 3+ meetings.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const season = new Date().getUTCFullYear();
-  const [rankings, tournaments, countries, upcoming, rivalries, weeks] = await Promise.all([
+  const [rankings, tournaments, countries, upcoming, rivalries, weeks, events] = await Promise.all([
     Promise.all(
       TOURS.map(async (t) => {
         const [latest] = await getRankingDates(t);
@@ -29,6 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // PostgREST returns at most 1,000 rows per request: fetch the rivalries in pages.
     Promise.all([0, 1000].map((from) => createPublicClient().rpc("top_rivalries", { p_min: 3, p_limit: 2000 }).range(from, from + 999))),
     getRecapWeeks(season),
+    getEvents(),
   ]);
 
   const page = (path: string, changeFrequency: "daily" | "weekly", priority: number) => ({ url: `${SITE_URL}${path}`, changeFrequency, priority });
@@ -50,10 +52,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     page("/upsets", "weekly", 0.5),
     page("/model", "weekly", 0.5),
     page("/changelog", "weekly", 0.3),
+    page("/records", "weekly", 0.6),
+    page("/tools/betting", "weekly", 0.4),
+    page("/records?tour=wta", "weekly", 0.6),
+    page("/history", "weekly", 0.6),
+    ...events.filter((e) => e.seasons >= 2).map((e) => page(`/history/${e.slug}`, "weekly", 0.5)),
     page("/about", "weekly", 0.4),
     ...weeks.map((w) => page(`/week/${w}`, "weekly", 0.5)),
     ...rankings.flat().map((r) => page(`/players/${r.player.id}`, "weekly", 0.6)),
     ...rankings.flat().map((r) => page(`/players/${r.player.id}/rivals`, "weekly", 0.4)),
+    ...rankings.flat().flatMap((r) => [season, season - 1].map((y) => page(`/players/${r.player.id}/season/${y}`, "weekly", 0.4))),
     ...tournaments.map((t) => page(`/tournaments/${t.id}`, "weekly", 0.5)),
     ...countries.map((c) => page(`/countries/${c.code}`, "weekly", 0.4)),
     ...upcoming.map((id) => page(`/matches/${id}`, "daily", 0.5)),

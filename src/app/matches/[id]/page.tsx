@@ -159,6 +159,14 @@ export default async function MatchPage({ params }: PageProps<"/matches/[id]">) 
       )}
 
       {m.explain && <ModelExplainer e={m.explain} nameA={a.name} nameB={b.name} />}
+      {m.scheduled && m.chanceA !== null && (
+        <p className="text-sm">
+          <Link href={`/tools/betting?match=${match.id}`} className="font-medium text-accent hover:underline">
+            Check a bookmaker’s price against the model →
+          </Link>{" "}
+          <span className="text-muted">Margin, fair odds and expected value. 18+.</span>
+        </p>
+      )}
 
       {m.recap && (
         <section aria-labelledby="recap-heading" className="space-y-2">

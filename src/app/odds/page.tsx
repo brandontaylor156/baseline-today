@@ -47,7 +47,11 @@ export default async function OddsPage() {
           {accuracy.length
             ? accuracy.map((a, i) => `${Math.round(a!.accuracy * 100)}% of ${a!.n} ${["ATP", "WTA"][i]} matches`).join(" and ")
             : "about 63% of matches"}
-          . Bookmakers are usually more accurate, and no model guarantees a profit. Betting is for adults only (18+, 21+ in
+          . Bookmakers are usually more accurate, and no model guarantees a profit.{" "}
+          <Link href="/tools/betting" className="underline underline-offset-2">
+            Betting maths calculator
+          </Link>
+          . Betting is for adults only (18+, 21+ in
           some places). If gambling stops being fun, help is free and confidential:{" "}
           <a href="https://www.ncpgambling.org/help-treatment/" className="underline underline-offset-2">
             1-800-GAMBLER

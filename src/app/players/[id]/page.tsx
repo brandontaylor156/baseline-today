@@ -199,6 +199,17 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
 
       <PlayerTimeline rows={seasonTimeline(seasonMatches, player.id)} year={year} />
 
+      {stats.since !== null && (
+        <nav aria-label="Season reviews" className="flex flex-wrap items-center gap-2 text-sm">
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted">Season reviews</span>
+          {Array.from({ length: year - Math.max(2015, stats.since) + 1 }, (_, i) => year - i).map((y) => (
+            <Link key={y} href={`/players/${player.id}/season/${y}`} className="rounded-lg border border-border px-2.5 py-1 tabular-nums hover:bg-surface-muted">
+              {y}
+            </Link>
+          ))}
+        </nav>
+      )}
+
       {results.recent.length > 0 && (
         <section aria-labelledby="results-heading" className="rounded-xl border border-border bg-surface p-4 sm:p-5">
           <h2 id="results-heading" className="mb-1 text-sm font-semibold uppercase tracking-wide text-muted">
