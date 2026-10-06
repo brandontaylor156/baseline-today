@@ -41,6 +41,7 @@
     "sync:conditions": "tsx --env-file=.env.local --conditions=react-server scripts/sync-conditions.mts",
     "conditions": "tsx --env-file=.env.local --conditions=react-server scripts/conditions.mts",
     "momentum": "tsx --env-file=.env.local --conditions=react-server scripts/momentum.mts",
+    "network": "tsx --env-file=.env.local --conditions=react-server scripts/network.mts",
     "traits": "tsx --env-file=.env.local --conditions=react-server scripts/traits.mts",
     "sync:traits": "tsx --env-file=.env.local --conditions=react-server scripts/sync-traits.mts",
     "sync:people": "tsx --env-file=.env.local --conditions=react-server scripts/sync-people.mts"

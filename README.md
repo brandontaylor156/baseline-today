@@ -132,6 +132,9 @@ set by set) ·
 - **Does momentum exist?** Coin-flip tiebreaks (8–6 or later) as a natural experiment, against the
   in-match model: winners take the next set 53% of the time, less than the model expects; clear
   tiebreak wins carry; bouncing back isn’t a lasting trait.
+- **The win network:** prestige by PageRank on who beat whom (Radicchi 2011), tested honestly:
+  it barely beats counting wins and trails the ratings (ATP 62.7% vs 65.0%). Plus a finder for the
+  shortest chain of real wins between any two players, each step linking to the match.
 - **Career comparables:** each player's last two years matched against every earlier player at the
   same age (birth dates for 1,600+ draw-only players from Wikidata), with a range for the next two
   years. Backtested from 2021 with only past data: the range holds 58% of outcomes against a 60% aim,

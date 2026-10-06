@@ -20,6 +20,7 @@ import { freshPages } from "@/lib/sync/fresh-pages";
 import { computeLab } from "@/lib/sync/lab";
 import { syncPeople } from "@/lib/sync/people";
 import { computeMomentum } from "@/lib/sync/momentum";
+import { computeNetwork } from "@/lib/sync/network";
 import { computePace } from "@/lib/sync/pace";
 import { computeProjections } from "@/lib/sync/projections";
 import { computePythagorean } from "@/lib/sync/pythagorean";
@@ -99,7 +100,7 @@ export async function GET(request: Request) {
   const rebuilt =
     now.getUTCDay() === 5
       ? await computeRebuiltRankings(db, now)
-          .then(async (r) => ({ ...r, drawAudit: await computeDrawAudit(db, now) }))
+          .then(async (r) => ({ ...r, drawAudit: await computeDrawAudit(db, now), network: await computeNetwork(db, now) }))
           .catch((err: Error) => `error: ${err.message}`)
       : "weekly";
   // "If a major started today" (a few seconds): daily, from today's ratings.

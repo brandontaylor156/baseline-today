@@ -73,6 +73,11 @@ const TOOLS = [
     text: "Coin-flip tiebreaks as a natural experiment: winning one 8–6 doesn’t carry into the next set beyond what the score says; winning one comfortably does.",
   },
   {
+    href: "/lab/network",
+    title: "The win network",
+    text: "Prestige by PageRank over who beat whom, tested honestly against the ratings, and the chain of real wins between any two players.",
+  },
+  {
     href: "/lab/forecast",
     title: "If a Grand Slam started today",
     text: "Hundreds of 128-player draws made with real seeding rules, each solved exactly: every player's chance on hard, clay and grass, updated daily.",

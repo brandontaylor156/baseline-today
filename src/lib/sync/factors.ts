@@ -47,6 +47,7 @@ export interface FactorsCache {
 }
 
 type Row = {
+  id: number;
   tour: "atp" | "wta";
   round: string | null;
   winner_side: number;
@@ -90,7 +91,7 @@ export async function loadMatches(db: AdminClient): Promise<{ matches: Record<"a
     const { data, error } = await db
       .from("matches")
       .select(
-        "tour, round, winner_side, result_detail, set_scores, pre_match_p1, player1_id, player2_id, player1_name, player2_name, player1_country, player2_country, tournament_id, tournaments!inner(start_date, surface, category, location)",
+        "id, tour, round, winner_side, result_detail, set_scores, pre_match_p1, player1_id, player2_id, player1_name, player2_name, player1_country, player2_country, tournament_id, tournaments!inner(start_date, surface, category, location)",
       )
       .eq("status", "final")
       .eq("confirmed", true)
@@ -108,6 +109,7 @@ export async function loadMatches(db: AdminClient): Promise<{ matches: Record<"a
       who.set(key1, { id: r.player1_id, name: r.player1_name ?? key1, country: r.player1_country });
       who.set(key2, { id: r.player2_id, name: r.player2_name ?? key2, country: r.player2_country });
       out[r.tour].push({
+        id: r.id,
         key1,
         key2,
         winner: r.winner_side as 1 | 2,

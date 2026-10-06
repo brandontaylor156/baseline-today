@@ -7,6 +7,8 @@
 import { playingDays } from "./comebacks";
 
 export interface FactorMatch {
+  /** The match row, for links. */
+  id?: number;
   key1: string;
   key2: string;
   winner: 1 | 2;
