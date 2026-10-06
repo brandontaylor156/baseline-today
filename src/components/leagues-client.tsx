@@ -249,22 +249,23 @@ function SampleLeague({ rows }: { rows: SampleRow[] }) {
     <section aria-labelledby="sample-heading" className="space-y-2">
       <div>
         <h2 id="sample-heading" className="text-base font-semibold">
-          Sample league: the bots
+          Benchmarks to beat
         </h2>
         <p className="text-sm text-muted">
-          Four bots with simple strategies, scored on every result this season that our model predicted. Can you beat Fran?
+          How four simple strategies would have done on every real result this season that our model predicted. A league pick’em
+          score above the top line means you beat the model.
         </p>
       </div>
       <div className="overflow-hidden rounded-xl border border-border bg-surface">
         <table className="w-full text-sm">
-          <caption className="sr-only">Sample league standings this season</caption>
+          <caption className="sr-only">How simple pick strategies did on this season’s results</caption>
           <thead className="border-b border-border text-left text-xs text-muted">
             <tr>
               <th scope="col" className="w-10 px-3 py-2 text-right font-medium">
                 #
               </th>
               <th scope="col" className="w-full px-2 py-2 font-medium">
-                Member
+                Strategy
               </th>
               <th scope="col" className="whitespace-nowrap px-2 py-2 text-right font-medium">
                 Pick’em
@@ -279,8 +280,7 @@ function SampleLeague({ rows }: { rows: SampleRow[] }) {
               <tr key={r.nickname}>
                 <td className="px-3 py-2 text-right tabular-nums">{i + 1}</td>
                 <td className="max-w-0 px-2 py-2">
-                  <span className="block truncate">{r.nickname}</span>
-                  <span className="block truncate text-xs text-muted">{r.strategy}</span>
+                  <span className="block truncate">{r.strategy}</span>
                 </td>
                 <td className="whitespace-nowrap px-2 py-2 text-right tabular-nums">
                   {r.correct.toLocaleString("en-US")}/{r.settled.toLocaleString("en-US")}

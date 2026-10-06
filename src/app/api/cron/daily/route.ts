@@ -16,6 +16,7 @@ import { computeFragility } from "@/lib/sync/fragility";
 import { freshPages } from "@/lib/sync/fresh-pages";
 import { computeLab } from "@/lib/sync/lab";
 import { syncPeople } from "@/lib/sync/people";
+import { computePace } from "@/lib/sync/pace";
 import { computeProjections } from "@/lib/sync/projections";
 import { computeRebuiltRankings } from "@/lib/sync/rebuilt-rankings";
 import { computeScorelines } from "@/lib/sync/scorelines";
@@ -54,7 +55,7 @@ export async function GET(request: Request) {
   const factors =
     now.getUTCDay() === 3
       ? await computeFactors(db, now)
-          .then(async (f) => ({ ...f, fragility: await computeFragility(db, now) }))
+          .then(async (f) => ({ ...f, fragility: await computeFragility(db, now), pace: await computePace(db, now) }))
           .catch((err: Error) => `error: ${err.message}`)
       : "weekly";
   // Scoreline checks (a few minutes): Thursdays.

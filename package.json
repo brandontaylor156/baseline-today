@@ -31,6 +31,7 @@
     "scorelines": "tsx --env-file=.env.local --conditions=react-server scripts/scorelines.mts",
     "rankings:rebuild": "tsx --env-file=.env.local --conditions=react-server scripts/rebuilt-rankings.mts",
     "turnarounds": "tsx --env-file=.env.local --conditions=react-server scripts/turnarounds.mts",
+    "pace": "tsx --env-file=.env.local --conditions=react-server scripts/pace.mts",
     "fragility": "tsx --env-file=.env.local --conditions=react-server scripts/fragility.mts",
     "factors": "tsx --env-file=.env.local --conditions=react-server scripts/factors.mts",
     "season": "tsx --env-file=.env.local --conditions=react-server scripts/season-outlook.mts",

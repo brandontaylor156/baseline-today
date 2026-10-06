@@ -115,11 +115,11 @@ export default function AboutPage() {
         </p>
         <p>
           A point-level model turns any score into a win chance. It is fitted so that at 0-0 it reproduces the pre-match chance,
-          which keeps live and pre-match numbers consistent. It powers watch parties and the{" "}
+          which keeps live and pre-match numbers consistent. It powers{" "}
           <Link href="/party/demo" className={a}>
-            simulated replay demo
-          </Link>
-          .
+            watch parties
+          </Link>{" "}
+          and the set-by-set chances on every match page.
         </p>
       </Section>
 

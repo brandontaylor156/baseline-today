@@ -158,16 +158,6 @@ export default async function MatchPage({ params }: PageProps<"/matches/[id]">) 
       </section>
 
       {match.status !== "final" && <StartParty matchId={match.id} />}
-      {match.status === "final" && !match.resultDetail && match.sets.length > 0 && (
-        <p className="text-sm">
-          <Link href={`/party/demo?match=${match.id}`} className="font-medium text-accent hover:underline">
-            Replay this match as a simulated watch party →
-          </Link>{" "}
-          <span className="text-muted">
-            Uses the real set scores; the point order, win chances and momentum are simulated from them.
-          </span>
-        </p>
-      )}
 
       {m.explain && <ModelExplainer e={m.explain} nameA={a.name} nameB={b.name} />}
       {m.chanceA !== null && !match.resultDetail && (

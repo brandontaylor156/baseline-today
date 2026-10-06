@@ -7,7 +7,7 @@ parties). A ground-up rebuild of my 2022 Flask tennis forum, built on Next.js an
 **Live:** [baseline-today.vercel.app](https://baseline-today.vercel.app) · [![CI](https://github.com/brandontaylor156/baseline-today/actions/workflows/ci.yml/badge.svg)](https://github.com/brandontaylor156/baseline-today/actions/workflows/ci.yml)
 
 **Try it without signing in:**
-[watch party demo](https://baseline-today.vercel.app/party/demo) (a simulated replay built from a
+[watch parties](https://baseline-today.vercel.app/party/demo) (a simulated replay built from a
 real result's set scores, with win chances, calls and chat) ·
 [Pick'em](https://baseline-today.vercel.app/pickem) (guest picks move into your account if you sign in) ·
 [sample league](https://baseline-today.vercel.app/leagues) ·
@@ -114,6 +114,9 @@ real result's set scores, with win chances, calls and chat) ·
 - **Greatest turnarounds / set-by-set chances:** each set updates the score and the belief about the
   day's form (an in-match spread tuned on 47,000 matches); match pages show the chance after each set.
   "Favourite lost the first set" is calibrated to within a few points (score-only was 5–8 too high).
+- **Court pace from scorelines:** each event's best-fitting serve-point rate given its set scores
+  and the ratings, with no ace counts needed. ATP: stable year to year (r = 0.51), grass +1.4, clay −1.0.
+  WTA scorelines carry a much weaker signal (r = 0.12), which the page says.
 - **Career comparables:** each player's last two years matched against every earlier player at the
   same age (birth dates for 1,600+ draw-only players from Wikidata), with a range for the next two
   years. Backtested from 2021 with only past data: the range holds 58% of outcomes against a 60% aim,

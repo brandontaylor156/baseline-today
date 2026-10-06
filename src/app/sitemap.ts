@@ -65,6 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     page("/lab/scorelines", "weekly", 0.5),
     page("/lab/fragility", "weekly", 0.4),
     page("/lab/turnarounds", "weekly", 0.5),
+    page("/lab/pace", "weekly", 0.5),
     page("/rankings/rebuilt", "weekly", 0.5),
     page("/lab/explorer", "weekly", 0.5),
     page("/lab/similar", "weekly", 0.5),

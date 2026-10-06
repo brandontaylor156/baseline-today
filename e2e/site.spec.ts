@@ -428,29 +428,17 @@ test("guest pick'em: picks without an account are kept in the browser", async ({
   await expect(page.locator('section[aria-labelledby="open-heading"] li button[aria-pressed="true"]')).toHaveCount(1);
 });
 
-test("sample league shows the strategy bots to signed-out visitors", async ({ page }) => {
+test("leagues show real strategy benchmarks to signed-out visitors", async ({ page }) => {
   await page.goto("/leagues");
-  await expect(page.getByRole("heading", { name: "Sample league: the bots" })).toBeVisible();
-  for (const bot of ["Favorite Fran", "Coin Flip Cal", "Alphabet Al", "Underdog Uma"]) {
-    await expect(page.getByText(bot, { exact: true })).toBeVisible();
-  }
+  await expect(page.getByRole("heading", { name: "Benchmarks to beat" })).toBeVisible();
+  await expect(page.getByText("Always picks the model's favorite", { exact: true })).toBeVisible();
 });
 
-test("demo watch party replays a real result with bots, calls and chat", async ({ page }) => {
+test("watch party page explains parties and shows a real match set by set", async ({ page }) => {
   await page.goto("/pickem");
-  await page.getByRole("link", { name: "Try a watch party →" }).click();
-  await expect(page.getByText("Watch party demo · simulated replay")).toBeVisible();
-  await expect(page.getByText("Only the set scores are real", { exact: false })).toBeVisible();
-  await page.getByRole("button", { name: "Play the match" }).click();
-  await expect(page.getByText("Here we go! 🎾")).toBeVisible();
-  await page.getByText("Who wins the match?").locator("..").getByRole("button").first().click();
-  await page.getByRole("button", { name: "10×" }).click();
-  await page.getByLabel("Message").fill("hello");
-  await page.getByRole("button", { name: "Send" }).click();
-  await expect(page.getByText(/Model has .* right now|Good match, that/)).toBeVisible();
-  await expect(page.getByRole("button", { name: "Replay" })).toBeVisible({ timeout: 60_000 });
-  await expect(page.getByText("Match over.")).toBeVisible();
-  await expect(page.getByText("In the room")).toBeVisible();
+  await page.getByRole("link", { name: "How watch parties work →" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "How watch parties work" })).toBeVisible();
+  await expect(page.getByText(/nothing simulated/)).toBeVisible();
 });
 
 test("readable head-to-head addresses: biggest rivalries, redirects and structured data", async ({ page, request }) => {
@@ -736,6 +724,10 @@ test("research lab: luck, time machine, aging and the explorer", async ({ page, 
   await page.goto("/lab/turnarounds");
   await expect(page.getByRole("heading", { level: 1, name: "Greatest turnarounds" })).toBeVisible();
   await expect(page.getByRole("table", { name: /lowest win chance/ }).locator("tbody tr")).toHaveCount(20);
+
+  await page.goto("/lab/pace");
+  await expect(page.getByRole("heading", { level: 1, name: "Court pace from scorelines" })).toBeVisible();
+  await expect(page.getByRole("table", { name: "Fastest ATP events lately" }).locator("tbody tr")).not.toHaveCount(0);
 
   await page.goto("/lab/forecast?tour=wta&surface=clay");
   await expect(page.getByRole("heading", { level: 1, name: "If a Grand Slam started today" })).toBeVisible();

@@ -223,9 +223,9 @@ export function WatchParty({ code }: { code: string }) {
         </button>{" "}
         to join this watch party, or{" "}
         <Link href="/party/demo" className="font-medium text-accent hover:underline">
-          try a demo party
-        </Link>{" "}
-        first.
+          see how watch parties work
+        </Link>
+        .
       </p>
     );
   }

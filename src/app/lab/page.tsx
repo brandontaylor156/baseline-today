@@ -43,6 +43,11 @@ const TOOLS = [
     text: "Win chances after every set of every match since 2016: the biggest comebacks, and what losing the first set really does to a favourite.",
   },
   {
+    href: "/lab/pace",
+    title: "Court pace from scorelines",
+    text: "How fast every ATP event plays, worked out from set scores and ratings alone: no ace counts needed. Stable year to year, and the surfaces line up.",
+  },
+  {
     href: "/lab/forecast",
     title: "If a Grand Slam started today",
     text: "Hundreds of 128-player draws made with real seeding rules, each solved exactly: every player's chance on hard, clay and grass, updated daily.",

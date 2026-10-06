@@ -88,7 +88,7 @@ export default async function PickemPage() {
           </Link>{" "}
           ·{" "}
           <Link href="/party/demo" className="font-medium text-accent hover:underline">
-            Try a watch party →
+            How watch parties work →
           </Link>{" "}
           <span className="text-muted">· Bracket Challenge opens on each tournament page before the first result.</span>
         </p>
