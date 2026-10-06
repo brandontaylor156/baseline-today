@@ -35,25 +35,37 @@ I'd love feedback, especially if a result or a draw looks wrong somewhere.
 
 ## Hacker News (Show HN)
 
-**Title:** Show HN: Baseline Today – tennis stats and exact title odds, built on free tiers
+**Title:** Show HN: I rebuilt 1,120 tennis draws from Wikipedia and replayed a decade of results
 
-**URL:** https://baseline-today.vercel.app/about
+**URL:** https://baseline-today.vercel.app/lab
 
 **First comment:**
 
-I built this to see how far free tiers go for a data-heavy sports site. Some parts that were fun:
+Baseline Today started as a tennis stats site on free tiers and turned into a research lab. The
+core is one replay:
 
-- Results come from Wikipedia draw pages: matching tournaments to the right page, parsing the
-  bracket templates, and only trusting a result once the page has been stable for 10 minutes.
-  52,000+ matches since 2015.
-- Title chances are computed exactly through the bracket (not Monte Carlo) from a surface-aware
-  Elo model, and recomputed client-side when you click hypothetical winners.
-- The multiplayer bits (pick'em, leagues, watch parties with realtime chat) are enforced entirely
-  with Postgres row level security, with a 55-check isolation test in CI.
-- Page visits never call a data API; scheduled jobs fill Postgres and pages read through a cache.
+- 52,000+ results since 2015 come from Wikipedia draw pages (matched to the right page, parsed from
+  bracket templates, only trusted once the page has been stable for 10 minutes).
+- Every result is replayed in order through a surface-aware Elo model. At the start of each
+  tournament the bracket is rebuilt from the results alone (each later-round match is between the
+  winners of two earlier ones), and every entrant's exact title chance is computed from that
+  week's ratings: 1,120 draws, 48,000 chances.
 
-Stack: Next.js, Supabase, Vercel. Code: https://github.com/brandontaylor156/baseline-today.
-Happy to answer questions.
+That one replay answers questions I couldn't find answered for free anywhere:
+
+- Expected vs actual titles: who converts their chances, and the most improbable champions
+  (Vacherot at Shanghai 2025 was about a 1-in-80,000 shot by the model).
+- Who stood in whose way: replay each draw without each contender. Alcaraz cost Sinner about 1.4
+  expected titles; Djokovic cost the field 26.7.
+- A clutch index: tiebreaks and deciding sets won against what a point-level model of each
+  matchup expected.
+- "If a Grand Slam started today": hundreds of random draws with real seeding rules, each solved
+  exactly.
+
+Everything is downloadable (CSV/JSON, CC BY-SA like the source) and there's a free JSON API.
+Stack: Next.js, Supabase (Postgres + RLS), Vercel; all free tiers. Code:
+https://github.com/brandontaylor156/baseline-today. Happy to answer questions about the bracket
+reconstruction or the model.
 
 ---
 

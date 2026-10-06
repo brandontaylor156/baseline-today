@@ -14,12 +14,17 @@ real result's set scores, with win chances, calls and chat) ·
 [title chances](https://baseline-today.vercel.app/tournaments) ·
 [week in tennis](https://baseline-today.vercel.app/week) ·
 [open data](https://baseline-today.vercel.app/data) ·
+[research lab](https://baseline-today.vercel.app/lab) ·
 [how it's built](https://baseline-today.vercel.app/about) ·
 [status](https://baseline-today.vercel.app/status)
 
 <p>
   <img src="docs/screenshots/home-desktop.png" alt="Homepage: this week's events, title favorites, results and upsets" width="62%">
   <img src="docs/screenshots/player-mobile-dark.png" alt="Player page with ranking history chart, dark mode" width="30%">
+</p>
+<p>
+  <img src="docs/screenshots/lab-in-the-way-desktop.png" alt="Research lab: how many titles each player cost their rivals, from every draw replayed" width="62%">
+  <img src="docs/screenshots/lab-forecast-mobile-dark.png" alt="If a Grand Slam started today: each player's chance by round, dark mode" width="30%">
 </p>
 <p>
   <img src="docs/screenshots/party-desktop.png" alt="Watch party: score, live win chance, momentum chart, calls and chat" width="62%">
