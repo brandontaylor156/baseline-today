@@ -432,7 +432,8 @@ test("sample league shows the strategy bots to signed-out visitors", async ({ pa
 test("demo watch party replays a real result with bots, calls and chat", async ({ page }) => {
   await page.goto("/pickem");
   await page.getByRole("link", { name: "Try a watch party →" }).click();
-  await expect(page.getByText("Watch party", { exact: true })).toBeVisible();
+  await expect(page.getByText("Watch party demo · simulated replay")).toBeVisible();
+  await expect(page.getByText("Only the set scores are real", { exact: false })).toBeVisible();
   await page.getByRole("button", { name: "Play the match" }).click();
   await expect(page.getByText("Here we go! 🎾")).toBeVisible();
   await page.getByText("Who wins the match?").locator("..").getByRole("button").first().click();

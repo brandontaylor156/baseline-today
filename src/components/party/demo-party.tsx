@@ -123,6 +123,12 @@ export function DemoParty({ match, points, seed }: { match: MatchInfo; points: S
   return (
     <PartyRoom
       match={match}
+      simulated={
+        <>
+          Only the set scores are real ({match.a.name} vs {match.b.name}, {match.tournament}). The point order is simulated from
+          them, so the point-by-point score, the win chance, the momentum chart and the bots’ comments are simulated too.
+        </>
+      }
       score={{
         sets: snap.sets,
         game: [snap.gameA, snap.gameB],
@@ -140,7 +146,7 @@ export function DemoParty({ match, points, seed }: { match: MatchInfo; points: S
       scoreControls={
         <div className="mt-4 space-y-2 border-t border-border pt-3">
           <p className="text-xs text-muted">
-            Demo replay of a real result. The set scores are real; the point order is simulated.
+            Simulated from the real set scores: the point order, win chance and momentum are not what happened point by point.
           </p>
           <div className="flex flex-wrap items-center gap-2 text-sm">
             <button

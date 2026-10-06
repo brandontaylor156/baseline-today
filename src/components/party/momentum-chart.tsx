@@ -4,7 +4,7 @@ const M = { top: 10, right: 40, bottom: 18, left: 34 };
 const pct = (p: number) => `${Math.round(p * 100)}%`;
 
 /** Win chance of player A after every point: above the midline A is ahead, below B is. */
-export function MomentumChart({ line, nameA, nameB }: { line: number[]; nameA: string; nameB: string }) {
+export function MomentumChart({ line, nameA, nameB, simulated = false }: { line: number[]; nameA: string; nameB: string; simulated?: boolean }) {
   if (line.length < 2) return null;
   const x = (i: number) => M.left + (i / (line.length - 1)) * (W - M.left - M.right);
   const y = (p: number) => M.top + (1 - p) * (H - M.top - M.bottom);
@@ -31,6 +31,7 @@ export function MomentumChart({ line, nameA, nameB }: { line: number[]; nameA: s
         </text>
       </svg>
       <figcaption className="text-xs text-muted">
+        {simulated ? <strong className="font-semibold text-foreground">Simulated: </strong> : null}
         {nameA}’s chance to win, point by point (above the dashed line: {nameA} ahead; below: {nameB}).
         {swing.d > 0.05 ? ` Circled: the biggest swing, ${pct(swing.d)} on one point.` : ""}
       </figcaption>

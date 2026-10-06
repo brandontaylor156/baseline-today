@@ -27,3 +27,8 @@ Next.js (App Router, `src/`) · TypeScript · Tailwind 4 · Supabase (Postgres, 
 - **Photos:** only freely licensed Wikimedia Commons images, always stored and shown with author,
   license and source link. Otherwise use the initials-and-flag avatar.
 - **Auth:** Google sign-in only, using the `@supabase/ssr` pattern (proxy refresh + `getClaims()`).
+- **Heavy test runs never target production.** Lighthouse, screenshot scripts, the full Playwright
+  suite, axe scans and the party UI test run against a local production build (`npm run build`,
+  then `npx next start`) or a Vercel preview deployment, never `https://baseline-today.vercel.app`.
+  A quick single-request smoke check after a deploy is fine. Local and preview servers still read the
+  shared Supabase project, so run heavy suites one at a time and not while CI is building.

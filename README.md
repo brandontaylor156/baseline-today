@@ -7,8 +7,8 @@ parties). A ground-up rebuild of my 2022 Flask tennis forum, built on Next.js an
 **Live:** [baseline-today.vercel.app](https://baseline-today.vercel.app) · [![CI](https://github.com/brandontaylor156/baseline-today/actions/workflows/ci.yml/badge.svg)](https://github.com/brandontaylor156/baseline-today/actions/workflows/ci.yml)
 
 **Try it without signing in:**
-[watch party demo](https://baseline-today.vercel.app/party/demo) (a real result replayed point by
-point with live win chances, calls and chat) ·
+[watch party demo](https://baseline-today.vercel.app/party/demo) (a simulated replay built from a
+real result's set scores, with win chances, calls and chat) ·
 [Pick'em](https://baseline-today.vercel.app/pickem) (guest picks move into your account if you sign in) ·
 [sample league](https://baseline-today.vercel.app/leagues) ·
 [title chances](https://baseline-today.vercel.app/tournaments) ·
@@ -56,8 +56,9 @@ point with live win chances, calls and chat) ·
   season's real results.
 - **Watch parties**: private rooms with real-time chat and reactions over private Supabase Realtime
   channels (never stored), the host's point-by-point scorekeeping or live data, a momentum chart and
-  per-set "call it" predictions. The **demo** replays a real result: the set scores are real, and the
-  point order is simulated and checked to replay to exactly those scores.
+  per-set "call it" predictions. The **demo** is a simulated replay: only the set scores are real. The
+  point order is simulated (and checked to replay to exactly those scores), so the win chance and
+  momentum chart are simulated too, and the page says so.
 
 **Sharing and integrations**
 - Match preview and result pages, share images for players, head-to-heads and matches, iCalendar

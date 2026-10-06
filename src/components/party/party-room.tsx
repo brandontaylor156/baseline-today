@@ -41,6 +41,8 @@ export interface Scoreboard {
 
 export interface RoomProps {
   match: MatchInfo;
+  /** Demo replays: the point order (and so the win chance and momentum) is simulated. */
+  simulated?: React.ReactNode;
   score: Scoreboard;
   /** Buttons at the top right (invite link, end party, demo playback). */
   actions: React.ReactNode;
@@ -69,7 +71,7 @@ export function PartyRoom(props: RoomProps) {
     <div className="space-y-5">
       <header className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <p className="text-sm font-medium text-accent">Watch party</p>
+          <p className="text-sm font-medium text-accent">{props.simulated ? "Watch party demo · simulated replay" : "Watch party"}</p>
           <h1 className="text-2xl font-semibold tracking-tight">
             {match.a.name} vs {match.b.name}
           </h1>
@@ -82,6 +84,11 @@ export function PartyRoom(props: RoomProps) {
         </div>
         <div className="flex flex-wrap gap-2 text-sm">{props.actions}</div>
       </header>
+      {props.simulated && (
+        <p className="rounded-lg border border-warn/40 bg-surface-muted px-3 py-2 text-sm">
+          <strong className="font-semibold">Simulated replay.</strong> {props.simulated}
+        </p>
+      )}
       {props.notice && (
         <p role="status" className="rounded-lg border border-border bg-surface-muted px-3 py-2 text-sm">
           {props.notice}
@@ -114,7 +121,7 @@ export function PartyRoom(props: RoomProps) {
               <div className="mt-3">
                 <div className="flex justify-between text-sm font-semibold tabular-nums">
                   <span>{pct(score.chanceA)}</span>
-                  <span className="text-xs font-normal text-muted">chance to win</span>
+                  <span className="text-xs font-normal text-muted">{props.simulated ? "simulated chance to win" : "chance to win"}</span>
                   <span>{pct(1 - score.chanceA)}</span>
                 </div>
                 <div aria-hidden className="mt-1 flex h-2 overflow-hidden rounded-full bg-surface-muted">
@@ -136,7 +143,7 @@ export function PartyRoom(props: RoomProps) {
 
           {score.line.length >= 2 && (
             <section aria-label="Momentum" className="rounded-xl border border-border bg-surface p-4">
-              <MomentumChart line={score.line} nameA={match.a.name} nameB={match.b.name} />
+              <MomentumChart line={score.line} nameA={match.a.name} nameB={match.b.name} simulated={Boolean(props.simulated)} />
             </section>
           )}
 

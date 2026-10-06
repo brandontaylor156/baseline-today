@@ -133,9 +133,11 @@ export default async function MatchPage({ params }: PageProps<"/matches/[id]">) 
       {match.status === "final" && !match.resultDetail && match.sets.length > 0 && (
         <p className="text-sm">
           <Link href={`/party/demo?match=${match.id}`} className="font-medium text-accent hover:underline">
-            Replay this match as a watch party →
+            Replay this match as a simulated watch party →
           </Link>{" "}
-          <span className="text-muted">Point-by-point demo with win chances, calls and chat.</span>
+          <span className="text-muted">
+            Uses the real set scores; the point order, win chances and momentum are simulated from them.
+          </span>
         </p>
       )}
 

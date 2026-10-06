@@ -6,7 +6,8 @@ import { getDemoMatch } from "@/lib/data/party-demo";
 
 export const metadata: Metadata = {
   title: "Watch party demo",
-  description: "Try a watch party without an account: a real result replayed point by point with live win chances, calls and chat.",
+  description:
+    "Try a watch party without an account: a simulated replay built from a real result's set scores, with win chances, calls and chat.",
 };
 
 export default async function DemoPartyPage({ searchParams }: PageProps<"/party/demo">) {
