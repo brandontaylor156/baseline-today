@@ -93,6 +93,10 @@ real result's set scores, with win chances, calls and chat) ·
   2020 suspension excluded), measured event by event against the ratings: after half a year out,
   players play about 60 points below their rating in the first event back and are normal by the
   fourth. Plus who's back right now and the strongest returns.
+- **Scoreline probabilities** on every match page (each set score, a tiebreak, total games), from
+  the model's chance played out point by point with day-to-day form. Checked against 47,000
+  completed matches: independent sets underpredicted straight-set wins (27% predicted, 43% real),
+  so a match-day form spread was added and tuned; straight sets, tiebreaks and games now calibrate.
 - **Career comparables:** each player's last two years matched against every earlier player at the
   same age (birth dates for 1,600+ draw-only players from Wikidata), with a range for the next two
   years. Backtested from 2021 with only past data: the range holds 58% of outcomes against a 60% aim,

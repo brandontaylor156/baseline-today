@@ -713,6 +713,10 @@ test("research lab: luck, time machine, aging and the explorer", async ({ page, 
   await expect(page.getByRole("heading", { level: 1, name: "Comeback curves" })).toBeVisible();
   await expect(page.getByRole("table", { name: /strongest returns/ }).locator("tbody tr")).not.toHaveCount(0);
 
+  await page.goto("/lab/scorelines");
+  await expect(page.getByRole("heading", { level: 1, name: "Scoreline probabilities" })).toBeVisible();
+  await expect(page.getByRole("img", { name: /Straight-sets win/ })).toBeVisible();
+
   await page.goto("/lab/forecast?tour=wta&surface=clay");
   await expect(page.getByRole("heading", { level: 1, name: "If a Grand Slam started today" })).toBeVisible();
   await expect(page.getByRole("table", { name: /clay Grand Slam starting today, WTA/ }).locator("tbody tr")).toHaveCount(20);

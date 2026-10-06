@@ -28,6 +28,11 @@ const TOOLS = [
     text: "How players perform after injuries and long absences, event by event back, on every return since 2016, and who is coming back right now.",
   },
   {
+    href: "/lab/scorelines",
+    title: "Scoreline probabilities",
+    text: "Every match's chance of each set score, a tiebreak and the total games, played out point by point with form on the day, and checked against 47,000 results.",
+  },
+  {
     href: "/lab/forecast",
     title: "If a Grand Slam started today",
     text: "Hundreds of 128-player draws made with real seeding rules, each solved exactly: every player's chance on hard, clay and grass, updated daily.",

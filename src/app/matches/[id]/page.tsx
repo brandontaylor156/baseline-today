@@ -7,6 +7,7 @@ import { JsonLd } from "@/components/json-ld";
 import { MarketHistory } from "@/components/market-history";
 import { MatchCard } from "@/components/match-card";
 import { ModelExplainer } from "@/components/model-explainer";
+import { ScorelineBox } from "@/components/scoreline-box";
 import { StartParty } from "@/components/party/start-party";
 import { WikiCredit } from "@/components/wiki-credit";
 import { getMatchPreview, type PreviewSide } from "@/lib/data/match-preview";
@@ -14,6 +15,8 @@ import { titleFromUrl } from "@/lib/data/results";
 import { displayName } from "@/lib/data/tournaments";
 import { TOUR_LABEL } from "@/lib/format";
 import { formatAmerican } from "@/lib/model/odds";
+import type { SetScore } from "@/lib/provider/types";
+import { SCORELINE_PARAMS } from "@/lib/scorelines";
 import { h2hPath } from "@/lib/slug";
 import { matchLd } from "@/lib/structured-data";
 
@@ -24,6 +27,14 @@ export function generateStaticParams() {
 }
 
 const pct = (p: number) => `${Math.round(p * 100)}%`;
+
+/** Sets won by each side of a completed regular scoreline, or null. */
+function actualSets(sets: SetScore[], bestOf: 3 | 5): { a: number; b: number } | null {
+  const done = sets.filter((x) => x.p1 !== null && x.p2 !== null);
+  const a = done.filter((x) => x.p1! > x.p2!).length;
+  const b = done.length - a;
+  return Math.max(a, b) === Math.ceil(bestOf / 2) ? { a, b } : null;
+}
 
 async function load(params: PageProps<"/matches/[id]">["params"]) {
   const { id } = await params;
@@ -159,6 +170,16 @@ export default async function MatchPage({ params }: PageProps<"/matches/[id]">) 
       )}
 
       {m.explain && <ModelExplainer e={m.explain} nameA={a.name} nameB={b.name} />}
+      {m.chanceA !== null && !match.resultDetail && (
+        <ScorelineBox
+          chanceA={m.chanceA}
+          bestOf={m.tour === "atp" && /grand slam/i.test(m.category ?? "") ? 5 : 3}
+          params={SCORELINE_PARAMS[m.tour]}
+          nameA={a.name}
+          nameB={b.name}
+          actual={actualSets(match.sets, m.tour === "atp" && /grand slam/i.test(m.category ?? "") ? 5 : 3)}
+        />
+      )}
       {m.scheduled && m.chanceA !== null && (
         <p className="text-sm">
           <Link href={`/tools/betting?match=${match.id}`} className="font-medium text-accent hover:underline">
