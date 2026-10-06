@@ -8,8 +8,17 @@ export function SiteFooter() {
           Rankings from BALLDONTLIE, results from Wikipedia (CC BY-SA 4.0). Not affiliated with the ATP or WTA.
         </p>
         <nav aria-label="Footer" className="flex flex-wrap gap-x-4 gap-y-2">
+          <Link href="/week" className="underline-offset-2 hover:underline">
+            Weekly
+          </Link>
           <Link href="/countries" className="underline-offset-2 hover:underline">
             Countries
+          </Link>
+          <Link href="/data" className="underline-offset-2 hover:underline">
+            Open data
+          </Link>
+          <Link href="/about" className="underline-offset-2 hover:underline">
+            About
           </Link>
           <Link href="/widgets" className="underline-offset-2 hover:underline">
             Widgets

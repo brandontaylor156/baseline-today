@@ -12,6 +12,9 @@ real result's set scores, with win chances, calls and chat) ·
 [Pick'em](https://baseline-today.vercel.app/pickem) (guest picks move into your account if you sign in) ·
 [sample league](https://baseline-today.vercel.app/leagues) ·
 [title chances](https://baseline-today.vercel.app/tournaments) ·
+[week in tennis](https://baseline-today.vercel.app/week) ·
+[open data](https://baseline-today.vercel.app/data) ·
+[how it's built](https://baseline-today.vercel.app/about) ·
 [status](https://baseline-today.vercel.app/status)
 
 <p>
@@ -60,6 +63,23 @@ real result's set scores, with win chances, calls and chat) ·
   point order is simulated (and checked to replay to exactly those scores), so the win chance and
   momentum chart are simulated too, and the page says so.
 
+**Weekly recaps and open data**
+- **Week in tennis** (`/week/<monday>`): a page for every week with the champions and finals,
+  the biggest upsets, ATP and WTA ranking movers and the model's record, generated from the data.
+- **Open data** (`/data`): every result since 2015 and the model ratings as CSV or JSON, under
+  Wikipedia's CC BY-SA 4.0 (rankings are excluded: the provider's terms don't allow it).
+- **RSS** (`/feed.xml`) of results and weekly recaps.
+
+**Getting found**
+- Readable head-to-head addresses (`/h2h/jannik-sinner-vs-carlos-alcaraz-<id>-<id>`) for 1,200+
+  top-100 rivalries in the sitemap; old query links redirect to them.
+- schema.org structured data on player (Person), match and tournament (SportsEvent) pages, and a
+  site search action.
+- IndexNow pings (Bing and others) for the pages that changed each day, and optional Google and
+  Bing site verification.
+- A Bluesky bot posts the upset of the day and the weekly recap with share cards (off until an
+  account is connected).
+
 **Sharing and integrations**
 - Match preview and result pages, share images for players, head-to-heads and matches, iCalendar
   feeds per player and per tour, and embeddable widgets.
@@ -102,9 +122,9 @@ Wikipedia draws ─── Supabase cron, 10 min ──┘   (RLS everywhere)  �
 
 | Layer | What | Where |
 | --- | --- | --- |
-| Unit (Vitest) | 211 tests: provider mapping, Wikipedia parsing, Elo and title-chance math, the live model, scorekeeping, bracket scoring, the demo replay, job health | `src/**/*.test.ts` |
-| Browser (Playwright) | 43 flows on desktop and mobile: every page type, 404s, no sideways scroll, signed-out flows, guest Pick'em, the demo party, cron auth | `e2e/site.spec.ts` |
-| Accessibility | axe (WCAG 2.2 AA) on 14 pages in light and dark mode, desktop and mobile | `e2e/a11y.spec.ts` |
+| Unit (Vitest) | 229 tests: provider mapping, Wikipedia parsing, Elo and title-chance math, the live model, scorekeeping, bracket scoring, the demo replay, job health, slugs, structured data, CSV export, Bluesky facets | `src/**/*.test.ts` |
+| Browser (Playwright) | 47 flows on desktop and mobile: every page type, 404s, no sideways scroll, signed-out flows, guest Pick'em, the demo party, canonical redirects, structured data, downloads and feeds, cron auth | `e2e/site.spec.ts` |
+| Accessibility | axe (WCAG 2.2 AA) on 17 pages in light and dark mode, desktop and mobile | `e2e/a11y.spec.ts` |
 | Database | 55 row level security checks: cross-user reads and writes for every user table, locked picks and brackets, league and party membership, the realtime channel check, anon access | `supabase/tests/isolation.sql` |
 | Realtime | two throwaway accounts in a real watch party: live score, chat and reactions reach the guest | `scripts/party-ui-test.mts` |
 
@@ -121,6 +141,8 @@ Everything below is off until its variables are set in Vercel (production):
 | Discord bot | `DISCORD_PUBLIC_KEY`, plus `DISCORD_APP_ID` and `DISCORD_BOT_TOKEN` locally for `node scripts/discord-register.mjs` | Interactions URL: `/api/discord` |
 | Daily digest | `DIGEST_WEBHOOK_URLS` (comma-separated Discord or Slack webhook URLs) | Sent after the daily sync |
 | Job failure alerts | `OPS_WEBHOOK_URLS` (falls back to `DIGEST_WEBHOOK_URLS`) | On failure and recovery |
+| Bluesky bot | `BLUESKY_HANDLE`, `BLUESKY_APP_PASSWORD` (an app password) | `npm run bluesky:preview` shows today's posts |
+| Search engine verification | `GOOGLE_SITE_VERIFICATION`, `BING_SITE_VERIFICATION` | Codes from Search Console / Bing Webmaster Tools |
 | Live scores and in-match win chance | `LIVE_SCORES_ENABLED=1` | Paid BALLDONTLIE plan (or its trial) |
 | Bookmaker odds and odds movement | `ODDS_ENABLED=1` | BALLDONTLIE GOAT plan |
 | AI recaps of finals and semifinals | `ANTHROPIC_API_KEY`, `RECAPS_ENABLED=1`, `RECAPS_DAILY_LIMIT` (default 10) | Claude Haiku; labelled as AI-written |
@@ -149,6 +171,7 @@ npm run dev
 | `npm run sync:tournaments -- 2025` | store a season’s calendar |
 | `npm run audit:draws` | re-check every tournament → draw page pairing (`--fix` to hide and rediscover) |
 | `npm run model:backtest` | score the model on a held-out season |
+| `npm run bluesky:preview` | print what the Bluesky bot would post today (posts nothing) |
 
 Database schema: `supabase/migrations/` (idempotent SQL). Live scores depend on a paid data plan
 and are being evaluated (see [PLAN.md](PLAN.md) and [docs/trial-runbook.md](docs/trial-runbook.md)).

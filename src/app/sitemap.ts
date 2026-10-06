@@ -4,15 +4,19 @@ import { getCountries } from "@/lib/data/countries";
 import { getScheduledMatchIds } from "@/lib/data/match-preview";
 import { getRankingDates, getRankings } from "@/lib/data/tennis";
 import { getSeasonTournaments } from "@/lib/data/tournaments";
+import { getRecapWeeks } from "@/lib/data/weekly";
 import { TOURS } from "@/lib/provider/types";
 import { SITE_URL } from "@/lib/site";
+import { h2hPath } from "@/lib/slug";
+import { createPublicClient } from "@/lib/supabase/public";
 
 export const revalidate = 86400;
 
-// Section pages, this week's ranked players, this season's tournaments and every country page.
+// Section pages, this week's ranked players, this season's tournaments, every country page,
+// upcoming matches and the head-to-heads of top-100 rivals with 3+ meetings.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const season = new Date().getUTCFullYear();
-  const [rankings, tournaments, countries, upcoming] = await Promise.all([
+  const [rankings, tournaments, countries, upcoming, rivalries, weeks] = await Promise.all([
     Promise.all(
       TOURS.map(async (t) => {
         const [latest] = await getRankingDates(t);
@@ -22,6 +26,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getSeasonTournaments(season),
     getCountries(),
     getScheduledMatchIds(),
+    createPublicClient().rpc("top_rivalries", { p_min: 3, p_limit: 2000 }),
+    getRecapWeeks(season),
   ]);
 
   const page = (path: string, changeFrequency: "daily" | "weekly", priority: number) => ({ url: `${SITE_URL}${path}`, changeFrequency, priority });
@@ -38,9 +44,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     page("/pickem", "daily", 0.5),
     page("/countries", "weekly", 0.5),
     page("/h2h", "weekly", 0.4),
+    page("/week", "weekly", 0.6),
+    page("/data", "weekly", 0.5),
+    page("/about", "weekly", 0.4),
+    ...weeks.map((w) => page(`/week/${w}`, "weekly", 0.5)),
     ...rankings.flat().map((r) => page(`/players/${r.player.id}`, "weekly", 0.6)),
     ...tournaments.map((t) => page(`/tournaments/${t.id}`, "weekly", 0.5)),
     ...countries.map((c) => page(`/countries/${c.code}`, "weekly", 0.4)),
     ...upcoming.map((id) => page(`/matches/${id}`, "daily", 0.5)),
+    ...(rivalries.data ?? []).map((r) => page(h2hPath({ id: r.player_a, name: r.name_a }, { id: r.player_b, name: r.name_b }), "weekly", 0.5)),
   ];
 }

@@ -3,10 +3,12 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { JsonLd } from "@/components/json-ld";
 import { ServiceWorker } from "@/components/service-worker";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { websiteLd } from "@/lib/structured-data";
 
 import "flag-icons/css/flag-icons.min.css";
 import "./globals.css";
@@ -27,6 +29,12 @@ export const metadata: Metadata = {
   description: "ATP and WTA singles rankings, recent results, player profiles and season records.",
   openGraph: { siteName: SITE_NAME, type: "website" },
   twitter: { card: "summary_large_image" },
+  // Search Console and Bing Webmaster Tools ownership checks (public codes, set in Vercel).
+  verification: {
+    ...(process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : {}),
+    ...(process.env.BING_SITE_VERIFICATION ? { other: { "msvalidate.01": process.env.BING_SITE_VERIFICATION } } : {}),
+  },
+  alternates: { types: { "application/rss+xml": `${SITE_URL}/feed.xml` } },
 };
 
 export const viewport: Viewport = {
@@ -46,6 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
+        <JsonLd data={websiteLd()} />
         <SiteHeader />
         <main id="main" className="mx-auto w-full max-w-4xl flex-1 px-4 py-6 sm:py-8">
           {children}

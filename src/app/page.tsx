@@ -85,6 +85,11 @@ export default async function Home() {
             </Link>
           </p>
         )}
+        <p className="mt-1 text-sm">
+          <Link href="/week" className="font-medium text-accent hover:underline">
+            Week-by-week recaps →
+          </Link>
+        </p>
       </header>
 
       {thisWeek.length > 0 && (

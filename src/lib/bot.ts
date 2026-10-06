@@ -9,6 +9,7 @@ import { getTrackRecord } from "@/lib/data/track-record";
 import { formatPoints, TOUR_LABEL } from "@/lib/format";
 import type { Tour } from "@/lib/provider/types";
 import { SITE_URL } from "@/lib/site";
+import { h2hPath } from "@/lib/slug";
 
 // Plain-text answers for chat bots and digests (Discord and Slack both render this markdown-ish
 // text). Kept under Discord's 2,000-character limit.
@@ -28,7 +29,7 @@ export async function oddsText(first: string, second: string): Promise<string> {
       `**${a.fullName} vs ${b.fullName}**`,
       chance,
       `Head-to-head since 2015: ${h2h.winsA}–${h2h.winsB}`,
-      `${SITE_URL}/h2h?a=${a.id}&b=${b.id}`,
+      `${SITE_URL}${h2hPath({ id: a.id, name: a.fullName }, { id: b.id, name: b.fullName })}`,
       "_Estimates, not betting advice._",
     ].join("\n"),
   );

@@ -2,12 +2,15 @@ import { timingSafeEqual } from "node:crypto";
 
 import { revalidateTag } from "next/cache";
 
+import { runBluesky } from "@/lib/bluesky";
 import { sendAlert, sendDigest } from "@/lib/digest";
+import { submitIndexNow } from "@/lib/indexnow";
 import { JOBS, jobHealth } from "@/lib/ops";
 import { provider } from "@/lib/provider";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { TENNIS_TAG } from "@/lib/supabase/public";
 import { runDailySync } from "@/lib/sync/daily";
+import { freshPages } from "@/lib/sync/fresh-pages";
 
 export const maxDuration = 300;
 
@@ -39,5 +42,11 @@ export async function GET(request: Request) {
   if (result.status === "ok") revalidateTag(TENNIS_TAG, "max");
   // Daily digest to chat webhooks, if any are configured.
   const digest = await sendDigest().catch((err: Error) => `error: ${err.message}`);
-  return Response.json({ ...result, digest }, { status: result.status === "error" ? 500 : 200 });
+  // Tell search engines (IndexNow) about the pages that changed today.
+  const indexnow = await freshPages(db, now)
+    .then(submitIndexNow)
+    .catch((err: Error) => `error: ${err.message}`);
+  // Bluesky: the upset of the day and, on Mondays, last week's recap (off until the account is set).
+  const bluesky = await runBluesky(db, now).catch((err: Error) => `error: ${err.message}`);
+  return Response.json({ ...result, digest, indexnow, bluesky }, { status: result.status === "error" ? 500 : 200 });
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { JsonLd } from "@/components/json-ld";
 import { FavoriteButton } from "@/components/favorite-button";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { PlayerResults } from "@/components/player-results";
@@ -17,6 +18,7 @@ import { getPlayerStats } from "@/lib/data/stats";
 import { getPlayer, getRankingDates } from "@/lib/data/tennis";
 import { bestRank, formatDate, formatHeight, formatPlays, formatPoints, formatWeight, TOUR_LABEL } from "@/lib/format";
 import { SITE_URL } from "@/lib/site";
+import { playerLd } from "@/lib/structured-data";
 import { seasonTimeline } from "@/lib/timeline";
 
 export const revalidate = 3600;
@@ -73,6 +75,18 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
 
   return (
     <article className="space-y-6">
+      <JsonLd
+        data={playerLd({
+          id: player.id,
+          tour: player.tour,
+          fullName: player.fullName,
+          countryName: player.countryName,
+          birthDate: player.birthDate,
+          birthPlace: player.birthPlace,
+          heightCm: player.heightCm,
+          imageUrl: player.image?.imageUrl ?? null,
+        })}
+      />
       <Link href={`/rankings/${player.tour}`} className="text-sm text-muted hover:text-foreground">
         ← {TOUR_LABEL[player.tour]} rankings
       </Link>

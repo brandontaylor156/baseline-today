@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { JsonLd } from "@/components/json-ld";
 import { MatchCard } from "@/components/match-card";
 import { MatchupRow } from "@/components/matchup-row";
 import { BracketChallenge } from "@/components/bracket-challenge";
@@ -15,6 +16,7 @@ import { titleChances } from "@/lib/draw-model";
 import { createPublicClient } from "@/lib/supabase/public";
 import { dateRange, displayName, getTournament } from "@/lib/data/tournaments";
 import { TOUR_LABEL } from "@/lib/format";
+import { tournamentLd } from "@/lib/structured-data";
 
 export const revalidate = 3600;
 
@@ -52,6 +54,16 @@ export default async function TournamentPage({ params }: PageProps<"/tournaments
 
   return (
     <article className="space-y-6">
+      <JsonLd
+        data={tournamentLd({
+          id: t.id,
+          name: displayName(t.name),
+          location: t.location,
+          startDate: t.startDate,
+          endDate: t.endDate,
+          champion: t.champion?.name ?? null,
+        })}
+      />
       <Link href="/tournaments" className="text-sm text-muted hover:text-foreground">
         ← Tournaments
       </Link>

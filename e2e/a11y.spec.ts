@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 // Automated accessibility check (axe, WCAG 2.2 A and AA) of the main pages, in light and dark mode.
-const PAGES = ["/", "/rankings/atp", "/results", "/tournaments", "/odds", "/pickem", "/leagues", "/party/demo", "/status", "/search?q=sinner", "/h2h", "/stats", "/privacy"];
+const PAGES = ["/", "/rankings/atp", "/results", "/tournaments", "/odds", "/pickem", "/leagues", "/party/demo", "/status", "/search?q=sinner", "/h2h", "/stats", "/privacy", "/week", "/data", "/about"];
 
 for (const scheme of ["light", "dark"] as const) {
   test.describe(`accessibility (${scheme})`, () => {

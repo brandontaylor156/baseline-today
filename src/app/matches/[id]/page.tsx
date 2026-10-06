@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Flag } from "@/components/flag";
+import { JsonLd } from "@/components/json-ld";
 import { MarketHistory } from "@/components/market-history";
 import { MatchCard } from "@/components/match-card";
 import { StartParty } from "@/components/party/start-party";
@@ -12,6 +13,8 @@ import { titleFromUrl } from "@/lib/data/results";
 import { displayName } from "@/lib/data/tournaments";
 import { TOUR_LABEL } from "@/lib/format";
 import { formatAmerican } from "@/lib/model/odds";
+import { h2hPath } from "@/lib/slug";
+import { matchLd } from "@/lib/structured-data";
 
 export const revalidate = 900;
 
@@ -31,7 +34,8 @@ export async function generateMetadata({ params }: PageProps<"/matches/[id]">): 
   if (!m) return {};
   const vs = `${m.a.name} vs ${m.b.name}`;
   const where = `${displayName(m.match.tournament.name)}${m.match.round ? `, ${m.match.round}` : ""}`;
-  const title = m.scheduled ? `${vs} prediction` : `${vs} result`;
+  const event = `${displayName(m.match.tournament.name)} ${m.match.tournamentStart?.slice(0, 4) ?? ""}`.trim();
+  const title = m.scheduled ? `${vs} prediction and head-to-head (${event})` : `${vs} result (${event})`;
   const description = m.scheduled
     ? `${where}: ${m.chanceA !== null ? `${m.a.name} ${pct(m.chanceA)}, ${m.b.name} ${pct(1 - m.chanceA)} by our model. ` : ""}Head-to-head, form and title stakes.`
     : `${where}: result, pre-match chances and head-to-head.`;
@@ -93,6 +97,18 @@ export default async function MatchPage({ params }: PageProps<"/matches/[id]">) 
 
   return (
     <article className="space-y-6">
+      <JsonLd
+        data={matchLd({
+          id: match.id,
+          name: `${a.name} vs ${b.name}`,
+          tournament: displayName(match.tournament.name),
+          location: null,
+          startDate: match.scheduledAt ?? match.tournamentStart,
+          a: { id: a.id, name: a.name },
+          b: { id: b.id, name: b.name },
+          winner: m.scheduled ? null : match.winner,
+        })}
+      />
       <Link href={`/tournaments/${match.tournament.id}`} className="text-sm text-muted hover:text-foreground">
         ← {displayName(match.tournament.name)}
       </Link>
@@ -236,7 +252,10 @@ export default async function MatchPage({ params }: PageProps<"/matches/[id]">) 
                 <span className="font-semibold tabular-nums">{`${Math.max(m.h2h.winsA, m.h2h.winsB)}–${Math.min(m.h2h.winsA, m.h2h.winsB)}`}</span>.
               </>
             )}{" "}
-            <Link href={`/h2h?a=${a.id}&b=${b.id}`} className="font-medium text-accent hover:underline">
+            <Link
+              href={a.id !== null && b.id !== null ? h2hPath({ id: a.id, name: a.name }, { id: b.id, name: b.name }) : "/h2h"}
+              className="font-medium text-accent hover:underline"
+            >
               Every meeting →
             </Link>
           </p>

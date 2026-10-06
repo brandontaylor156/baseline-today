@@ -1083,6 +1083,16 @@ export type Database = {
           tournament_id: number
         }[]
       }
+      top_rivalries: {
+        Args: { p_limit?: number; p_min?: number }
+        Returns: {
+          meetings: number
+          name_a: string
+          name_b: string
+          player_a: number
+          player_b: number
+        }[]
+      }
       try_acquire_sync_lock: {
         Args: { p_key: string; p_ttl_seconds: number }
         Returns: boolean

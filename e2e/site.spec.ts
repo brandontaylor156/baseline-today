@@ -200,7 +200,9 @@ test.describe("player extras", () => {
     await expect(page).toHaveURL(/\/h2h\?a=\d+$/);
     await page.getByLabel("Compare with").fill("zverev");
     await page.getByRole("button", { name: /Zverev/ }).first().click();
-    await expect(page).toHaveURL(/\/h2h\?a=\d+&b=\d+$/);
+    // A complete pair moves to its readable, canonical address.
+    await expect(page).toHaveURL(/\/h2h\/[a-z0-9-]+-vs-[a-z0-9-]+-\d+-\d+$/);
+    await expect(page.getByRole("heading", { level: 1, name: / vs .*Zverev|Zverev.* vs / })).toBeVisible();
     await expect(page.getByRole("heading", { name: /Meetings/ })).toBeVisible();
   });
 });
@@ -292,6 +294,8 @@ test("robots and sitemap", async ({ request }) => {
   const xml = await sitemap.text();
   expect(xml).toContain("/players/");
   expect(xml).toContain("/tournaments/");
+  expect(xml).toMatch(/\/h2h\/[a-z0-9-]+-vs-[a-z0-9-]+-\d+-\d+</);
+  expect(xml).toContain("/week/");
 });
 
 test("title chances on a tournament in progress", async ({ page }) => {
@@ -337,8 +341,10 @@ test("matchup share card and calendar feeds", async ({ page, request }) => {
   const hrefs = await page.locator("tbody tr a").evaluateAll((as) => as.slice(0, 2).map((a) => a.getAttribute("href")!));
   const [a, b] = hrefs.map((h) => h.split("/").pop());
   await page.goto(`/h2h?a=${a}&b=${b}`);
-  const og = await page.locator('meta[property="og:image"]').getAttribute("content");
-  expect(og).toContain(`/h2h/card?a=${a}&b=${b}`);
+  const og = (await page.locator('meta[property="og:image"]').getAttribute("content"))!;
+  expect(og).toMatch(/\/h2h\/card\?a=\d+&b=\d+/);
+  expect(og).toContain(`=${a}`);
+  expect(og).toContain(`=${b}`);
   const card = await request.get(`/h2h/card?a=${a}&b=${b}`);
   expect(card.headers()["content-type"]).toBe("image/png");
 
@@ -444,4 +450,69 @@ test("demo watch party replays a real result with bots, calls and chat", async (
   await expect(page.getByRole("button", { name: "Replay" })).toBeVisible({ timeout: 60_000 });
   await expect(page.getByText("Match over.")).toBeVisible();
   await expect(page.getByText("In the room")).toBeVisible();
+});
+
+test("readable head-to-head addresses: biggest rivalries, redirects and structured data", async ({ page, request }) => {
+  await page.goto("/h2h");
+  const rivalry = page.getByRole("region", { name: "Biggest rivalries" }).getByRole("link").first();
+  await expect(rivalry).toBeVisible();
+  const href = (await rivalry.getAttribute("href"))!;
+  expect(href).toMatch(/^\/h2h\/[a-z0-9-]+-vs-[a-z0-9-]+-\d+-\d+$/);
+  // A wrong name in the slug redirects to the canonical one; the old query form does too.
+  const [, x, y] = /-(\d+)-(\d+)$/.exec(href)!;
+  const wrong = await request.get(`/h2h/someone-vs-else-${x}-${y}`, { maxRedirects: 0 });
+  expect([301, 308]).toContain(wrong.status());
+  expect(wrong.headers()["location"]).toContain(href);
+  const old = await request.get(`/h2h?a=${y}&b=${x}`, { maxRedirects: 0 });
+  expect(old.headers()["location"]).toContain(href);
+  expect((await request.get("/h2h/nope")).status()).toBe(404);
+  await rivalry.click();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", new RegExp(`${href}$`));
+});
+
+test("structured data on player, match and tournament pages", async ({ page }) => {
+  await page.goto("/rankings/atp");
+  await page.locator("tbody tr").first().getByRole("link").click();
+  await expect(page).toHaveURL(/\/players\/\d+$/);
+  await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(2);
+  const ld = async () => (await page.locator('script[type="application/ld+json"]').allTextContents()).map((t) => JSON.parse(t)["@type"]);
+  expect(await ld()).toEqual(expect.arrayContaining(["WebSite", "Person"]));
+  await page.goto("/tournaments");
+  await page.locator('main a[href^="/tournaments/"]').first().click();
+  await expect(page).toHaveURL(/\/tournaments\/\d+$/);
+  await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(2);
+  expect(await ld()).toContain("SportsEvent");
+});
+
+test("weekly recap: list, a week with champions, linked from the homepage", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Week-by-week recaps →" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Week in tennis" })).toBeVisible();
+  await page.locator('main a[href^="/week/"]').first().click();
+  await expect(page.getByRole("heading", { name: "Champions" })).toBeVisible();
+  await expect(page.getByText("🏆").first()).toBeVisible();
+  expect((await page.request.get("/week/2026-09-29")).status()).toBe(404);
+});
+
+test("open data downloads, RSS feed, IndexNow key and the case study", async ({ page, request }) => {
+  await page.goto("/");
+  await page.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "Open data" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Open tennis data" })).toBeVisible();
+  const ratings = await request.get("/data/ratings.csv");
+  expect(ratings.headers()["content-type"]).toContain("text/csv");
+  const head = (await ratings.text()).split("\r\n")[0];
+  expect(head).toBe("tour,player,country,elo,elo_hard,elo_clay,elo_grass,matches");
+  const json = await (await request.get(`/data/results-${new Date().getUTCFullYear()}.json`)).json();
+  expect(json.license).toContain("CC BY-SA 4.0");
+  expect(json.count).toBeGreaterThan(100);
+  expect(Object.keys(json.data[0])).toContain("model_winner_chance");
+  expect((await request.get("/data/rankings.csv")).status()).toBe(404);
+
+  const feed = await request.get("/feed.xml");
+  expect(feed.headers()["content-type"]).toContain("application/rss+xml");
+  expect(await feed.text()).toContain("<rss version=\"2.0\"");
+  expect((await request.get("/447a8b74f419cf147fea548adc78a6cb.txt")).status()).toBe(200);
+
+  await page.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "About" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "How Baseline Today is built" })).toBeVisible();
 });
