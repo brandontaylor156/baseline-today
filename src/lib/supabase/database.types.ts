@@ -803,6 +803,12 @@ export type Database = {
           },
         ]
       }
+      player_traits: {
+        Row: { article: string | null; backhand: string | null; checked_at: string; hand: string | null; height_cm: number | null; player_key: string; source: string; tour: string; wikidata_id: string }
+        Insert: { article?: string | null; backhand?: string | null; checked_at?: string; hand?: string | null; height_cm?: number | null; player_key: string; source?: string; tour: string; wikidata_id: string }
+        Update: { article?: string | null; backhand?: string | null; checked_at?: string; hand?: string | null; height_cm?: number | null; player_key?: string; source?: string; tour?: string; wikidata_id?: string }
+        Relationships: []
+      }
       ranking_points: {
         Row: { category: string; country: string | null; end_date: string; name: string; player_id: number | null; player_key: string; points: number; tour: string; tournament_id: number }
         Insert: { category: string; country?: string | null; end_date: string; name: string; player_id?: number | null; player_key: string; points: number; tour: string; tournament_id: number }

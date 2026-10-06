@@ -36,6 +36,8 @@
     "factors": "tsx --env-file=.env.local --conditions=react-server scripts/factors.mts",
     "season": "tsx --env-file=.env.local --conditions=react-server scripts/season-outlook.mts",
     "projections": "tsx --env-file=.env.local --conditions=react-server scripts/projections.mts",
+    "traits": "tsx --env-file=.env.local --conditions=react-server scripts/traits.mts",
+    "sync:traits": "tsx --env-file=.env.local --conditions=react-server scripts/sync-traits.mts",
     "sync:people": "tsx --env-file=.env.local --conditions=react-server scripts/sync-people.mts"
   },
   "dependencies": {

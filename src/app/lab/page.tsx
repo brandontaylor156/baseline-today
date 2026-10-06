@@ -48,6 +48,11 @@ const TOOLS = [
     text: "How fast every ATP event plays, worked out from set scores and ratings alone: no ace counts needed. Stable year to year, and the surfaces line up.",
   },
   {
+    href: "/lab/traits",
+    title: "Lefties, one-handers and height",
+    text: "Hand, backhand and height for 1,900 players from Wikidata and Wikipedia, joined to every match: tall players beat their ratings, lefties don’t.",
+  },
+  {
     href: "/lab/forecast",
     title: "If a Grand Slam started today",
     text: "Hundreds of 128-player draws made with real seeding rules, each solved exactly: every player's chance on hard, clay and grass, updated daily.",

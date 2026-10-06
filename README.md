@@ -115,6 +115,10 @@ set by set) ·
 - **Court pace from scorelines:** each event's best-fitting serve-point rate given its set scores
   and the ratings, with no ace counts needed. ATP: stable year to year (r = 0.51), grass +1.4, clay −1.0.
   WTA scorelines carry a much weaker signal (r = 0.12), which the page says.
+- **Lefties, one-handers and height:** playing hand, backhand and height for 1,900+ players from
+  Wikidata (CC0), with gaps filled from each player’s Wikipedia infobox, joined to every match since
+  2016. Tall players beat their ratings (+9 per 10 cm, ATP; +21 on grass); no left-handed edge beyond
+  the ratings; one-handed backhands slightly under (not significant).
 - **Career comparables:** each player's last two years matched against every earlier player at the
   same age (birth dates for 1,600+ draw-only players from Wikidata), with a range for the next two
   years. Backtested from 2021 with only past data: the range holds 58% of outcomes against a 60% aim,

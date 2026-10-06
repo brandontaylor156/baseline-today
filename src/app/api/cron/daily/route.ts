@@ -21,6 +21,8 @@ import { computeProjections } from "@/lib/sync/projections";
 import { computeRebuiltRankings } from "@/lib/sync/rebuilt-rankings";
 import { computeScorelines } from "@/lib/sync/scorelines";
 import { computeSeasonOutlook } from "@/lib/sync/season-outlook";
+import { syncTraits } from "@/lib/sync/traits";
+import { computeTraits } from "@/lib/sync/traits-analysis";
 import { computeTurnarounds } from "@/lib/sync/turnarounds";
 
 export const maxDuration = 300;
@@ -69,7 +71,7 @@ export async function GET(request: Request) {
   const projections =
     now.getUTCDay() === 2
       ? await syncPeople(db, 200)
-          .then((people) => computeProjections(db, now).then((p) => ({ people, ...p })))
+          .then(async (people) => ({ people, traits: await syncTraits(db).then(() => computeTraits(db, now)), ...(await computeProjections(db, now)) }))
           .catch((err: Error) => `error: ${err.message}`)
       : "weekly";
   // The rest of the season simulated (about 20 seconds): daily until the Finals.

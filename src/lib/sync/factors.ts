@@ -83,7 +83,7 @@ export interface ComebacksCache {
 
 type Who = { id: number | null; name: string; country: string | null };
 
-async function loadMatches(db: AdminClient): Promise<{ matches: Record<"atp" | "wta", FactorMatch[]>; who: Map<string, Who> }> {
+export async function loadMatches(db: AdminClient): Promise<{ matches: Record<"atp" | "wta", FactorMatch[]>; who: Map<string, Who> }> {
   const out: Record<"atp" | "wta", FactorMatch[]> = { atp: [], wta: [] };
   const who = new Map<string, Who>();
   for (let from = 0; ; from += BATCH) {
