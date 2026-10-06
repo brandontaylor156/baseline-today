@@ -55,6 +55,31 @@ export default function DataPage() {
         </p>
       </section>
 
+      <section aria-labelledby="chances-heading" className="space-y-3">
+        <h2 id="chances-heading" className="text-lg font-semibold">
+          Pre-tournament title chances
+        </h2>
+        <p className="text-sm text-muted">
+          From the <Link href="/lab" className="underline underline-offset-2">research lab</Link>: every entrant of every draw we could
+          rebuild, with their rating going in, their exact title chance before the first ball, and for champions the chance of beating the
+          opponents they actually met.
+        </p>
+        <ul className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
+          {seasons.map((s) => (
+            <li key={s} className="rounded-lg border border-border bg-surface px-3 py-2">
+              <span className="font-medium">{s}</span>{" "}
+              <a href={`/data/title-chances-${s}.csv`} className={link}>
+                CSV
+              </a>{" "}
+              ·{" "}
+              <a href={`/data/title-chances-${s}.json`} className={link}>
+                JSON
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <section aria-labelledby="ratings-heading" className="space-y-3">
         <h2 id="ratings-heading" className="text-lg font-semibold">
           Model ratings
@@ -88,6 +113,10 @@ export default function DataPage() {
             ["/api/v1/h2h?a=4&b=6", "Head-to-head: record, by surface, every meeting and the model’s chance on each surface."],
             ["/api/v1/title-odds/<tournament id>", "Each remaining player’s chance to reach every round of a draw in progress."],
             ["/api/v1/upsets?days=7&max=0.35", "Recent wins where our model gave the winner the smallest chance."],
+            ["/api/v1/lab/title-chances?tournament=<id>", "Every entrant’s pre-tournament title chance in a rebuilt draw."],
+            ["/api/v1/lab/ratings?player=4", "A player’s weekly rating since 2015, overall and per surface."],
+            ["/api/v1/lab/in-the-way?player=4", "Expected titles a player cost others, and others cost them."],
+            ["/api/v1/lab/forecast?tour=atp", "“If a major started today”: chances by round on each surface."],
           ].map(([path, what]) => (
             <li key={path} className="rounded-lg border border-border bg-surface px-3 py-2">
               <a href={path.includes("<") ? undefined : path} className="font-mono text-xs text-accent hover:underline">

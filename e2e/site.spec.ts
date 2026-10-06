@@ -620,6 +620,15 @@ test("public JSON API", async ({ request }) => {
   expect(body.data.modelChanceA.all).toBeGreaterThan(0);
   expect((await request.get("/api/v1/h2h?a=4")).status()).toBe(400);
   expect((await (await request.get("/api/v1/upsets?days=7")).json()).data).toBeInstanceOf(Array);
+
+  // Research lab data.
+  const ratings = await (await request.get("/api/v1/lab/ratings?player=4")).json();
+  expect(ratings.data.weeks.length).toBeGreaterThan(50);
+  const forecast = await (await request.get("/api/v1/lab/forecast?tour=wta")).json();
+  expect(Object.keys(forecast.data.surfaces)).toEqual(expect.arrayContaining(["hard", "clay", "grass"]));
+  expect((await request.get("/api/v1/lab/nope")).status()).toBe(404);
+  const chances = await request.get("/data/title-chances-2024.csv");
+  expect((await chances.text()).split("\r\n")[0]).toContain("title_chance");
 });
 
 test("daily puzzle: a wrong guess gets feedback, the answer stays on the server", async ({ page, request }) => {

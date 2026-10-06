@@ -3,7 +3,10 @@
 
 export const FIRST_SEASON = 2015;
 
-export type DataFile = { kind: "results"; season: number; format: "csv" | "json" } | { kind: "ratings"; format: "csv" | "json" };
+export type DataFile =
+  | { kind: "results"; season: number; format: "csv" | "json" }
+  | { kind: "ratings"; format: "csv" | "json" }
+  | { kind: "title-chances"; season: number; format: "csv" | "json" };
 
 /** "results-2026.csv", "ratings.json" → what to serve, or null. */
 export function parseDataFile(name: string, currentSeason: number): DataFile | null {
@@ -11,6 +14,11 @@ export function parseDataFile(name: string, currentSeason: number): DataFile | n
   if (results) {
     const season = Number(results[1]);
     return season >= FIRST_SEASON && season <= currentSeason ? { kind: "results", season, format: results[2] as "csv" | "json" } : null;
+  }
+  const chances = /^title-chances-(\d{4})\.(csv|json)$/.exec(name);
+  if (chances) {
+    const season = Number(chances[1]);
+    return season >= FIRST_SEASON && season <= currentSeason ? { kind: "title-chances", season, format: chances[2] as "csv" | "json" } : null;
   }
   const ratings = /^ratings\.(csv|json)$/.exec(name);
   return ratings ? { kind: "ratings", format: ratings[1] as "csv" | "json" } : null;
@@ -47,6 +55,8 @@ export const RESULT_COLUMNS = [
   "source",
   "license",
 ];
+
+export const TITLE_CHANCE_COLUMNS = ["tournament_id", "tournament", "tour", "category", "season", "player", "player_id", "rating", "title_chance", "champion", "champion_path_chance", "source", "license"];
 
 export const RATING_COLUMNS = ["tour", "player", "country", "elo", "elo_hard", "elo_clay", "elo_grass", "matches", "source", "license"];
 

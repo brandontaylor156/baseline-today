@@ -22,3 +22,10 @@ describe("toCsv", () => {
     expect(toCsv(["a", "b"], [["x,y", 'say "hi"'], [null, 3], ["=SUM(A1)", "-5"]])).toBe('a,b\r\n"x,y","say ""hi"""\r\n,3\r\n\'=SUM(A1),\'-5\r\n');
   });
 });
+
+describe("title-chance files", () => {
+  it("parses per-season lab downloads", () => {
+    expect(parseDataFile("title-chances-2024.csv", 2026)).toEqual({ kind: "title-chances", season: 2024, format: "csv" });
+    expect(parseDataFile("title-chances-2030.json", 2026)).toBeNull();
+  });
+});
