@@ -44,8 +44,20 @@ function writeGuest(picks: Map<number, 1 | 2>) {
 type GuestRecord = { correct: number; settled: number; model: number };
 
 /** Pick buttons for open matches, your record, and your leaderboard name. */
-export function PickemBoard({ matches, weekStart, seasonStart }: { matches: PickemMatch[]; weekStart: string; seasonStart: string }) {
+export function PickemBoard({
+  matches,
+  weekStart,
+  seasonStart,
+  signedOut,
+}: {
+  matches: PickemMatch[];
+  weekStart: string;
+  seasonStart: string;
+  /** The server saw no session cookie, so the visitor is a guest before the client confirms it. */
+  signedOut: boolean;
+}) {
   const user = useUser();
+  const guestView = user === null || (user === undefined && signedOut);
   const pathname = usePathname();
   const [picks, setPicks] = useState<Map<number, 1 | 2>>(new Map());
   const [busy, setBusy] = useState<number | null>(null);
@@ -124,7 +136,7 @@ export function PickemBoard({ matches, weekStart, seasonStart }: { matches: Pick
   }, [user, matches, weekStart, seasonStart]);
 
   async function pick(matchId: number, side: 1 | 2) {
-    if (user === undefined) return;
+    if (user === undefined && !signedOut) return;
     if (!user) {
       const next = new Map(guest);
       if (next.get(matchId) === side) next.delete(matchId);
@@ -161,7 +173,7 @@ export function PickemBoard({ matches, weekStart, seasonStart }: { matches: Pick
       {user && <MyRecord mine={mine} />}
       {user && stats && <Badges stats={stats} />}
       {user && <LeaderboardName />}
-      {user === null && (
+      {guestView && (
         <div className="space-y-1 rounded-xl border border-border bg-surface p-4 text-sm">
           <p>
             {guest.size === 0 ? "Try it: tap a player to pick them. " : `You’ve made ${guest.size} ${guest.size === 1 ? "pick" : "picks"} as a guest, saved in this browser only. `}
@@ -211,9 +223,9 @@ export function PickemBoard({ matches, weekStart, seasonStart }: { matches: Pick
                     <button
                       key={side}
                       type="button"
-                      disabled={busy === m.id || user === undefined}
+                      disabled={busy === m.id || (user === undefined && !signedOut)}
                       onClick={() => pick(m.id, side)}
-                      aria-pressed={user === undefined ? undefined : on}
+                      aria-pressed={user === undefined && !signedOut ? undefined : on}
                       className={`flex min-w-0 items-center gap-1.5 rounded-lg border px-3 py-2 text-left disabled:opacity-60 ${
                         on ? "border-accent bg-accent-soft font-medium" : "border-border hover:bg-surface-muted"
                       }`}

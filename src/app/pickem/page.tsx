@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { connection } from "next/server";
 
@@ -51,6 +52,8 @@ export default async function PickemPage() {
   const week = weekStart(now);
   const season = `${now.getUTCFullYear()}-01-01`;
   const db = createPublicClient({ cached: false });
+  // No Supabase session cookie: render the signed-out view on the server instead of after hydration.
+  const signedOut = !(await cookies()).getAll().some((c) => c.name.startsWith("sb-"));
   const [{ matchups }, weekBoard, seasonBoard, info] = await Promise.all([
     getUpcoming(now),
     db.rpc("pickem_leaderboard", { p_since: week }),
@@ -100,7 +103,7 @@ export default async function PickemPage() {
         <h2 id="open-heading" className="text-sm font-semibold uppercase tracking-wide text-muted">
           Open matches · {open.length}
         </h2>
-        <PickemBoard matches={open} weekStart={week} seasonStart={season} />
+        <PickemBoard matches={open} weekStart={week} seasonStart={season} signedOut={signedOut} />
         <p className="text-xs text-muted">
           Picks close when the result is posted, or at the start time when we know it. Walkovers don’t count. “Model” is our model’s
           record on the same matches (its pre-match favorite), updated daily. Percentages on the buttons are the model’s chances.
