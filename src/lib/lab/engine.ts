@@ -29,6 +29,8 @@ export interface TitleChanceRow {
   champion: boolean;
   /** Entrant's overall rating going in (for context). */
   rating: number;
+  /** Champions only: chance of beating the opponents they actually met (draw luck = path ÷ chance). */
+  path?: number;
 }
 
 /** Expected titles `other` gained, summed over draws, when `player` is replaced by a typical entrant. */
@@ -103,8 +105,12 @@ export function runLab(
           return bestOf === 5 ? bestOfFive(q) : q;
         };
         const base = winChances(tree, p);
+        // The champion's actual path: the product of their chances in the matches they played.
+        const path = list
+          .filter((m) => !m.walkover && (m.key1 === tree.winner || m.key2 === tree.winner))
+          .reduce((acc, m) => acc * (m.key1 === tree.winner ? p(m.key1, m.key2) : p(m.key2, m.key1)), 1);
         for (const [key, chance] of base) {
-          titles.push({ tournamentId, key, chance, champion: key === tree.winner, rating: Math.round(get(key).overall) });
+          titles.push({ tournamentId, key, chance, champion: key === tree.winner, rating: Math.round(get(key).overall), ...(key === tree.winner ? { path } : {}) });
         }
         // What if each contender hadn't been there: who gains their share?
         for (const [player, chance] of base) {

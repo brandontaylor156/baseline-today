@@ -122,7 +122,21 @@ export default function AboutPage() {
         </p>
       </Section>
 
-      <Section id="security" title="4. Multiplayer games on row level security">
+      <Section id="lab" title="4. Replaying ten years of tennis">
+        <p>
+          The <Link href="/lab" className={a}>research lab</Link> replays every result since 2015 in order through the rating model. At
+          the start of each tournament it rebuilds the draw from the results alone (every later-round match was between the winners of
+          two earlier ones), then computes each entrant’s exact title chance from the ratings of that week: 1,120 draws, 48,000 title
+          chances.
+        </p>
+        <p>
+          That one replay answers questions that usually need a data team: who won more titles than their chances said, which titles
+          were the most improbable, how many titles one player cost another (each draw replayed without them), and who wins more
+          tiebreaks and deciding sets than a point-level model of the matchup expects.
+        </p>
+      </Section>
+
+      <Section id="security" title="5. Multiplayer games on row level security">
         <p>
           Pick’em, Bracket Challenge, private leagues and watch parties are enforced by Postgres row level security, not by app
           code. Picks lock once a result is posted, brackets lock at the first result, and league and party data is visible only
@@ -136,7 +150,7 @@ export default function AboutPage() {
         </p>
       </Section>
 
-      <Section id="quality" title="5. Quality on a budget">
+      <Section id="quality" title="6. Quality on a budget">
         <ul className="list-disc space-y-1.5 pl-5">
           <li>Unit tests for every pure piece: parsing, Elo, title odds, the live model, scorekeeping, bracket scoring.</li>
           <li>Browser tests on desktop and phone for every page type, plus automated accessibility checks (WCAG 2.2 AA) in light and dark mode.</li>
@@ -150,7 +164,7 @@ export default function AboutPage() {
         </ul>
       </Section>
 
-      <Section id="open" title="6. Open by default">
+      <Section id="open" title="7. Open by default">
         <p>
           The results and ratings are free to download as CSV or JSON on the{" "}
           <Link href="/data" className={a}>

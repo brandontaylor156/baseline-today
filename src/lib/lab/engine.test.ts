@@ -64,3 +64,13 @@ describe("titles denied", () => {
     expect(out.denied.every((d) => d.gain >= 0.02)).toBe(true);
   });
 });
+
+describe("draw luck", () => {
+  it("records the champion's path chance, equal to the title chance when every match is played as drawn", () => {
+    const out = runLab([m(1, 70, "2023-01-02", 1, "A", "B", 1), m(2, 70, "2023-01-02", 1, "C", "D", 1), m(3, 70, "2023-01-02", 2, "A", "C", 1)], { atp: 1 });
+    const champ = out.titles.find((t) => t.champion)!;
+    // Even ratings: path = 0.5 × 0.5 = title chance 0.25.
+    expect(champ.path).toBeCloseTo(0.25);
+    expect(out.titles.filter((t) => !t.champion).every((t) => t.path === undefined)).toBe(true);
+  });
+});

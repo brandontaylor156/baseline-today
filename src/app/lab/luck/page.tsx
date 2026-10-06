@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Flag } from "@/components/flag";
 import { getLuck, getTitleExtremes, type LuckRow } from "@/lib/data/lab";
 import { isTour, TOUR_LABEL } from "@/lib/format";
+import { createPublicClient } from "@/lib/supabase/public";
 import type { Tour } from "@/lib/provider/types";
 
 export const revalidate = 3600;
@@ -81,7 +82,14 @@ function LuckTable({ title, note, rows }: { title: string; note: string; rows: L
 export default async function LuckPage({ searchParams }: PageProps<"/lab/luck">) {
   const { tour: q } = await searchParams;
   const tour: Tour = typeof q === "string" && isTour(q) ? q : "atp";
-  const [luck, longshots, busts] = await Promise.all([getLuck(tour), getTitleExtremes(tour, true, 12), getTitleExtremes(tour, false, 12)]);
+  const db = createPublicClient();
+  const [luck, longshots, busts, { data: easy }, { data: hard }] = await Promise.all([
+    getLuck(tour),
+    getTitleExtremes(tour, true, 12),
+    getTitleExtremes(tour, false, 12),
+    db.rpc("lab_draw_luck", { p_tour: tour, p_easiest: true, p_limit: 10 }),
+    db.rpc("lab_draw_luck", { p_tour: tour, p_easiest: false, p_limit: 10 }),
+  ]);
   const byExpected = [...luck].sort((a, b) => b.expected - a.expected).slice(0, 15);
   const over = [...luck].filter((r) => r.expected >= 1 || r.titles >= 2).sort((a, b) => b.titles - b.expected - (a.titles - a.expected)).slice(0, 10);
   const under = [...luck].filter((r) => r.expected >= 1).sort((a, b) => a.titles - a.expected - (b.titles - b.expected)).slice(0, 10);
@@ -156,6 +164,33 @@ export default async function LuckPage({ searchParams }: PageProps<"/lab/luck">)
             ))}
           </ol>
         </section>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        {(
+          [
+            ["Easiest paths to a title", easy, "Upsets elsewhere cleared the way: the opponents they actually met were much easier than the draw promised."],
+            ["Hardest paths to a title", hard, "They had to beat the best: the opponents they met were tougher than the draw’s average path."],
+          ] as const
+        ).map(([title, rows, note]) => (
+          <section key={title} aria-label={title} className="space-y-2">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">{title}</h2>
+            <p className="text-xs text-muted">{note} 500-level events and above.</p>
+            <ol className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface text-sm">
+              {(rows ?? []).map((r) => (
+                <li key={r.tournament_id} className="flex items-baseline gap-3 px-4 py-2.5">
+                  <span className="w-14 shrink-0 font-semibold tabular-nums">{(r.path_chance / r.chance).toFixed(1)}×</span>
+                  <span className="min-w-0 flex-1">
+                    <Who id={r.player_id} name={r.name} country={r.country} />
+                    <Link href={`/tournaments/${r.tournament_id}`} className="mt-1.5 block truncate text-xs text-muted hover:underline">
+                      {r.tournament} {r.season} · title chance {odds(r.chance)}, actual path {odds(r.path_chance)}
+                    </Link>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </section>
+        ))}
       </div>
 
       <p className="text-xs text-muted">

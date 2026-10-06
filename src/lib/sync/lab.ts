@@ -84,7 +84,15 @@ export async function computeLab(db: AdminClient) {
   const finals = new Set(titles.filter((t) => t.champion).map((t) => t.tournamentId));
   const titleRows = titles
     .filter((t) => finals.has(t.tournamentId))
-    .map((t) => ({ tournament_id: t.tournamentId, player_key: t.key, player_id: idOf(t.key), chance: Math.round(t.chance * 1e6) / 1e6, champion: t.champion, rating: t.rating }));
+    .map((t) => ({
+      tournament_id: t.tournamentId,
+      player_key: t.key,
+      player_id: idOf(t.key),
+      chance: Math.round(t.chance * 1e6) / 1e6,
+      champion: t.champion,
+      rating: t.rating,
+      path_chance: t.path === undefined ? null : Math.round(t.path * 1e6) / 1e6,
+    }));
   for (let i = 0; i < titleRows.length; i += BATCH) {
     const { error } = await db.from("lab_title_chances").upsert(titleRows.slice(i, i + BATCH), { onConflict: "tournament_id,player_key" });
     if (error) throw new Error(`lab: title chances: ${error.message}`);

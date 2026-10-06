@@ -94,9 +94,9 @@ export type Database = {
         Relationships: []
       }
       lab_title_chances: {
-        Row: { champion: boolean; chance: number; player_id: number | null; player_key: string; rating: number | null; tournament_id: number }
-        Insert: { champion: boolean; chance: number; player_id?: number | null; player_key: string; rating?: number | null; tournament_id: number }
-        Update: { champion?: boolean; chance?: number; player_id?: number | null; player_key?: string; rating?: number | null; tournament_id?: number }
+        Row: { champion: boolean; chance: number; path_chance: number | null; player_id: number | null; player_key: string; rating: number | null; tournament_id: number }
+        Insert: { champion: boolean; chance: number; path_chance?: number | null; player_id?: number | null; player_key: string; rating?: number | null; tournament_id: number }
+        Update: { champion?: boolean; chance?: number; path_chance?: number | null; player_id?: number | null; player_key?: string; rating?: number | null; tournament_id?: number }
         Relationships: []
       }
       league_members: {
@@ -1109,6 +1109,10 @@ export type Database = {
       lab_denied_totals: {
         Args: { p_tour: string }
         Returns: { cost_by_others: number; cost_others: number; country: string | null; name: string; player_id: number }[]
+      }
+      lab_draw_luck: {
+        Args: { p_easiest: boolean; p_limit?: number; p_tour: string }
+        Returns: { chance: number; country: string | null; name: string; path_chance: number; player_id: number | null; season: number; tournament: string; tournament_id: number }[]
       }
       lab_luck: {
         Args: { p_since?: number; p_tour: string }

@@ -63,6 +63,19 @@ real result's set scores, with win chances, calls and chat) ·
   point order is simulated (and checked to replay to exactly those scores), so the win chance and
   momentum chart are simulated too, and the page says so.
 
+**Research lab** (`/lab`)
+- **The engine:** every result since 2015 replayed in order through the Elo model; at each
+  tournament's start the bracket is rebuilt from the results alone (1,120 of 1,181 draws) and every
+  entrant's exact title chance computed from the ratings of that week. Recomputed weekly.
+- **Expected vs actual titles**, the most improbable champions and the biggest favourites who
+  lost, plus each title's draw luck (the opponents actually met against the draw's average path).
+- **Who stood in whose way:** each draw replayed without each contender, so the site can say how many
+  expected titles one player cost another (Alcaraz cost Sinner 1.4; Djokovic cost the field 26.7).
+- **Clutch index:** tiebreaks and deciding sets won against what a point-level model fitted to each
+  matchup expected.
+- **Results explorer** (any player, any filter, shareable URLs, CSV), a **time machine** for
+  cross-era matchups, **aging curves** by the delta method, and **similar players**.
+
 **Weekly recaps and open data**
 - **Week in tennis** (`/week/<monday>`): a page for every week with the champions and finals,
   the biggest upsets, ATP and WTA ranking movers and the model's record, generated from the data.
