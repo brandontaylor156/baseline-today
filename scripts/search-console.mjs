@@ -38,7 +38,8 @@ function token() {
   }
 }
 
-let quotaProject = process.env.GOOGLE_QUOTA_PROJECT ?? null;
+// The Google Cloud project that pays the (free) API quota: the one behind Google sign-in.
+let quotaProject = process.env.GOOGLE_QUOTA_PROJECT ?? "baseline-today";
 async function api(method, url, body) {
   const res = await fetch(url, {
     method,
@@ -72,7 +73,8 @@ async function pickProject(arg) {
 }
 
 function vercel(args, input) {
-  const r = spawnSync("vercel", args, { input, shell: win, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
+  const [cmd, full] = win ? ["cmd.exe", ["/d", "/c", "vercel", ...args]] : ["vercel", args];
+  const r = spawnSync(cmd, full, { input, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
   if (r.status !== 0) throw new Error(`vercel ${args[0]}: ${(r.stderr || r.stdout).trim().split("\n").pop()}`);
   return r.stdout;
 }
