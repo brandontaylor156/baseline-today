@@ -19,6 +19,7 @@ import { computeLab } from "@/lib/sync/lab";
 import { syncPeople } from "@/lib/sync/people";
 import { computePace } from "@/lib/sync/pace";
 import { computeProjections } from "@/lib/sync/projections";
+import { computePythagorean } from "@/lib/sync/pythagorean";
 import { computeRebuiltRankings } from "@/lib/sync/rebuilt-rankings";
 import { computeScorelines } from "@/lib/sync/scorelines";
 import { computeSeasonOutlook } from "@/lib/sync/season-outlook";
@@ -58,7 +59,7 @@ export async function GET(request: Request) {
   const factors =
     now.getUTCDay() === 3
       ? await computeFactors(db, now)
-          .then(async (f) => ({ ...f, fragility: await computeFragility(db, now), pace: await computePace(db, now) }))
+          .then(async (f) => ({ ...f, fragility: await computeFragility(db, now) }))
           .catch((err: Error) => `error: ${err.message}`)
       : "weekly";
   // Scoreline checks (a few minutes): Thursdays.
@@ -77,6 +78,13 @@ export async function GET(request: Request) {
       : "weekly";
   // The rest of the season simulated (about 20 seconds): daily until the Finals.
   const season = await computeSeasonOutlook(db, now).catch((err: Error) => `error: ${err.message}`);
+  // Court pace and the deserved record (about 90 seconds): Saturdays, a free day.
+  const saturday =
+    now.getUTCDay() === 6
+      ? await computePace(db, now)
+          .then(async (pace) => ({ pace, deserved: await computePythagorean(db, now) }))
+          .catch((err: Error) => `error: ${err.message}`)
+      : "weekly";
   // Rankings rebuilt from results (about 40 seconds): Fridays, incrementally.
   const rebuilt =
     now.getUTCDay() === 5
@@ -98,5 +106,5 @@ export async function GET(request: Request) {
     .catch((err: Error) => `error: ${err.message}`);
   // Bluesky: the upset of the day and, on Mondays, last week's recap (off until the account is set).
   const bluesky = await runBluesky(db, now).catch((err: Error) => `error: ${err.message}`);
-  return Response.json({ ...result, records, lab, factors, scorelines: scorelineCheck, projections, season, rebuilt, forecast, digest, indexnow, bluesky }, { status: result.status === "error" ? 500 : 200 });
+  return Response.json({ ...result, records, lab, factors, scorelines: scorelineCheck, projections, season, rebuilt, saturday, forecast, digest, indexnow, bluesky }, { status: result.status === "error" ? 500 : 200 });
 }

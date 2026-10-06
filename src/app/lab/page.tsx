@@ -58,6 +58,11 @@ const TOOLS = [
     text: "Every draw we hold, tested against thousands of rule-following redraws: did the top seeds get easier first-round opponents than chance? No single draw stands out.",
   },
   {
+    href: "/lab/deserved",
+    title: "The deserved record",
+    text: "Wins a player’s share of games deserved, this season’s luckiest and unluckiest records, and whether games or wins predict next season better.",
+  },
+  {
     href: "/lab/forecast",
     title: "If a Grand Slam started today",
     text: "Hundreds of 128-player draws made with real seeding rules, each solved exactly: every player's chance on hard, clay and grass, updated daily.",

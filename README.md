@@ -122,6 +122,9 @@ set by set) ·
 - **Are the draws fair?** A permutation audit of 615 real draws: were the top seeds’ first-round
   opponents weaker than rule-following redraws give (pre-event ratings), with a Benjamini–Hochberg
   correction. No single draw survives; across all, a slight tilt (6.8% vs 5%, −3.8 points).
+- **The deserved record:** tennis’s Pythagorean record (after Kovalchik 2016) from each
+  player-season’s share of games; games predict next season slightly better than records
+  (ATP r 0.716 vs 0.708, WTA 0.475 vs 0.444), and close-match luck carries over a little on the ATP only.
 - **Career comparables:** each player's last two years matched against every earlier player at the
   same age (birth dates for 1,600+ draw-only players from Wikidata), with a range for the next two
   years. Backtested from 2021 with only past data: the range holds 58% of outcomes against a 60% aim,

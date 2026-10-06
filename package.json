@@ -37,6 +37,7 @@
     "season": "tsx --env-file=.env.local --conditions=react-server scripts/season-outlook.mts",
     "projections": "tsx --env-file=.env.local --conditions=react-server scripts/projections.mts",
     "draw:audit": "tsx --env-file=.env.local --conditions=react-server scripts/draw-audit.mts",
+    "pythagorean": "tsx --env-file=.env.local --conditions=react-server scripts/pythagorean.mts",
     "traits": "tsx --env-file=.env.local --conditions=react-server scripts/traits.mts",
     "sync:traits": "tsx --env-file=.env.local --conditions=react-server scripts/sync-traits.mts",
     "sync:people": "tsx --env-file=.env.local --conditions=react-server scripts/sync-people.mts"
