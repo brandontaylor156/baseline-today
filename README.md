@@ -111,6 +111,9 @@ real result's set scores, with win chances, calls and chat) ·
   52 weeks, Finals points from Wikipedia, Wimbledon 2022 at zero), with a what-if that removes any big
   event, and every week's No. 1. Against the 2025–26 rankings we hold: 98–99% of the top 10 matched,
   rank correlation 0.95, points within 1–2%.
+- **Greatest turnarounds / set-by-set chances:** each set updates the score and the belief about the
+  day's form (an in-match spread tuned on 47,000 matches); match pages show the chance after each set.
+  "Favourite lost the first set" is calibrated to within a few points (score-only was 5–8 too high).
 - **Career comparables:** each player's last two years matched against every earlier player at the
   same age (birth dates for 1,600+ draw-only players from Wikidata), with a range for the next two
   years. Backtested from 2021 with only past data: the range holds 58% of outcomes against a 60% aim,

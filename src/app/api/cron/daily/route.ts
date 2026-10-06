@@ -20,6 +20,7 @@ import { computeProjections } from "@/lib/sync/projections";
 import { computeRebuiltRankings } from "@/lib/sync/rebuilt-rankings";
 import { computeScorelines } from "@/lib/sync/scorelines";
 import { computeSeasonOutlook } from "@/lib/sync/season-outlook";
+import { computeTurnarounds } from "@/lib/sync/turnarounds";
 
 export const maxDuration = 300;
 
@@ -57,7 +58,12 @@ export async function GET(request: Request) {
           .catch((err: Error) => `error: ${err.message}`)
       : "weekly";
   // Scoreline checks (a few minutes): Thursdays.
-  const scorelineCheck = now.getUTCDay() === 4 ? await computeScorelines(db, now).catch((err: Error) => `error: ${err.message}`) : "weekly";
+  const scorelineCheck =
+    now.getUTCDay() === 4
+      ? await computeScorelines(db, now)
+          .then(async (s) => ({ ...s, turnarounds: await computeTurnarounds(db, now) }))
+          .catch((err: Error) => `error: ${err.message}`)
+      : "weekly";
   // Career comparables (about a minute, from the lab's ratings): Tuesdays, after new players' birth dates.
   const projections =
     now.getUTCDay() === 2

@@ -38,6 +38,11 @@ const TOOLS = [
     text: "Do some favourites keep letting matches drift into deciding sets, and does it predict upsets? Measured against the scoreline model: it doesn't last, and it doesn't predict.",
   },
   {
+    href: "/lab/turnarounds",
+    title: "Greatest turnarounds",
+    text: "Win chances after every set of every match since 2016: the biggest comebacks, and what losing the first set really does to a favourite.",
+  },
+  {
     href: "/lab/forecast",
     title: "If a Grand Slam started today",
     text: "Hundreds of 128-player draws made with real seeding rules, each solved exactly: every player's chance on hard, clay and grass, updated daily.",

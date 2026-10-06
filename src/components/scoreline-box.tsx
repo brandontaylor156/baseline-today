@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { gamesRange, matchScorelines } from "@/lib/scorelines";
+import { IN_MATCH_TAU, setPath } from "@/lib/set-path";
 
 const pct = (p: number) => (p >= 0.995 ? "99%+" : p < 0.005 ? "<1%" : `${Math.round(p * 100)}%`);
 
@@ -15,6 +16,8 @@ export function ScorelineBox({
   nameA,
   nameB,
   actual,
+  setOrder,
+  tour,
 }: {
   chanceA: number;
   bestOf: 3 | 5;
@@ -22,6 +25,9 @@ export function ScorelineBox({
   nameA: string;
   nameB: string;
   actual: { a: number; b: number } | null;
+  /** Who won each set, in order (1 = A), for a finished match: shows the chance after each set. */
+  setOrder?: (1 | 2)[];
+  tour: "atp" | "wta";
 }) {
   const s = matchScorelines(chanceA, bestOf, params);
   const [lo, hi] = gamesRange(s.games);
@@ -53,6 +59,22 @@ export function ScorelineBox({
           );
         })}
       </ul>
+      {setOrder && setOrder.length > 0 && (
+        <div className="text-sm">
+          <h3 className="text-xs text-muted">{nameA.split(" ").at(-1)}’s chance, set by set</h3>
+          <ol className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 tabular-nums">
+            {setPath(chanceA, bestOf, { ...params, tau: IN_MATCH_TAU[tour] }, setOrder).map((p, i, all) => (
+              <li key={i} className="flex items-center gap-2">
+                <span className={i === all.length - 1 ? "font-semibold" : ""}>
+                  <span className="text-xs text-muted">{i === 0 ? "Start " : `Set ${i} `}</span>
+                  {p >= 0.995 ? (p === 1 ? "won" : "99%+") : p <= 0.005 ? (p === 0 ? "lost" : "<1%") : pct(p)}
+                </span>
+                {i < all.length - 1 && <span aria-hidden className="text-muted">→</span>}
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
       <dl className="grid grid-cols-3 gap-2 text-sm">
         <div>
           <dt className="text-xs text-muted">A tiebreak</dt>

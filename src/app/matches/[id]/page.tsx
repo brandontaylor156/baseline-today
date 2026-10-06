@@ -175,9 +175,15 @@ export default async function MatchPage({ params }: PageProps<"/matches/[id]">) 
           chanceA={m.chanceA}
           bestOf={m.tour === "atp" && /grand slam/i.test(m.category ?? "") ? 5 : 3}
           params={SCORELINE_PARAMS[m.tour]}
+          tour={m.tour}
           nameA={a.name}
           nameB={b.name}
           actual={actualSets(match.sets, m.tour === "atp" && /grand slam/i.test(m.category ?? "") ? 5 : 3)}
+          setOrder={
+            actualSets(match.sets, m.tour === "atp" && /grand slam/i.test(m.category ?? "") ? 5 : 3)
+              ? match.sets.filter((x) => x.p1 !== null && x.p2 !== null && x.p1 !== x.p2).map((x) => (x.p1! > x.p2! ? 1 : 2))
+              : undefined
+          }
         />
       )}
       {m.scheduled && m.chanceA !== null && (
