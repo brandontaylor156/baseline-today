@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { meetingRound } from "../title-odds";
 
-import { drawSection, isPlausibleResult, parseDraw, parseDrawLines, parseScore, type WikiMatch } from "./draw-parse";
+import { cleanRound, drawSection, englishRound, isPlausibleResult, parseDraw, parseDrawLines, parseScore, type WikiMatch } from "./draw-parse";
 import { nameKeys, normalizeName } from "./names";
 
 const fixture = (name: string) => readFileSync(new URL(`../../../test/fixtures/wiki/${name}.wikitext`, import.meta.url), "utf8");
@@ -189,5 +189,28 @@ describe("parseDrawLines", () => {
 
   it("rejects pages without a bracket", () => {
     expect(parseDrawLines(["== Draw ==", "No bracket yet."].join("\n"))).toBeNull();
+  });
+});
+
+describe("cleanRound", () => {
+  it("strips wiki links, templates and run-on parameters", () => {
+    expect(cleanRound("2023 Wimbledon Championships – Men's singles final|Final")).toBe("Final");
+    expect(cleanRound("{{nowrap|Fourth round}}")).toBe("Fourth round");
+    expect(cleanRound("First round|RD4=Quarterfinals")).toBe("First round");
+    expect(cleanRound("[[Final]]")).toBe("Final");
+  });
+
+  it("spells rounds one way", () => {
+    expect(cleanRound("Quarter-finals")).toBe("Quarterfinals");
+    expect(cleanRound("Semi-finals")).toBe("Semifinals");
+    expect(cleanRound("semifinals")).toBe("Semifinals");
+    expect(cleanRound("final")).toBe("Final");
+    expect(cleanRound("Finals")).toBe("Finals");
+    expect(cleanRound("Second round")).toBe("Second round");
+  });
+
+  it("still translates Italian labels", () => {
+    expect(englishRound("{{nowrap|Quarti di finale}}")).toBe("Quarterfinals");
+    expect(englishRound("Finale")).toBe("Final");
   });
 });

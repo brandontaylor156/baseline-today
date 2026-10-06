@@ -180,10 +180,26 @@ const ITALIAN_ROUNDS: [RegExp, string][] = [
   [/^finale$/i, "Final"],
 ];
 
+/**
+ * A round label without wiki markup: "{{nowrap|Fourth round}}" → "Fourth round",
+ * "2023 Wimbledon … final|Final" (a link's target|text) → "Final", a label run into the next
+ * parameter ("First round|RD4=Quarterfinals") → "First round", and "Quarter-finals" → "Quarterfinals".
+ * Keep in step with supabase/migrations/20261006140000_round_labels.sql.
+ */
+export function cleanRound(label: string): string {
+  let s = label.split(/\|\s*RD\d+\s*=/i)[0];
+  s = s.replace(/\{\{[^{}|]*\|([^{}]*)\}\}/g, "$1");
+  if (s.includes("|")) s = s.slice(s.lastIndexOf("|") + 1);
+  s = s.replace(/[[\]{}]/g, "").replace(/\s+/g, " ").trim();
+  s = s.replace(/^quarter-?finals?$/i, "Quarterfinals").replace(/^semi-?finals?$/i, "Semifinals").replace(/^finals?$/i, (m) => (m.length > 5 ? "Finals" : "Final"));
+  return s ? s[0].toUpperCase() + s.slice(1) : s;
+}
+
 /** Round labels in English whatever the page language (so pages dedupe and sort alike). */
 export function englishRound(label: string): string {
-  for (const [re, english] of ITALIAN_ROUNDS) if (re.test(label.trim())) return english;
-  return label;
+  const clean = cleanRound(label);
+  for (const [re, english] of ITALIAN_ROUNDS) if (re.test(clean)) return english;
+  return clean;
 }
 
 /**
