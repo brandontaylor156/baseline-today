@@ -169,8 +169,10 @@ export default async function DrawReportPage({ params }: PageProps<"/tournaments
             <ul className="divide-y divide-border rounded-xl border border-border bg-surface text-sm">
               {s.rows.map((m) => (
                 <li key={`${m.a.key}-${m.b.key}`} className="flex items-center justify-between gap-3 px-3 py-2">
-                  <span className="min-w-0">
-                    <Name p={m.a} /> <span className="text-muted">v</span> <Name p={m.b} />
+                  <span className="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
+                    <Name p={m.a} />
+                    <span className="hidden text-muted sm:inline">v</span>
+                    <Name p={m.b} />
                   </span>
                   <span className="shrink-0 font-semibold tabular-nums">{pct(m.p)}</span>
                 </li>
