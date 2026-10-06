@@ -1,5 +1,14 @@
 [
  {
+  "hash": "fd6649c",
+  "date": "2026-10-06",
+  "subject": "Who's in form; player rating charts per surface for every player",
+  "bullets": [
+   "/lab/form: wins over the last 30/60/90 days against the wins the model expected from each matchup (lab_form, tournaments-first query: 11 ms)",
+   "Player pages chart the weekly rating overall or on hard, clay or grass, from the lab's ratings (every player, not only the 324 with the older rating history)"
+  ]
+ },
+ {
   "hash": "89fb072",
   "date": "2026-10-06",
   "subject": "Research lab: if a Grand Slam started today",

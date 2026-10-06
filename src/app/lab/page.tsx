@@ -18,6 +18,11 @@ const TOOLS = [
     text: "Hundreds of 128-player draws made with real seeding rules, each solved exactly: every player's chance on hard, clay and grass, updated daily.",
   },
   {
+    href: "/lab/greatest",
+    title: "The greatest matches since 2015",
+    text: "Every match scored for strength, drama and stakes: Alcaraz–Sinner at Roland Garros 2025 tops the decade. The best of each season too.",
+  },
+  {
     href: "/lab/form",
     title: "Who’s in form",
     text: "Wins over the last 30, 60 or 90 days against what the model expected from each matchup: the hottest and coldest players right now.",

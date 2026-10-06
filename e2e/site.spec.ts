@@ -687,6 +687,11 @@ test("research lab: luck, time machine, aging and the explorer", async ({ page, 
   await expect(page.getByRole("heading", { level: 1, name: "If a Grand Slam started today" })).toBeVisible();
   await expect(page.getByRole("table", { name: /clay Grand Slam starting today, WTA/ }).locator("tbody tr")).toHaveCount(20);
 
+  await page.goto("/lab/greatest");
+  await expect(page.locator("main ol li")).toHaveCount(50);
+  await page.getByRole("navigation", { name: "Season" }).getByRole("link", { name: "2024" }).click();
+  await expect(page.locator("main ol li")).toHaveCount(10);
+
   await page.goto("/lab/form?days=90");
   await expect(page.getByRole("table", { name: "Hot: winning more than expected" }).locator("tbody tr")).not.toHaveCount(0);
 
