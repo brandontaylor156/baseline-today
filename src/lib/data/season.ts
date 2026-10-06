@@ -32,7 +32,7 @@ type Row = {
 export const getSeasonMatches = cache(async (tour: Tour, season: number): Promise<SeasonMatch[]> => {
   const db = createPublicClient();
   const out: SeasonMatch[] = [];
-  for (let from = 0; ; from += 1000) {
+  for (let from = 0, attempt = 0; ; from += 1000) {
     const { data, error } = await db
       .from("matches")
       .select(
@@ -49,7 +49,14 @@ export const getSeasonMatches = cache(async (tour: Tour, season: number): Promis
       .not("winner_side", "is", null)
       .order("id")
       .range(from, from + 999);
+    // A busy database can cancel a page (statement timeout, 57014): retry it twice before failing.
+    if (error?.code === "57014" && attempt < 2) {
+      attempt++;
+      from -= 1000;
+      continue;
+    }
     if (error) throw new Error(`season matches: ${error.message}`);
+    attempt = 0;
     for (const r of (data ?? []) as unknown as Row[]) {
       const side = (p: Row["p1"], id: number | null, name: string | null, country: string | null) => ({
         key: playerKey(p?.id ?? id, p?.full_name ?? name),
