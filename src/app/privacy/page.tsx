@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Privacy" };
 
-const UPDATED = "2 October 2026";
+const UPDATED = "5 October 2026";
 const REPO = "https://github.com/brandontaylor156/baseline-today";
 
 export default function PrivacyPage() {
@@ -45,10 +45,15 @@ export default function PrivacyPage() {
         </p>
       </Section>
 
-      <Section title="Cookies">
+      <Section title="Cookies and analytics">
         <p>
           When you sign in, we set cookies that keep your session active. They are required for signing in and are not
-          used for tracking. There are no analytics, advertising or third-party tracking cookies.
+          used for tracking. There are no advertising or third-party tracking cookies.
+        </p>
+        <p>
+          We count page views and measure page speed with Vercel Web Analytics and Speed Insights. They use no cookies
+          and don’t identify you: visits are counted with a hash that changes every day, and we see only totals per
+          page, country, browser and device type.
         </p>
       </Section>
 

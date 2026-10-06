@@ -1,5 +1,7 @@
 import { revalidateTag } from "next/cache";
 
+import { sendAlert } from "@/lib/digest";
+import { alertFor } from "@/lib/ops";
 import { notifyFavorites } from "@/lib/push/notify";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { TENNIS_TAG } from "@/lib/supabase/public";
@@ -14,7 +16,12 @@ export const maxDuration = 120;
 // a time, and unchanged Wikipedia pages are never downloaded again.
 export async function GET() {
   const db = createAdminClient();
+  const { data: before } = await db.from("sync_state").select("status").eq("key", "results").maybeSingle();
   const result = await refreshResults(db);
+  if (result.status !== "skipped") {
+    const alert = alertFor("results refresh", before?.status, result.status, result.status === "error" ? result.error : undefined);
+    if (alert) await sendAlert(alert);
+  }
   // New or newly confirmed results: let cached player pages pick them up.
   if (result.status === "ok" && ((result.results ?? 0) > 0 || (result.confirmed ?? 0) > 0)) revalidateTag(TENNIS_TAG, "max");
   // Title chances over time: a snapshot whenever results moved them.

@@ -2,7 +2,8 @@ import { timingSafeEqual } from "node:crypto";
 
 import { revalidateTag } from "next/cache";
 
-import { sendDigest } from "@/lib/digest";
+import { sendAlert, sendDigest } from "@/lib/digest";
+import { JOBS, jobHealth } from "@/lib/ops";
 import { provider } from "@/lib/provider";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { TENNIS_TAG } from "@/lib/supabase/public";
@@ -22,8 +23,18 @@ function authorized(request: Request): boolean {
 export async function GET(request: Request) {
   if (!authorized(request)) return new Response("Unauthorized", { status: 401 });
 
-  const result = await runDailySync(createAdminClient(), provider);
+  const db = createAdminClient();
+  const result = await runDailySync(db, provider);
   console.log(`daily sync: ${JSON.stringify(result)}`);
+  if (result.status === "error") await sendAlert(`⚠️ Baseline Today: daily sync failed: ${result.error}`);
+  if (result.status === "ok" && "error" in result.model) await sendAlert(`⚠️ Baseline Today: rating model failed: ${result.model.error}`);
+  // Watchdog for the 10-minute results job, which runs from Supabase cron and could stop silently.
+  const now = new Date();
+  const { data: results } = await db.from("sync_state").select("key, last_refreshed_at, status").eq("key", "results").maybeSingle();
+  const resultsHealth = jobHealth(results ?? undefined, JOBS.find((j) => j.key === "results")!.staleMinutes, now);
+  if (resultsHealth === "stale" || resultsHealth === "never") {
+    await sendAlert(`⚠️ Baseline Today: results refresh hasn't succeeded since ${results?.last_refreshed_at ?? "ever"}`);
+  }
   // Serve fresh rankings on the next visit instead of waiting out the hourly revalidation.
   if (result.status === "ok") revalidateTag(TENNIS_TAG, "max");
   // Daily digest to chat webhooks, if any are configured.

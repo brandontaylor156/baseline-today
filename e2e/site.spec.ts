@@ -134,7 +134,8 @@ test("privacy page is linked from every page", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "Privacy" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Privacy" })).toBeVisible();
-  await expect(page.getByText("no analytics, advertising or third-party tracking cookies", { exact: false })).toBeVisible();
+  await expect(page.getByText("no advertising or third-party tracking cookies", { exact: false })).toBeVisible();
+  await expect(page.getByText("They use no cookies", { exact: false })).toBeVisible();
 });
 
 test("live scores stay hidden until switched on", async ({ page, request }) => {
@@ -396,4 +397,15 @@ test("watch parties: start from a match, invite links ask to sign in, bad codes 
   await page.goto("/party/ABCD2345");
   await expect(page.getByText("to join this watch party")).toBeVisible();
   expect((await request.get("/party/nope")).status()).toBe(404);
+});
+
+test("status page shows each background job and data freshness, linked from the footer", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "Status" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Status" })).toBeVisible();
+  for (const job of ["Results from Wikipedia", "Daily rankings sync", "Rating model"]) {
+    await expect(page.getByText(job, { exact: true })).toBeVisible();
+  }
+  await expect(page.getByText("ATP rankings")).toBeVisible();
+  await expect(page.getByText(/^(Healthy|Behind|Failing|Not run yet)$/).first()).toBeVisible();
 });
