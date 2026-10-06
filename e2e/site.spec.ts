@@ -753,6 +753,10 @@ test("research lab: luck, time machine, aging and the explorer", async ({ page, 
   await expect(page.getByRole("heading", { level: 1, name: "The win network" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Does prestige predict?" })).toBeVisible();
 
+  await page.goto("/lab/breakthrough");
+  await expect(page.getByRole("heading", { level: 1, name: "Who breaks through next?" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Does it work?" })).toBeVisible();
+
   await page.goto("/lab/forecast?tour=wta&surface=clay");
   await expect(page.getByRole("heading", { level: 1, name: "If a Grand Slam started today" })).toBeVisible();
   await expect(page.getByRole("table", { name: /clay Grand Slam starting today, WTA/ }).locator("tbody tr")).toHaveCount(20);

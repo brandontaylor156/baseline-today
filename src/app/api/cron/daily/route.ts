@@ -10,6 +10,8 @@ import { provider } from "@/lib/provider";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { TENNIS_TAG } from "@/lib/supabase/public";
 import { runDailySync } from "@/lib/sync/daily";
+import { computeBreakthrough } from "@/lib/sync/breakthrough";
+import { importChallengers } from "@/lib/sync/challengers";
 import { syncConditions } from "@/lib/sync/conditions";
 import { computeConditions } from "@/lib/sync/conditions-analysis";
 import { computeDrawAudit } from "@/lib/sync/draw-audit";
@@ -63,7 +65,12 @@ export async function GET(request: Request) {
   const factors =
     now.getUTCDay() === 3
       ? await computeFactors(db, now)
-          .then(async (f) => ({ ...f, fragility: await computeFragility(db, now) }))
+          .then(async (f) => ({
+            ...f,
+            fragility: await computeFragility(db, now),
+            challengers: await importChallengers(db, [now.getUTCFullYear()], now),
+            breakthrough: await computeBreakthrough(db, now),
+          }))
           .catch((err: Error) => `error: ${err.message}`)
       : "weekly";
   // Scoreline checks (a few minutes): Thursdays.

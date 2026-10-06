@@ -803,6 +803,18 @@ export type Database = {
           },
         ]
       }
+      challenger_events: {
+        Row: { article: string | null; checked_at: string; draw_title: string; end_date: string | null; id: number; location: string | null; matches: number; name: string; season: number; start_date: string | null; surface: string | null }
+        Insert: { article?: string | null; checked_at?: string; draw_title: string; end_date?: string | null; id?: number; location?: string | null; matches?: number; name: string; season: number; start_date?: string | null; surface?: string | null }
+        Update: { article?: string | null; checked_at?: string; draw_title?: string; end_date?: string | null; id?: number; location?: string | null; matches?: number; name?: string; season?: number; start_date?: string | null; surface?: string | null }
+        Relationships: []
+      }
+      challenger_matches: {
+        Row: { event_id: number; id: number; player1_country: string | null; player1_name: string; player2_country: string | null; player2_name: string; result_detail: string | null; round: string | null; round_rank: number; set_scores: Json; winner_side: number | null }
+        Insert: { event_id: number; id?: number; player1_country?: string | null; player1_name: string; player2_country?: string | null; player2_name: string; result_detail?: string | null; round?: string | null; round_rank: number; set_scores?: Json; winner_side?: number | null }
+        Update: { event_id?: number; id?: number; player1_country?: string | null; player1_name?: string; player2_country?: string | null; player2_name?: string; result_detail?: string | null; round?: string | null; round_rank?: number; set_scores?: Json; winner_side?: number | null }
+        Relationships: []
+      }
       venues: {
         Row: { checked_at: string; country_code: string | null; elevation: number | null; latitude: number | null; location: string; longitude: number | null; name: string | null; timezone: string | null }
         Insert: { checked_at?: string; country_code?: string | null; elevation?: number | null; latitude?: number | null; location: string; longitude?: number | null; name?: string | null; timezone?: string | null }

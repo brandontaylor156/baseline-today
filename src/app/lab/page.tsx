@@ -13,6 +13,11 @@ export const metadata: Metadata = {
 
 const TOOLS = [
   {
+    href: "/lab/breakthrough",
+    title: "Who breaks through next?",
+    text: "Every ATP Challenger draw on Wikipedia since 2016, replayed with the tour: each prospect’s chance of a tour breakthrough, from a model tested on seasons it never saw.",
+  },
+  {
     href: "/lab/season",
     title: "Season simulator",
     text: "The rest of the season played out thousands of times, every event and draw: each player's chance of the Finals, year-end No. 1 and the top 10. Backtested on 2025.",

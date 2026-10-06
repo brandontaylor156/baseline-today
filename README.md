@@ -81,6 +81,11 @@ set by set) ·
 - **Margin-of-victory Elo:** rating updates scale with the winner's share of games (Kovalchik 2020;
   Angelini et al. 2022). Backtested 2018–2026 with season-ahead calibration: log loss 0.6224 → 0.6195
   (ATP) and 0.6299 → 0.6252 (WTA). Every rating, prediction and lab dataset uses it.
+- **Who breaks through next?** 59,682 ATP Challenger results (1,656 events, 2016–2026) read
+  from Wikipedia draw pages and dated from each event’s article, replayed with every tour result in
+  one margin-of-victory Elo. A logistic model trained on 2017–2022 season starts predicts 10+
+  tour-level wins in the next two seasons; on held-out 2023–2024: AUC 0.918 (rating alone 0.886),
+  calibrated by bin. First breakthroughs and players on the way back, separately.
 - **Season simulator:** the rest of the season played out 2,000 times (entries from each player's
   habits, seeded draws with byes, every match, points won and last year's points dropped, then the
   Finals): chances of qualifying, year-end No. 1 and the top 10, daily. Backtested from three 2025
