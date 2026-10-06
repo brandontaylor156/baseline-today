@@ -80,6 +80,10 @@ real result's set scores, with win chances, calls and chat) ·
   matchup expected.
 - **Results explorer** (any player, any filter, shareable URLs, CSV), a **time machine** for
   cross-era matchups, **aging curves** by the delta method, and **similar players**.
+- **Career comparables:** each player's last two years matched against every earlier player at the
+  same age (birth dates for 1,600+ draw-only players from Wikidata), with a range for the next two
+  years. Backtested from 2021 with only past data: the range holds 58% of outcomes against a 60% aim,
+  and the page says plainly that the middle of it doesn't beat "no change".
 
 **Weekly recaps and open data**
 - **Week in tennis** (`/week/<monday>`): a page for every week with the champions and finals,

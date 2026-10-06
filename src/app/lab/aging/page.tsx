@@ -144,7 +144,13 @@ export default async function AgingPage({ searchParams }: PageProps<"/lab/aging"
         Method: each player’s average rating over each year of age, minus that calendar year’s field average; then the change from one
         age to the next for the same player, averaged over all players with 20+ tracked matches in both years. Players who fade often
         stop playing enough to count, which flattens the late-career decline. Small samples at the youngest and oldest ages; no
-        projection is shown where fewer than 15 players back an age.
+        projection is shown where fewer than 15 players back an age. Ages from player records and Wikidata (CC0).
+      </p>
+      <p className="text-sm">
+        <Link href={`/lab/comparables?tour=${tour}`} className="font-medium text-accent hover:underline">
+          Career comparables →
+        </Link>{" "}
+        <span className="text-muted">the same idea for one player: who was on the same path at the same age, and what they did next.</span>
       </p>
     </div>
   );

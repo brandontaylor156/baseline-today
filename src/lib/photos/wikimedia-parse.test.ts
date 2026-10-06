@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   birthDate,
+  titleItems,
   imageFileName,
   isFreeLicense,
   parseImageInfo,
@@ -73,5 +74,21 @@ describe("Commons parsing", () => {
   it("rejects images without a usable license", () => {
     expect(parseImageInfo({ thumburl: "a", descriptionurl: "b", extmetadata: { LicenseShortName: { value: "Fair use" } } })).toBeNull();
     expect(parseImageInfo(undefined)).toBeNull();
+  });
+});
+
+describe("titleItems", () => {
+  it("follows normalization and redirects, and skips missing pages", () => {
+    const items = titleItems(["rafael nadal", "Rafa Nadal", "Nobody Here"], {
+      query: {
+        normalized: [{ from: "rafael nadal", to: "Rafael nadal" }],
+        redirects: [
+          { from: "Rafael nadal", to: "Rafael Nadal" },
+          { from: "Rafa Nadal", to: "Rafael Nadal" },
+        ],
+        pages: { "1": { title: "Rafael Nadal", pageprops: { wikibase_item: "Q10132" } }, "-1": { title: "Nobody Here", missing: "" } },
+      },
+    });
+    expect(Object.fromEntries(items)).toEqual({ "rafael nadal": "Q10132", "Rafa Nadal": "Q10132" });
   });
 });

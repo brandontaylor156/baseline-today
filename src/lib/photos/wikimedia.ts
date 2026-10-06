@@ -1,12 +1,16 @@
 import "server-only";
 
 import type { Tour } from "@/lib/provider/types";
+import { normalizeName } from "@/lib/wiki/names";
 
 import {
   birthDate,
   imageFileName,
+  isTourPlayer,
   parseImageInfo,
   pickPlayerEntity,
+  titleItems,
+  type TitleQuery,
   type CommonsImageInfo,
   type ParsedImage,
   type WikidataEntity,
@@ -85,4 +89,37 @@ export async function lookupPlayer(fullName: string, tour: Tour, knownWikidataId
 
   const file = imageFileName(entity);
   return { wikidataId: entity.id, birthDate: birthDate(entity), image: file ? await getImage(file) : null };
+}
+
+/**
+ * Birth dates for players known only by name: their Wikipedia article (the draws link it), then the
+ * article's Wikidata item, kept only when it is a tennis player of the tour's sex. A name whose plain
+ * article is someone else gets a second try as "Name (tennis)". Up to 50 names per request.
+ */
+export async function birthDatesByTitle(names: string[], tour: Tour): Promise<Map<string, { wikidataId: string; birthDate: string | null }>> {
+  const out = new Map<string, { wikidataId: string; birthDate: string | null }>();
+  const attempt = async (titles: Map<string, string>) => {
+    for (let i = 0; i < titles.size; i += 50) {
+      const chunk = [...titles.entries()].slice(i, i + 50);
+      const params = new URLSearchParams({ action: "query", format: "json", redirects: "1", prop: "pageprops", ppprop: "wikibase_item", titles: chunk.map(([, t]) => t).join("|") });
+      const items = titleItems(chunk.map(([, t]) => t), await getJson<TitleQuery>(`https://en.wikipedia.org/w/api.php?${params}`));
+      const entities = new Map((await getEntities([...new Set(items.values())])).map((e) => [e.id, e]));
+      for (const [name, title] of chunk) {
+        const entity = entities.get(items.get(title) ?? "");
+        if (entity && isTourPlayer(entity, tour)) out.set(name, { wikidataId: entity.id, birthDate: birthDate(entity) });
+      }
+    }
+  };
+  await attempt(new Map(names.map((n) => [n, n])));
+  await attempt(new Map(names.filter((n) => !out.has(n)).map((n) => [n, `${n} (tennis)`])));
+
+  // Other spellings ("Aslan Karacev"): a Wikidata label or alias that matches the name exactly.
+  for (const name of names.filter((n) => !out.has(n))) {
+    const params = new URLSearchParams({ action: "wbsearchentities", search: name, language: "en", type: "item", limit: "7", format: "json" });
+    const data = await getJson<{ search?: { id: string; match?: { text?: string } }[] }>(`https://www.wikidata.org/w/api.php?${params}`);
+    const exact = (data.search ?? []).filter((r) => normalizeName(r.match?.text ?? "") === normalizeName(name)).map((r) => r.id);
+    const entity = pickPlayerEntity(await getEntities(exact), tour);
+    if (entity) out.set(name, { wikidataId: entity.id, birthDate: birthDate(entity) });
+  }
+  return out;
 }

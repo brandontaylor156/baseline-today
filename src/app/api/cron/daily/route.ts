@@ -13,6 +13,8 @@ import { runDailySync } from "@/lib/sync/daily";
 import { computeForecast } from "@/lib/sync/forecast";
 import { freshPages } from "@/lib/sync/fresh-pages";
 import { computeLab } from "@/lib/sync/lab";
+import { syncPeople } from "@/lib/sync/people";
+import { computeProjections } from "@/lib/sync/projections";
 
 export const maxDuration = 300;
 
@@ -42,6 +44,13 @@ export async function GET(request: Request) {
   }
   // Research lab (rebuilds every draw; about a minute): Mondays, after the week's events finish.
   const lab = now.getUTCDay() === 1 ? await computeLab(db).catch((err: Error) => `error: ${err.message}`) : "weekly";
+  // Career comparables (about a minute, from the lab's ratings): Tuesdays, after new players' birth dates.
+  const projections =
+    now.getUTCDay() === 2
+      ? await syncPeople(db, 200)
+          .then((people) => computeProjections(db, now).then((p) => ({ people, ...p })))
+          .catch((err: Error) => `error: ${err.message}`)
+      : "weekly";
   // "If a major started today" (a few seconds): daily, from today's ratings.
   const forecast = await computeForecast(db, now).catch((err: Error) => `error: ${err.message}`);
   // All-time records (expensive): recomputed once a day into stat_cache.
@@ -56,5 +65,5 @@ export async function GET(request: Request) {
     .catch((err: Error) => `error: ${err.message}`);
   // Bluesky: the upset of the day and, on Mondays, last week's recap (off until the account is set).
   const bluesky = await runBluesky(db, now).catch((err: Error) => `error: ${err.message}`);
-  return Response.json({ ...result, records, lab, forecast, digest, indexnow, bluesky }, { status: result.status === "error" ? 500 : 200 });
+  return Response.json({ ...result, records, lab, projections, forecast, digest, indexnow, bluesky }, { status: result.status === "error" ? 500 : 200 });
 }

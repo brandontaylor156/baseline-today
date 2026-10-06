@@ -87,6 +87,12 @@ export type Database = {
         Update: { gain?: number; other_id?: number | null; other_key?: string; player_id?: number | null; player_key?: string; tour?: string }
         Relationships: []
       }
+      lab_people: {
+        Row: { birth_date: string | null; checked_at: string; country: string | null; name: string; player_key: string; tour: string; wikidata_id: string | null }
+        Insert: { birth_date?: string | null; checked_at?: string; country?: string | null; name: string; player_key: string; tour: string; wikidata_id?: string | null }
+        Update: { birth_date?: string | null; checked_at?: string; country?: string | null; name?: string; player_key?: string; tour?: string; wikidata_id?: string | null }
+        Relationships: []
+      }
       lab_ratings: {
         Row: { clay: number; grass: number; hard: number; matches: number; overall: number; player_id: number | null; player_key: string; tour: string; week: string }
         Insert: { clay: number; grass: number; hard: number; matches: number; overall: number; player_id?: number | null; player_key: string; tour: string; week: string }
@@ -1114,6 +1120,10 @@ export type Database = {
         Args: { p_easiest: boolean; p_limit?: number; p_tour: string }
         Returns: { chance: number; country: string | null; name: string; path_chance: number; player_id: number | null; season: number; tournament: string; tournament_id: number }[]
       }
+      lab_birth_dates: {
+        Args: { p_tour: string }
+        Returns: { birth_date: string; player_key: string }[]
+      }
       lab_form: {
         Args: { p_days?: number; p_min?: number; p_tour: string }
         Returns: { country: string | null; expected: number; last_match: string; matches: number; name: string; player_id: number; wins: number }[]
@@ -1125,6 +1135,10 @@ export type Database = {
       lab_peaks: {
         Args: { p_limit?: number; p_tour: string }
         Returns: { clay: number; country: string | null; grass: number; hard: number; name: string; peak: number; player_id: number; week: string }[]
+      }
+      lab_unlinked_names: {
+        Args: never
+        Returns: { country: string | null; n: number; name: string; tour: string }[]
       }
       lab_title_extremes: {
         Args: { p_champions: boolean; p_limit?: number; p_tour: string }

@@ -63,6 +63,11 @@ const TOOLS = [
     text: "Who a player’s results most resemble: surface strengths, tiebreaks, deciding sets, comebacks, and how they fare as favourite or underdog.",
   },
   {
+    href: "/lab/comparables",
+    title: "Career comparables",
+    text: "Each player's last two years matched against every earlier player at the same age: who was on the same road, what became of them, and a backtested range for what's next.",
+  },
+  {
     href: "/lab/aging",
     title: "Aging curves",
     text: "How much players improve from one age to the next, measured on the same players against their field, and where today’s young players are headed.",

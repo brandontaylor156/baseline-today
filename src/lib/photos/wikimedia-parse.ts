@@ -90,3 +90,26 @@ export function parseImageInfo(info: CommonsImageInfo | undefined): ParsedImage 
     licenseUrl: meta?.LicenseUrl?.value?.trim() || null,
   };
 }
+
+export interface TitleQuery {
+  query?: {
+    normalized?: { from: string; to: string }[];
+    redirects?: { from: string; to: string }[];
+    pages?: Record<string, { title: string; missing?: string; pageprops?: { wikibase_item?: string } }>;
+  };
+}
+
+/** Wikidata item for each requested Wikipedia title, following normalization and redirects. */
+export function titleItems(requested: string[], data: TitleQuery): Map<string, string> {
+  const step = (list: { from: string; to: string }[] | undefined) => new Map((list ?? []).map((x) => [x.from, x.to]));
+  const normalized = step(data.query?.normalized);
+  const redirects = step(data.query?.redirects);
+  const items = new Map(Object.values(data.query?.pages ?? {}).flatMap((p) => (p.pageprops?.wikibase_item ? [[p.title, p.pageprops.wikibase_item] as const] : [])));
+  const out = new Map<string, string>();
+  for (const title of requested) {
+    const n = normalized.get(title) ?? title;
+    const item = items.get(redirects.get(n) ?? n);
+    if (item) out.set(title, item);
+  }
+  return out;
+}
