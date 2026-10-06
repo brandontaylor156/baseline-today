@@ -51,7 +51,10 @@ export default async function TournamentPage({ params }: PageProps<"/tournaments
   const live = model && titleChances(model) ? model : null;
   const history = live ? await getTitleHistory(t.id, live) : null;
 
-  const { data: ident } = await createPublicClient().from("tournaments").select("provider, provider_id").eq("id", t.id).maybeSingle();
+  const [{ data: ident }, { count: drawCount }] = await Promise.all([
+    createPublicClient().from("tournaments").select("provider, provider_id").eq("id", t.id).maybeSingle(),
+    createPublicClient().from("wiki_draws").select("tournament_id", { count: "exact", head: true }).eq("tournament_id", t.id).not("bracket->lines", "is", null),
+  ]);
   const historyPath = ident?.provider === "balldontlie" ? `/history/${eventSlug(t.tour, t.name, ident.provider_id)}` : null;
   const facts = [TOUR_LABEL[t.tour], t.category, t.location ? displayName(t.location.split(",")[0]) : null, t.surface, t.drawSize ? `${t.drawSize}-player draw` : null].filter(Boolean);
 
@@ -81,6 +84,14 @@ export default async function TournamentPage({ params }: PageProps<"/tournaments
               {" · "}
               <Link href={historyPath} className="font-medium text-accent hover:underline">
                 Past winners →
+              </Link>
+            </>
+          )}
+          {(drawCount ?? 0) > 0 && (
+            <>
+              {" · "}
+              <Link href={`/tournaments/${t.id}/draw-report`} className="font-medium text-accent hover:underline">
+                Draw analysis →
               </Link>
             </>
           )}

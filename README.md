@@ -97,6 +97,10 @@ real result's set scores, with win chances, calls and chat) ·
   the model's chance played out point by point with day-to-day form. Checked against 47,000
   completed matches: independent sets underpredicted straight-set wins (27% predicted, 43% real),
   so a match-day form spread was added and tuned; straight sets, tiebreaks and games now calibrate.
+- **Draw analysis** for every bracket (`/tournaments/<id>/draw-report`): each quarter's favourite,
+  the quarter of death and the most open quarter, every seed's draw luck against 200 random draws
+  with the real seeding rules and byes, the likeliest quarterfinals and finals, and the dark horses.
+  New draws are announced to search engines the day they appear.
 - **Career comparables:** each player's last two years matched against every earlier player at the
   same age (birth dates for 1,600+ draw-only players from Wikidata), with a range for the next two
   years. Backtested from 2021 with only past data: the range holds 58% of outcomes against a 60% aim,
