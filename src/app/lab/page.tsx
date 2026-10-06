@@ -13,6 +13,11 @@ export const metadata: Metadata = {
 
 const TOOLS = [
   {
+    href: "/lab/season",
+    title: "Season simulator",
+    text: "The rest of the season played out thousands of times, every event and draw: each player's chance of the Finals, year-end No. 1 and the top 10. Backtested on 2025.",
+  },
+  {
     href: "/lab/forecast",
     title: "If a Grand Slam started today",
     text: "Hundreds of 128-player draws made with real seeding rules, each solved exactly: every player's chance on hard, clay and grass, updated daily.",

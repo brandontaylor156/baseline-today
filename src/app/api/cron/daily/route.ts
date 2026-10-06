@@ -15,6 +15,7 @@ import { freshPages } from "@/lib/sync/fresh-pages";
 import { computeLab } from "@/lib/sync/lab";
 import { syncPeople } from "@/lib/sync/people";
 import { computeProjections } from "@/lib/sync/projections";
+import { computeSeasonOutlook } from "@/lib/sync/season-outlook";
 
 export const maxDuration = 300;
 
@@ -51,6 +52,8 @@ export async function GET(request: Request) {
           .then((people) => computeProjections(db, now).then((p) => ({ people, ...p })))
           .catch((err: Error) => `error: ${err.message}`)
       : "weekly";
+  // The rest of the season simulated (about 20 seconds): daily until the Finals.
+  const season = await computeSeasonOutlook(db, now).catch((err: Error) => `error: ${err.message}`);
   // "If a major started today" (a few seconds): daily, from today's ratings.
   const forecast = await computeForecast(db, now).catch((err: Error) => `error: ${err.message}`);
   // All-time records (expensive): recomputed once a day into stat_cache.
@@ -65,5 +68,5 @@ export async function GET(request: Request) {
     .catch((err: Error) => `error: ${err.message}`);
   // Bluesky: the upset of the day and, on Mondays, last week's recap (off until the account is set).
   const bluesky = await runBluesky(db, now).catch((err: Error) => `error: ${err.message}`);
-  return Response.json({ ...result, records, lab, projections, forecast, digest, indexnow, bluesky }, { status: result.status === "error" ? 500 : 200 });
+  return Response.json({ ...result, records, lab, projections, season, forecast, digest, indexnow, bluesky }, { status: result.status === "error" ? 500 : 200 });
 }

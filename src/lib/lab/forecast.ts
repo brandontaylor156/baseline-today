@@ -4,7 +4,7 @@
 import { lineBracket, reachChances, type Node } from "./bracket";
 
 /** Seeded PRNG (mulberry32) so a forecast is reproducible. */
-function rng(seed: number): () => number {
+export function rng(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
     a = (a + 0x6d2b79f5) >>> 0;
@@ -15,7 +15,7 @@ function rng(seed: number): () => number {
   };
 }
 
-function shuffle<T>(xs: T[], rand: () => number): T[] {
+export function shuffle<T>(xs: T[], rand: () => number): T[] {
   const out = [...xs];
   for (let i = out.length - 1; i > 0; i--) {
     const j = Math.floor(rand() * (i + 1));
@@ -25,7 +25,7 @@ function shuffle<T>(xs: T[], rand: () => number): T[] {
 }
 
 /** Slot order of seed numbers in a standard bracket of `size` (slot i holds seed order[i]). */
-function seedSlots(size: number): number[] {
+export function seedSlots(size: number): number[] {
   let order = [1, 2];
   while (order.length < size) {
     const s = order.length * 2;

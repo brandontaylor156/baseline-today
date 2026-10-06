@@ -80,6 +80,11 @@ real result's set scores, with win chances, calls and chat) ·
   matchup expected.
 - **Results explorer** (any player, any filter, shareable URLs, CSV), a **time machine** for
   cross-era matchups, **aging curves** by the delta method, and **similar players**.
+- **Season simulator:** the rest of the season played out 2,000 times (entries from each player's
+  habits, seeded draws with byes, every match, points won and last year's points dropped, then the
+  Finals): chances of qualifying, year-end No. 1 and the top 10, daily. Backtested from three 2025
+  dates against the real qualifiers (Wikipedia's seeds list): beat "the current top 8 qualify" five
+  times of six and had the year-end No. 1 right each time.
 - **Career comparables:** each player's last two years matched against every earlier player at the
   same age (birth dates for 1,600+ draw-only players from Wikidata), with a range for the next two
   years. Backtested from 2021 with only past data: the range holds 58% of outcomes against a 60% aim,

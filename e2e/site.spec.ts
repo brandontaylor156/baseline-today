@@ -700,6 +700,10 @@ test("research lab: luck, time machine, aging and the explorer", async ({ page, 
   await expect(page.getByRole("table", { name: /closest to/ }).locator("tbody tr")).toHaveCount(10);
   await expect(page.getByRole("heading", { name: "Does it work? The backtest" })).toBeVisible();
 
+  await page.goto("/lab/season");
+  await expect(page.getByRole("heading", { level: 1, name: "Season simulator" })).toBeVisible();
+  await expect(page.getByRole("table", { name: /season simulator/ }).locator("tbody tr")).not.toHaveCount(0);
+
   await page.goto("/lab/forecast?tour=wta&surface=clay");
   await expect(page.getByRole("heading", { level: 1, name: "If a Grand Slam started today" })).toBeVisible();
   await expect(page.getByRole("table", { name: /clay Grand Slam starting today, WTA/ }).locator("tbody tr")).toHaveCount(20);

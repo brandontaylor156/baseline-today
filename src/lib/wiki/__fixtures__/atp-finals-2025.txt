@@ -1,0 +1,159 @@
+==Seeds==
+{{columns-list|colwidth=30em|
+# {{flagicon|ESP}} [[Carlos Alcaraz]] ''(final)''
+# '''{{flagicon|ITA}} [[Jannik Sinner]] (champion)'''
+# {{flagicon|GER}} [[Alexander Zverev]] ''(round robin)''
+# {{flagicon|SRB}} [[Novak Djokovic]] ''(withdrew due to shoulder injury)''
+# {{flagicon|USA}} [[Ben Shelton]]  ''(round robin)''
+# {{flagicon|USA}} [[Taylor Fritz]] ''(round robin)''
+# {{flagicon|AUS}} [[Alex de Minaur]] ''(semifinals)''
+# {{flagicon|CAN}} [[Félix Auger-Aliassime]] ''(semifinals)''
+# {{flagicon|ITA}} [[Lorenzo Musetti]] ''(round robin)''
+}}
+
+==Alternates==
+{{columns-list|colwidth=30em|
+# {{flagicon|KAZ}} [[Alexander Bublik]] ''(did not play)''
+# {{flagicon|NOR}} [[Casper Ruud]] ''(did not play)''
+}}
+
+==Draw==
+{{Draw key}}
+
+===Finals===
+{{4TeamBracket-Tennis3
+|RD1=Semifinals
+|RD2=Final
+
+|team-width=175
+
+|RD1-seed1=1
+|RD1-team1='''{{flagicon|ESP}} [[Carlos Alcaraz]]'''
+|RD1-score1-1='''6'''
+|RD1-score1-2='''6'''
+|RD1-score1-3=
+|RD1-seed2=8
+|RD1-team2={{flagicon|CAN}} [[Félix Auger-Aliassime]]
+|RD1-score2-1=2
+|RD1-score2-2=4
+|RD1-score2-3=
+
+|RD1-seed3=2
+|RD1-team3='''{{flagicon|ITA}} [[Jannik Sinner]]'''
+|RD1-score3-1='''7'''
+|RD1-score3-2='''6'''
+|RD1-score3-3=
+|RD1-seed4=7
+|RD1-team4={{flagicon|AUS}} [[Alex de Minaur]]
+|RD1-score4-1=5
+|RD1-score4-2=2
+|RD1-score4-3=
+
+|RD2-seed1=1
+|RD2-team1={{flagicon|ESP}} [[Carlos Alcaraz]]
+|RD2-score1-1=6<sup>4</sup>
+|RD2-score1-2=5
+|RD2-score1-3=
+|RD2-seed2=2
+|RD2-team2='''{{flagicon|ITA}} [[Jannik Sinner]]'''
+|RD2-score2-1='''7<sup>7</sup>'''
+|RD2-score2-2='''7'''
+|RD2-score2-3=
+}}
+
+===[[Jimmy Connors]] Group===
+<!--Use this template {{twlp|W=0|L=0|dec=0}} to automatically calculate the percentage of sets and games won, using W for wins and L for losses.-->
+{{4TeamRR-TennisWide
+| title-1=
+|title-2=RR<br />{{nowrap|W–L}}
+|title-3=Set<br />W–L
+|title-4=Game<br />W–L
+|title-5=Standings
+
+| seed-1=1
+| team-1-abbrev='''{{flagicon|ESP}} [[Carlos Alcaraz|Alcaraz]]'''
+| team-1='''{{nowrap|{{flagicon|ESP}} [[Carlos Alcaraz]]}}'''
+| match-w/l-1='''3–0'''
+| set-w/l-1='''{{twlp|W=6|L=1|dec=0}}'''
+| game-w/l-1='''{{twlp|W=44|L=28|dec=0}}'''
+| standings-1='''1'''
+
+| seed-2=6
+| team-2-abbrev={{flagicon|USA}} [[Taylor Fritz|Fritz]]
+| team-2={{flagicon|USA}} [[Taylor Fritz]]
+| match-w/l-2=1–2
+| set-w/l-2={{twlp|W=3|L=4|dec=0}}
+| game-w/l-2={{twlp|W=36|L=39|dec=0}}
+| standings-2=3
+
+| seed-3=7
+| team-3-abbrev='''{{flagicon|AUS}} [[Alex de Minaur|de Minaur]]'''
+| team-3='''{{flagicon|AUS}} [[Alex de Minaur]]'''
+| match-w/l-3='''1–2'''
+| set-w/l-3='''{{twlp|W=3|L=4|dec=0}}'''
+| game-w/l-3='''{{twlp|W=37|L=39|dec=0}}'''
+| standings-3='''2'''
+
+| seed-4=9
+| team-4-abbrev={{flagicon|ITA}} [[Lorenzo Musetti|Musetti]]
+| team-4={{flagicon|ITA}} [[Lorenzo Musetti]]
+| match-w/l-4=1–2
+| set-w/l-4={{twlp|W=2|L=5|dec=0}}
+| game-w/l-4={{twlp|W=29|L=40|dec=0}}
+| standings-4=4
+
+|color-row-1= |1v2='''6–7<sup>(2–7)</sup>, 7–5, 6–3''' |1v3='''7–6<sup>(7–5)</sup>, 6–2''' |1v4='''6–4, 6–1'''
+|color-row-2= |2v1=7–6<sup>(7–2)</sup>, 5–7, 3–6  |2v3=6–7<sup>(3–7)</sup>, 3–6 |2v4='''6–3, 6–4'''
+|color-row-3= |3v1=6–7<sup>(5–7)</sup>, 2–6 |3v2='''7–6<sup>(7–3)</sup>, 6–3''' |3v4=5–7, 6–3, 5–7
+|color-row-4= |4v1=4–6, 1–6 |4v2=3–6, 4–6 |4v3='''7–5, 3–6, 7–5'''
+}}
+
+===[[Björn Borg]] Group===
+<!--Use this template {{twlp|W=0|L=0|dec=0}} to automatically calculate the percentage of sets and games won, using W for wins and L for losses.-->
+{{4TeamRR-TennisWide
+| title-1=
+|title-2=RR<br />{{nowrap|W–L}}
+|title-3=Set<br />W–L
+|title-4=Game<br />W–L
+|title-5=Standings
+
+| seed-1=2
+| team-1-abbrev='''{{flagicon|ITA}} [[Jannik Sinner|Sinner]]'''
+| team-1='''{{nowrap|{{flagicon|ITA}} [[Jannik Sinner]]}}'''
+| match-w/l-1='''3–0'''
+| set-w/l-1='''{{twlp|W=6|L=0|dec=0}}'''
+| game-w/l-1='''{{twlp|W=38|L=22|dec=0}}'''
+| standings-1='''1'''
+
+| seed-2=3
+| team-2-abbrev={{flagicon|GER}} [[Alexander Zverev|Zverev]] 
+| team-2={{flagicon|GER}} [[Alexander Zverev]]
+| match-w/l-2=1–2
+| set-w/l-2={{twlp|W=2|L=4|dec=0}}
+| game-w/l-2={{twlp|W=30|L=34|dec=0}}
+| standings-2=3
+
+| seed-3=5
+| team-3-abbrev={{flagicon|USA}} [[Ben Shelton|Shelton]]
+| team-3={{flagicon|USA}} [[Ben Shelton]]
+| match-w/l-3=0–3
+| set-w/l-3={{twlp|W=1|L=6|dec=0}}
+| game-w/l-3={{twlp|W=35|L=44|dec=0}}
+| standings-3=4
+
+| seed-4=8
+| team-4-abbrev='''{{flagicon|CAN}} [[Félix Auger-Aliassime|Auger-Aliassime]]'''
+| team-4='''{{flagicon|CAN}} [[Félix Auger-Aliassime]]'''
+| match-w/l-4='''2–1'''
+| set-w/l-4='''{{twlp|W=4|L=3|dec=0}}'''
+| game-w/l-4='''{{twlp|W=37|L=40|dec=0}}'''
+| standings-4='''2'''
+
+|color-row-1= |1v2='''6–4, 6–3''' |1v3='''6–3, 7–6<sup>(7–3)</sup>''' |1v4='''7–5, 6–1'''
+|color-row-2= |2v1=4–6, 3–6 |2v3='''6–3, 7–6<sup>(8–6)</sup>''' |2v4=4–6, 6–7<sup>(4–7)</sup>
+|color-row-3= |3v1=3–6, 6–7<sup>(3–7)</sup> |3v2=3–6, 6–7<sup>(6–8)</sup> |3v4=6–4, 6–7<sup>(7–9)</sup>, 5–7
+|color-row-4= |4v1=5–7, 1–6 |4v2='''6–4, 7–6<sup>(7–4)</sup>''' |4v3='''4–6, 7–6<sup>(9–7)</sup>, 7–5'''
+}}
+
+<small>''Standings are determined by: 1. number of wins; 2. number of matches; 3. in two-player ties, head-to-head records; 4. in three-player ties, (a) percentage of sets won (head-to-head records if two players remain tied), then (b) percentage of games won (head-to-head records if two players remain tied), then (c) ATP rankings.''</small>
+

@@ -803,6 +803,12 @@ export type Database = {
           },
         ]
       }
+      season_odds: {
+        Row: { day: string; finals: number; no1: number; player_id: number; top10: number; tour: string }
+        Insert: { day: string; finals: number; no1: number; player_id: number; top10: number; tour: string }
+        Update: { day?: string; finals?: number; no1?: number; player_id?: number; top10?: number; tour?: string }
+        Relationships: []
+      }
       stat_cache: {
         Row: { data: Json; key: string; updated_at: string }
         Insert: { data: Json; key: string; updated_at?: string }

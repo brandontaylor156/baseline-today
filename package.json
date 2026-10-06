@@ -28,6 +28,7 @@
     "changelog": "node scripts/changelog.mjs",
     "lab:compute": "tsx --env-file=.env.local --conditions=react-server scripts/lab-compute.mts",
     "forecast": "tsx --env-file=.env.local --conditions=react-server scripts/forecast.mts",
+    "season": "tsx --env-file=.env.local --conditions=react-server scripts/season-outlook.mts",
     "projections": "tsx --env-file=.env.local --conditions=react-server scripts/projections.mts",
     "sync:people": "tsx --env-file=.env.local --conditions=react-server scripts/sync-people.mts"
   },

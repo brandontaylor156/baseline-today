@@ -7,6 +7,8 @@ import { getSeasonTournaments } from "@/lib/data/tournaments";
 import { isTour, TOUR_LABEL } from "@/lib/format";
 import { countsForRace, resultsWorth } from "@/lib/points";
 import { TOURS, type Tour } from "@/lib/provider/types";
+import { createPublicClient } from "@/lib/supabase/public";
+import type { SeasonOutlookCache } from "@/lib/sync/season-outlook";
 
 export const metadata: Metadata = {
   title: "Season race",
@@ -27,7 +29,15 @@ export default async function RacePage({ searchParams }: PageProps<"/race">) {
   const q = await searchParams;
   const tour = typeof q.tour === "string" && isTour(q.tour) ? q.tour : "atp";
   const season = new Date().getUTCFullYear();
-  const [{ rows, live, events, qualify, weeksLeft }, calendar] = await Promise.all([getRace(tour, season), getSeasonTournaments(season)]);
+  const [{ rows, live, events, qualify: rough, weeksLeft }, calendar, { data: sim }] = await Promise.all([
+    getRace(tour, season),
+    getSeasonTournaments(season),
+    createPublicClient().from("stat_cache").select("data").eq("key", `season:${tour}`).maybeSingle(),
+  ]);
+  // The season simulator's chances when it has run this season; the rough estimate otherwise.
+  const outlook = sim?.data as unknown as SeasonOutlookCache | undefined;
+  const simulated = outlook?.season === season && rough !== null ? new Map(outlook.players.map((p) => [`id:${p.id}`, p.finals])) : null;
+  const qualify = simulated ?? rough;
   // What it takes: the gap to the last qualifying place, against the events still to start.
   const today = new Date().toISOString().slice(0, 10);
   const finalsStart = calendar.find((t) => t.tour === tour && /finals/i.test(t.category ?? ""))?.startDate ?? `${season}-11-08`;
@@ -162,7 +172,16 @@ export default async function RacePage({ searchParams }: PageProps<"/race">) {
           The dashed line marks the {SPOTS} qualifying places. Projected adds each player’s expected points from the {live} tournament
           {live === 1 ? "" : "s"} in progress, using our model’s chances to go further.
         </p>
-        {qualify && (
+        {simulated && (
+          <p>
+            Finals chance: from the{" "}
+            <Link href={`/lab/season?tour=${tour}`} className="underline hover:text-foreground">
+              season simulator
+            </Link>
+            , which plays out every remaining event on the calendar {outlook!.sims.toLocaleString("en-US")} times from the model’s ratings.
+          </p>
+        )}
+        {qualify && !simulated && (
           <p>
             Finals chance: how often a player finishes in the top {SPOTS} across 4,000 simulated finishes to the season ({weeksLeft}{" "}
             week{weeksLeft === 1 ? "" : "s"} left). Events in progress end according to our model; after that, each player keeps

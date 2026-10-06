@@ -46,8 +46,10 @@ export function roundNumber(label: string | null, rounds: number): number {
   return n >= 0 ? n + 1 : 0;
 }
 
-export function raceTable(matches: SeasonMatch[], events: Map<number, RaceEvent>, live: Map<number, LiveDraw>): RaceRow[] {
-  type Run = { first: number; last: number; wonLast: boolean };
+type Run = { first: number; last: number; wonLast: boolean };
+
+/** Each player's run in each event: first and last round played, and whether they won the last. */
+function collectRuns(matches: SeasonMatch[], events: Map<number, RaceEvent>) {
   const runs = new Map<string, Map<number, Run>>();
   const info = new Map<string, { id: number | null; name: string; country: string | null }>();
 
@@ -69,6 +71,28 @@ export function raceTable(matches: SeasonMatch[], events: Map<number, RaceEvent>
       runs.set(p.key, byEvent);
     }
   }
+  return { runs, info };
+}
+
+/** Wins in a run (rounds before the last one played, plus the last if won; robust to gaps and byes). */
+const runWins = (run: Run) => (run.last === 0 ? 0 : run.last - 1 + (run.wonLast ? 1 : 0));
+
+/** Points each player earned in each event (by tournament id). */
+export function eventPoints(matches: SeasonMatch[], events: Map<number, RaceEvent>): Map<string, Map<number, number>> {
+  const { runs } = collectRuns(matches, events);
+  return new Map(
+    [...runs].map(([key, byEvent]) => [
+      key,
+      new Map([...byEvent].map(([tid, run]) => {
+        const ev = events.get(tid)!;
+        return [tid, pointsFor(ev.tour, ev.category, ev.rounds, runWins(run), run.first === 2)] as const;
+      })),
+    ]),
+  );
+}
+
+export function raceTable(matches: SeasonMatch[], events: Map<number, RaceEvent>, live: Map<number, LiveDraw>): RaceRow[] {
+  const { runs, info } = collectRuns(matches, events);
   // Players in live draws who haven't played yet.
   for (const [tid, draw] of live) {
     for (const p of draw.players) {
@@ -88,8 +112,7 @@ export function raceTable(matches: SeasonMatch[], events: Map<number, RaceEvent>
     let liveBanked = 0;
     for (const [tid, run] of byEvent) {
       const ev = events.get(tid)!;
-      // Wins: rounds before the last one played, plus the last if won (robust to gaps and byes).
-      const wins = run.last === 0 ? 0 : run.last - 1 + (run.wonLast ? 1 : 0);
+      const wins = runWins(run);
       const hadBye = run.first === 2;
       const reach = live.get(tid)?.reach.get(key);
       const alive = reach !== undefined && (reach.at(-1) ?? 0) > 0 && run.wonLast;
