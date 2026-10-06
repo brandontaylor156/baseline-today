@@ -1,5 +1,18 @@
 [
  {
+  "hash": "3caef5a",
+  "date": "2026-10-06",
+  "subject": "Batch 2: records, tournament history, season reviews, race maths, betting maths, API",
+  "bullets": [
+   "/records: all-time records since 2015 per tour (titles overall and by surface, finals, winning streaks, youngest/oldest champions, biggest final upsets, tiebreaks, comebacks, 6-0 sets), computed daily into stat_cache",
+   "/history and /history/<tour>-<event>-<id>: every event's champions and finals since 2015, most titles there, biggest upsets; linked from each tournament page; ItemList structured data",
+   "/players/<id>/season/<year>: season reviews with best wins, toughest losses, splits, ranking path and every tournament",
+   "Race: \"what it takes\" to reach the top 8, as single results at the events still to play (resultsWorth)",
+   "/tools/betting: odds formats, implied chance, margin and fair odds, expected value against the model or your own chance, Kelly (fractional), parlays and arbitrage, with 18+ and problem-gambling help; linked from match pages",
+   "Public JSON API: /api/v1/players, /h2h, /title-odds/<id>, /upsets (CORS, cached, license in every response), documented on /data"
+  ]
+ },
+ {
   "hash": "7f951c6",
   "date": "2026-10-06",
   "subject": "Fix round labels with wiki markup (8 men's Grand Slam finals weren't titles)",

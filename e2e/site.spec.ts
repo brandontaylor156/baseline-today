@@ -320,7 +320,8 @@ test("title chances on a tournament in progress", async ({ page }) => {
 
 test("pick'em: open matches, leaderboards, sign-in prompt", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Pick’em" }).click();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Play" }).click();
+  await page.getByRole("main").getByRole("link", { name: "Pick’em" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Pick’em" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "This week" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Sign in with Google" })).toBeVisible();
@@ -619,4 +620,23 @@ test("public JSON API", async ({ request }) => {
   expect(body.data.modelChanceA.all).toBeGreaterThan(0);
   expect((await request.get("/api/v1/h2h?a=4")).status()).toBe(400);
   expect((await (await request.get("/api/v1/upsets?days=7")).json()).data).toBeInstanceOf(Array);
+});
+
+test("daily puzzle: a wrong guess gets feedback, the answer stays on the server", async ({ page, request }) => {
+  await page.goto("/play");
+  await expect(page.getByRole("heading", { name: /^Guess the player #\d+$/ })).toBeVisible();
+  const meta = await (await request.get("/api/puzzle")).json();
+  expect(meta).toMatchObject({ number: expect.any(Number), tour: expect.stringMatching(/^(atp|wta)$/) });
+  expect(JSON.stringify(meta)).not.toContain("answer");
+  // Guess someone from the right tour via the API, then check the page renders a row.
+  const name = meta.tour === "atp" ? "zverev" : "gauff";
+  const [player] = (await (await request.get(`/api/search?q=${name}`)).json()) as { id: number }[];
+  const res = await request.post("/api/puzzle", { data: { day: meta.day, playerId: player.id } });
+  const body = await res.json();
+  expect(body.feedback).toHaveProperty("country");
+  expect(body.answer === undefined).toBe(!body.feedback.correct);
+  expect((await request.post("/api/puzzle", { data: { day: "2020-01-01", playerId: 1 } })).status()).toBe(400);
+  await page.getByLabel(/^Guess 1 of 6$/).fill(name);
+  await page.getByRole("button", { name: new RegExp(name, "i") }).first().click();
+  await expect(page.getByRole("table", { name: /Your guesses/ })).toBeVisible();
 });

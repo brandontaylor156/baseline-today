@@ -31,8 +31,8 @@ export function SiteHeader() {
           <Link href="/stats" className="rounded-md px-1.5 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground sm:px-2.5 lg:px-2">
             Stats
           </Link>
-          <Link href="/pickem" className="rounded-md px-1.5 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground sm:px-2.5 lg:px-2">
-            Pick’em
+          <Link href="/play" className="rounded-md px-1.5 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground sm:px-2.5 lg:px-2">
+            Play
           </Link>
           <Link href="/rankings/atp" className="rounded-md px-1.5 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground sm:px-2.5 lg:px-2">
             Rankings
