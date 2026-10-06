@@ -15,6 +15,7 @@ import { calendarSections, dateRange, displayName, getSeasonTournaments } from "
 import { formatPoints, TOUR_LABEL } from "@/lib/format";
 import { upsets } from "@/lib/leaders";
 import { TOURS, type Tour } from "@/lib/provider/types";
+import { createPublicClient } from "@/lib/supabase/public";
 
 export const revalidate = 900;
 
@@ -64,7 +65,12 @@ export default async function Home() {
   const rankings = { atp: rest[0] as RankingRow[], wta: rest[1] as RankingRow[] };
   const seasonMatches = [...(rest[2] as Awaited<ReturnType<typeof getSeasonMatches>>), ...(rest[3] as Awaited<ReturnType<typeof getSeasonMatches>>)];
   const { now: thisWeek } = calendarSections(tournaments, today);
-  const [record, onThisDay] = await Promise.all([getTrackRecord(), getFinalsOnDay(now.getUTCMonth() + 1, now.getUTCDate())]);
+  const [record, onThisDay, { data: pairs }] = await Promise.all([
+    getTrackRecord(),
+    getFinalsOnDay(now.getUTCMonth() + 1, now.getUTCDate()),
+    createPublicClient().rpc("lab_denied_pairs", { p_tour: "atp", p_limit: 1 }),
+  ]);
+  const topPair = pairs?.[0] ?? null;
   const favorites = new Map(
     await Promise.all(thisWeek.map(async (t) => [t.id, t.champion ? null : ((await getTitleOdds(t.id))?.players[0] ?? null)] as const)),
   );
@@ -92,6 +98,16 @@ export default async function Home() {
           </Link>
         </p>
       </header>
+
+      {topPair && (
+        <Link href="/lab" className="block rounded-xl border border-accent/50 bg-accent-soft p-4 hover:border-accent">
+          <span className="text-xs font-semibold uppercase tracking-wide text-accent">Research lab</span>
+          <span className="mt-1 block font-semibold">
+            Every draw since 2015, replayed: {topPair.player} cost {topPair.other} {topPair.gain.toFixed(1)} titles.
+          </span>
+          <span className="block text-sm text-muted">Expected vs actual titles, the greatest matches, a Grand Slam forecast for today and more →</span>
+        </Link>
+      )}
 
       {thisWeek.length > 0 && (
         <section aria-labelledby="week-heading" className="space-y-2">
