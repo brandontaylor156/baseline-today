@@ -105,13 +105,13 @@ export default async function StatsPage({ searchParams }: PageProps<"/stats">) {
             return (
               <li key={m.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3">
                 <span className="w-12 shrink-0 font-semibold tabular-nums text-accent">{Math.round(winnerChance * 100)}%</span>
-                <span className="min-w-0 flex-1">
-                  <span className="flex flex-wrap items-center gap-x-1.5">
+                <span className="flex min-w-0 flex-1 flex-col gap-2">
+                  <span className="flex flex-wrap items-center gap-x-1.5 gap-y-2">
                     <PlayerName id={winner.id} name={winner.name} country={winner.country} />
                     <span className="text-muted">beat</span>
                     <PlayerName id={loser.id} name={loser.name} country={loser.country} />
                   </span>
-                  <Link href={`/tournaments/${m.tournamentId}`} className="text-xs text-muted hover:underline">
+                  <Link href={`/tournaments/${m.tournamentId}`} className="self-start text-xs text-muted hover:underline">
                     {displayName(m.tournamentName)}
                     {m.round ? ` · ${m.round}` : ""}
                   </Link>

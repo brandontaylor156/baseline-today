@@ -1,0 +1,28 @@
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test } from "@playwright/test";
+
+// Automated accessibility check (axe, WCAG 2.2 A and AA) of the main pages, in light and dark mode.
+const PAGES = ["/", "/rankings/atp", "/results", "/tournaments", "/odds", "/pickem", "/leagues", "/party/demo", "/status", "/search?q=sinner", "/h2h", "/stats", "/privacy"];
+
+for (const scheme of ["light", "dark"] as const) {
+  test.describe(`accessibility (${scheme})`, () => {
+    test.use({ colorScheme: scheme });
+    for (const path of PAGES) {
+      test(path, async ({ page }) => {
+        await page.goto(path);
+        await page.waitForLoadState("networkidle");
+        const { violations } = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
+        const summary = violations.map((v) => `${v.id} (${v.impact}): ${v.nodes.length}× ${v.nodes[0]?.target.join(" ")} – ${v.help}`);
+        expect(summary).toEqual([]);
+      });
+    }
+  });
+}
+
+test("a player page passes axe", async ({ page }) => {
+  await page.goto("/rankings/atp");
+  await page.locator('a[href^="/players/"]').first().click();
+  await page.waitForLoadState("networkidle");
+  const { violations } = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
+  expect(violations.map((v) => `${v.id}: ${v.nodes.length}× ${v.nodes[0]?.target.join(" ")}`)).toEqual([]);
+});

@@ -17,7 +17,7 @@ export function PlayerTimeline({ rows, year }: { rows: TimelineRow[]; year: numb
         {rows.map((r) => (
           <li key={r.tournamentId} className="flex items-center gap-3 py-2">
             <span className="w-9 shrink-0 text-xs text-muted">{month(r.date)}</span>
-            <span className="min-w-0 flex-1">
+            <span className="flex min-w-0 flex-1 flex-col gap-1.5">
               <Link href={`/tournaments/${r.tournamentId}`} className="block truncate font-medium hover:underline">
                 {titleCase(r.name)}
               </Link>
