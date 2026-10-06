@@ -5,10 +5,13 @@ import { PlayerAvatar } from "@/components/player-avatar";
 import { PlayerResults } from "@/components/player-results";
 import { RankRaceChart } from "@/components/rank-race-chart";
 import { WikiCredit } from "@/components/wiki-credit";
+import { EdgeChart } from "@/components/edge-chart";
 import { getHeadToHead } from "@/lib/data/h2h";
-import { predictPair } from "@/lib/data/predictions";
+import { getRatingWeeks } from "@/lib/data/lab";
+import { getModelInfo, predictPair } from "@/lib/data/predictions";
 import { getRankingDates, type PlayerDetail } from "@/lib/data/tennis";
 import { TOUR_LABEL } from "@/lib/format";
+import { edgeOverTime } from "@/lib/lab/edge";
 import { h2hPath } from "@/lib/slug";
 
 /** Share card, title and canonical URL for a valid pair. */
@@ -40,10 +43,21 @@ function Side({ player, wins, align }: { player: PlayerDetail; wins: number; ali
 
 /** Record, ranking race, model chances and every meeting for two players of the same tour. */
 export async function H2HContent({ a, b }: { a: PlayerDetail; b: PlayerDetail }) {
-  const [h2h, ...model] = await Promise.all([
+  const [h2h, weeksA, weeksB, info, ...model] = await Promise.all([
     getHeadToHead(a.id, b.id),
+    getRatingWeeks(a.id),
+    getRatingWeeks(b.id),
+    getModelInfo(),
     ...(["Hard", "Clay", "Grass"] as const).map((s) => predictPair(a.tour, a.id, b.id, s)),
   ]);
+  const edge = edgeOverTime(weeksA, weeksB, info.calibration[a.tour] ?? 1);
+  const meetings = h2h.meetings
+    .filter((m) => m.resultDetail !== "walkover" && m.winner !== null && m.tournamentStart)
+    .map((m) => ({
+      date: m.tournamentStart!,
+      aWon: (m.winner === 1 ? m.player1 : m.player2)?.id === a.id,
+      label: `${m.tournament.name}${m.round ? `, ${m.round}` : ""}`,
+    }));
   const predictions = (model as ({ p: number; minMatches: number } | null)[]).map((p, i) => ({ surface: ["Hard", "Clay", "Grass"][i], p }));
   return (
     <>
@@ -66,6 +80,15 @@ export async function H2HContent({ a, b }: { a: PlayerDetail; b: PlayerDetail })
           </dl>
         )}
       </section>
+
+      {edge.length > 8 && (
+        <section aria-labelledby="edge-heading" className="rounded-xl border border-border bg-surface p-4 sm:p-5">
+          <h2 id="edge-heading" className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">
+            {a.fullName}’s edge over time
+          </h2>
+          <EdgeChart points={edge} meetings={meetings} nameA={a.fullName} nameB={b.fullName} />
+        </section>
+      )}
 
       {(a.history.length > 1 || b.history.length > 1) && (
         <section aria-labelledby="race-heading" className="rounded-xl border border-border bg-surface p-4 sm:p-5">

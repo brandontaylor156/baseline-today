@@ -469,6 +469,9 @@ test("readable head-to-head addresses: biggest rivalries, redirects and structur
   expect((await request.get("/h2h/nope")).status()).toBe(404);
   await rivalry.click();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", new RegExp(`${href}$`));
+  // Big rivalries chart who has had the edge, with their meetings marked.
+  await expect(page.getByRole("heading", { name: /’s edge over time$/ })).toBeVisible();
+  await expect(page.getByRole("img", { name: /chance against .* by week/ })).toBeVisible();
 });
 
 test("structured data on player, match and tournament pages", async ({ page }) => {
