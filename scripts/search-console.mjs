@@ -22,14 +22,16 @@ const SCOPES = [
   "https://www.googleapis.com/auth/webmasters",
 ];
 
-function gcloudPath() {
+/** [command, args] for gcloud. On Windows it's a .cmd under "Cloud SDK": run it via cmd.exe so Node quotes the path. */
+function gcloud(args) {
+  if (!win) return ["gcloud", args];
   const local = join(process.env.LOCALAPPDATA ?? "", "Google", "Cloud SDK", "google-cloud-sdk", "bin", "gcloud.cmd");
-  return win && existsSync(local) ? local : "gcloud";
+  return ["cmd.exe", ["/d", "/c", existsSync(local) ? local : "gcloud", ...args]];
 }
 
 function token() {
   try {
-    return execFileSync(gcloudPath(), ["auth", "application-default", "print-access-token"], { encoding: "utf8", shell: win, stdio: ["ignore", "pipe", "pipe"] }).trim();
+    return execFileSync(...gcloud(["auth", "application-default", "print-access-token"]), { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
   } catch {
     console.error("✗ Not signed in. Run: npm run search -- login");
     process.exit(1);
@@ -163,7 +165,7 @@ async function inspect(path = "/") {
 
 const [cmd, ...rest] = process.argv.slice(2);
 function login() {
-  const r = spawnSync(gcloudPath(), ["auth", "application-default", "login", `--scopes=${SCOPES.join(",")}`], { shell: win, stdio: "inherit" });
+  const r = spawnSync(...gcloud(["auth", "application-default", "login", `--scopes=${SCOPES.join(",")}`]), { stdio: "inherit" });
   if (r.status === 0) console.log("\n✓ Signed in. Tell Claude, or run: npm run search -- setup");
   process.exit(r.status ?? 1);
 }
