@@ -172,6 +172,7 @@ npm run dev
 | `npm run audit:draws` | re-check every tournament → draw page pairing (`--fix` to hide and rediscover) |
 | `npm run model:backtest` | score the model on a held-out season |
 | `npm run bluesky:preview` | print what the Bluesky bot would post today (posts nothing) |
+| `npm run setup` | guided setup for the account-based switches: Discord webhook, Bluesky bot, Bing, Discord bot |
 | `npm run search -- setup` · `status` · `report` · `inspect /path` | Google Search Console from the terminal (after `npm run search -- login`) |
 
 Database schema: `supabase/migrations/` (idempotent SQL). Live scores depend on a paid data plan

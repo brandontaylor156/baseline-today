@@ -56,10 +56,10 @@ export interface BotPost {
   link: { path: string; title: string; description: string; image: string };
 }
 
-async function publish(session: Session, post: BotPost): Promise<void> {
+async function publish(session: Session, post: BotPost): Promise<{ uri: string; cid: string }> {
   const text = clip300(post.text);
   const image = await thumb(session, post.link.image);
-  await xrpc(
+  return xrpc<{ uri: string; cid: string }>(
     "com.atproto.repo.createRecord",
     JSON.stringify({
       repo: session.did,
@@ -165,6 +165,31 @@ export async function ensureBotProfile(session: Session): Promise<boolean> {
     session,
   );
   return true;
+}
+
+export const BOT_INTRO =
+  "Hi! I'm an automated account 🤖. I post the day's biggest tennis upset and a weekly recap of champions and ranking movers. A human reads the replies. The site is free and ad-free: title chances for every draw, head-to-heads since 2015, and a pick'em where you can try to beat the model. #tennis";
+
+/** Posts the intro and pins it to the profile (run once at setup, only when asked). */
+export async function postIntro(): Promise<string> {
+  if (!blueskyEnabled()) return "off: set BLUESKY_HANDLE and BLUESKY_APP_PASSWORD";
+  const session = await login();
+  await ensureBotProfile(session);
+  const ref = await publish(session, {
+    key: "intro",
+    text: BOT_INTRO,
+    link: { path: "/", title: "Baseline Today", description: "Tennis rankings, results, title chances and head-to-heads.", image: "/opengraph-image" },
+  });
+  const res = await fetch(`${PDS}/com.atproto.repo.getRecord?repo=${encodeURIComponent(session.did)}&collection=app.bsky.actor.profile&rkey=self`, {
+    headers: { Authorization: `Bearer ${session.accessJwt}` },
+  });
+  const current = res.ok ? (((await res.json()) as { value?: Record<string, unknown> }).value ?? {}) : {};
+  await xrpc(
+    "com.atproto.repo.putRecord",
+    JSON.stringify({ repo: session.did, collection: "app.bsky.actor.profile", rkey: "self", record: { ...current, $type: "app.bsky.actor.profile", pinnedPost: ref } }),
+    session,
+  );
+  return "intro posted and pinned";
 }
 
 /** Logs in and labels the profile; used at setup so the account is marked before its first post. */
