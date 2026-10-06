@@ -4,6 +4,8 @@
 // home soil. A logistic regression on top of the model's chance says what each is worth, in rating
 // points, with an error bar; a holdout says whether they improve predictions at all.
 
+import { playingDays } from "./comebacks";
+
 export interface FactorMatch {
   key1: string;
   key2: string;
@@ -45,8 +47,6 @@ export interface FactorRow {
   date: string;
 }
 
-const DAY = 86_400_000;
-const days = (a: string, b: string) => (Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / DAY;
 
 interface EventState {
   tournamentId: number;
@@ -76,12 +76,12 @@ export function factorRows(matches: FactorMatch[]): FactorRow[] {
   };
 
   const features = (key: string, now: EventState, prev: EventState | undefined, country: string | null, m: FactorMatch) => {
-    const gap = prev ? days(prev.startDate, m.startDate) : Infinity;
+    const gap = prev ? (Date.parse(`${m.startDate}T00:00:00Z`) - Date.parse(`${prev.startDate}T00:00:00Z`)) / 86_400_000 : Infinity;
     return [
       now.games / 10,
       now.lastLong ? 1 : 0,
       prev && gap >= 5 && gap <= 9 && prev.matches >= 3 ? 1 : 0,
-      prev && gap >= 56 ? 1 : 0,
+      prev && playingDays(prev.startDate, m.startDate) >= 56 ? 1 : 0,
       prev && m.surface && prev.surface && prev.surface !== m.surface ? 1 : 0,
       country && m.host && country === m.host ? 1 : 0,
       (played.get(key) ?? 0) < 20 ? 1 : 0,

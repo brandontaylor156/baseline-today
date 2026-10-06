@@ -89,6 +89,10 @@ real result's set scores, with win chances, calls and chat) ·
   week before, surface changes, home soil and inexperience, each measured in rating points on top
   of the model (logistic regression on 48,000 matches, 95% intervals) and tested on a 2023+ holdout.
   Layoffs and inexperience matter on both tours; the home advantage and back-to-back fatigue don't show up.
+- **Comeback curves:** every return from eight weeks or more away since 2016 (off-season and the
+  2020 suspension excluded), measured event by event against the ratings: after half a year out,
+  players play about 60 points below their rating in the first event back and are normal by the
+  fourth. Plus who's back right now and the strongest returns.
 - **Career comparables:** each player's last two years matched against every earlier player at the
   same age (birth dates for 1,600+ draw-only players from Wikidata), with a range for the next two
   years. Backtested from 2021 with only past data: the range holds 58% of outcomes against a 60% aim,

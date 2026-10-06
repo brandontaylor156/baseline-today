@@ -23,6 +23,11 @@ const TOOLS = [
     text: "Layoffs, tiredness, long matches, home crowds, surface changes and inexperience, measured on 48,000 matches against the ratings: what's real and what's myth.",
   },
   {
+    href: "/lab/comebacks",
+    title: "Comeback curves",
+    text: "How players perform after injuries and long absences, event by event back, on every return since 2016, and who is coming back right now.",
+  },
+  {
     href: "/lab/forecast",
     title: "If a Grand Slam started today",
     text: "Hundreds of 128-player draws made with real seeding rules, each solved exactly: every player's chance on hard, clay and grass, updated daily.",

@@ -16,6 +16,8 @@
   --chart-line: #1f7a4d;
   /* Second series (validated as a pair with --chart-line: CVD ΔE 17.5 light). */
   --chart-line-2: #8a4fbf;
+  /* Third series (validated as a trio, light surface: CVD ΔE ≥ 14, all checks pass). */
+  --chart-line-3: #c45a12;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -34,6 +36,7 @@
     /* Darker than --accent: the chart lightness band for dark surfaces is L 0.48–0.67. */
     --chart-line: #3fa86e;
     --chart-line-2: #a97be0;
+    --chart-line-3: #d4702c;
   }
 }
 
@@ -51,6 +54,7 @@
   --color-warn: var(--warn);
   --color-chart-line: var(--chart-line);
   --color-chart-line-2: var(--chart-line-2);
+  --color-chart-line-3: var(--chart-line-3);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
