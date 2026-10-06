@@ -3,7 +3,7 @@ import "server-only";
 import { getRace } from "@/lib/data/race";
 import { getSeasonMatches } from "@/lib/data/season";
 import { bestOfFive, calibrate, normalizeSurface, winProbability, type Rating } from "@/lib/model/elo";
-import { countsForRace } from "@/lib/points";
+import { countsForRace, defaultDrawSize } from "@/lib/points";
 import type { Tour } from "@/lib/provider/types";
 import { eventPoints, roundsFor, type RaceEvent } from "@/lib/race";
 import { FIELD, simulateSeason, type SeasonOutlook, type SimEvent, type SimPlayer } from "@/lib/season-sim";
@@ -20,17 +20,6 @@ const FORM_SD = Number(process.env.SEASON_FORM_SD ?? 0);
 const POOL = 200;
 const DAY = 86_400_000;
 
-// Draw sizes when the calendar doesn't have one yet (the previous edition's comes first).
-const DEFAULT_DRAW: Record<string, number> = {
-  "Grand Slam": 128,
-  "Masters 1000": 96,
-  "WTA 1000": 64,
-  "ATP 500": 32,
-  "WTA 500": 28,
-  "ATP 250": 28,
-  "WTA 250": 32,
-  "WTA 125": 32,
-};
 
 type T = { id: number; provider_id: number | null; name: string; category: string | null; surface: string | null; start_date: string | null; end_date: string | null; draw_size: number | null };
 
@@ -159,7 +148,7 @@ async function buildSeason(db: AdminClient, tour: Tour, asOf: string, live: bool
     .filter((t) => (live ? t.start_date! > asOf : !finished(t)))
     .sort((a, b) => a.start_date!.localeCompare(b.start_date!));
   const events: SimEvent[] = future.map((t) => {
-    const drawSize = t.draw_size ?? prevByProvider.get(t.provider_id)?.draw_size ?? DEFAULT_DRAW[t.category!] ?? 32;
+    const drawSize = t.draw_size ?? prevByProvider.get(t.provider_id)?.draw_size ?? defaultDrawSize(t.category);
     return { key: String(t.id), week: monday(t.start_date!), category: t.category!, rounds: roundsFor(drawSize), drawSize };
   });
   const surfaceOf = new Map(future.map((t) => [String(t.id), normalizeSurface(t.surface)]));

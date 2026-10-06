@@ -803,6 +803,12 @@ export type Database = {
           },
         ]
       }
+      ranking_points: {
+        Row: { category: string; country: string | null; end_date: string; name: string; player_id: number | null; player_key: string; points: number; tour: string; tournament_id: number }
+        Insert: { category: string; country?: string | null; end_date: string; name: string; player_id?: number | null; player_key: string; points: number; tour: string; tournament_id: number }
+        Update: { category?: string; country?: string | null; end_date?: string; name?: string; player_id?: number | null; player_key?: string; points?: number; tour?: string; tournament_id?: number }
+        Relationships: []
+      }
       season_odds: {
         Row: { day: string; finals: number; no1: number; player_id: number; top10: number; tour: string }
         Insert: { day: string; finals: number; no1: number; player_id: number; top10: number; tour: string }
@@ -1145,6 +1151,10 @@ export type Database = {
       lab_unlinked_names: {
         Args: never
         Returns: { country: string | null; n: number; name: string; tour: string }[]
+      }
+      rebuilt_ranking: {
+        Args: { p_best?: number; p_date: string; p_exclude?: number; p_limit?: number; p_tour: string }
+        Returns: { country: string | null; events: number; name: string; player_id: number | null; player_key: string; points: number; rank: number }[]
       }
       lab_title_extremes: {
         Args: { p_champions: boolean; p_limit?: number; p_tour: string }

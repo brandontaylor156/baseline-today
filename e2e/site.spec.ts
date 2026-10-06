@@ -726,6 +726,13 @@ test("research lab: luck, time machine, aging and the explorer", async ({ page, 
   await expect(page.getByRole("heading", { name: "The verdict: a myth" })).toBeVisible();
   await expect(page.getByRole("table", { name: /most often/ }).locator("tbody tr")).toHaveCount(10);
 
+  await page.goto("/rankings/rebuilt?tour=atp&date=2023-01-02");
+  await expect(page.getByRole("heading", { level: 1, name: "Rankings on any date" })).toBeVisible();
+  await expect(page.getByRole("table", { name: "Rebuilt ranking" }).locator("tbody tr")).toHaveCount(50);
+  await page.getByLabel("Without").selectOption({ index: 1 });
+  await page.getByRole("button", { name: "Show" }).click();
+  await expect(page.getByRole("columnheader", { name: "Change" })).toBeVisible();
+
   await page.goto("/lab/forecast?tour=wta&surface=clay");
   await expect(page.getByRole("heading", { level: 1, name: "If a Grand Slam started today" })).toBeVisible();
   await expect(page.getByRole("table", { name: /clay Grand Slam starting today, WTA/ }).locator("tbody tr")).toHaveCount(20);

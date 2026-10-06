@@ -26,7 +26,12 @@ export async function RankingsView({ tour, date }: { tour: Tour; date?: string }
           <h1 id="rankings-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
             {TOUR_LABEL[tour]} rankings
           </h1>
-          <p className="text-sm text-muted">{TOUR_NAME[tour]} · top {rows.length || 100}</p>
+          <p className="text-sm text-muted">
+            {TOUR_NAME[tour]} · top {rows.length || 100} ·{" "}
+            <Link href={`/rankings/rebuilt?tour=${tour}`} className="font-medium text-accent hover:underline">
+              Any date since 2016 →
+            </Link>
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <nav aria-label="Tour" className="flex rounded-lg border border-border bg-surface p-0.5 text-sm">

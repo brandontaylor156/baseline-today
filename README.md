@@ -104,6 +104,10 @@ real result's set scores, with win chances, calls and chat) ·
 - **Fragile favourites: trait or myth?** Deciding sets as favourite against the scoreline model.
   The verdict is a myth: it doesn't persist from 2016–2020 to 2021+ (r ≈ 0) and doesn't predict
   upsets out of sample. The page says so and shows the lists as what chance looks like.
+- **Rankings on any date since 2016** (`/rankings/rebuilt`), rebuilt from results (best 19/18 of
+  52 weeks, Finals points from Wikipedia, Wimbledon 2022 at zero), with a what-if that removes any big
+  event, and every week's No. 1. Against the 2025–26 rankings we hold: 98–99% of the top 10 matched,
+  rank correlation 0.95, points within 1–2%.
 - **Career comparables:** each player's last two years matched against every earlier player at the
   same age (birth dates for 1,600+ draw-only players from Wikidata), with a range for the next two
   years. Backtested from 2021 with only past data: the range holds 58% of outcomes against a 60% aim,

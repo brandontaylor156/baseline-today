@@ -73,3 +73,17 @@ export function resultsWorth(tour: Tour, gap: number, categories: string[]): { c
   }
   return out.sort((a, b) => a.points - b.points);
 }
+
+// Draw sizes when the calendar doesn't have one (a typical draw for the category).
+const DEFAULT_DRAW: Record<string, number> = {
+  "Grand Slam": 128,
+  "Masters 1000": 96,
+  "WTA 1000": 64,
+  "ATP 500": 32,
+  "WTA 500": 28,
+  "ATP 250": 28,
+  "WTA 250": 32,
+  "WTA 125": 32,
+};
+
+export const defaultDrawSize = (category: string | null) => (category ? DEFAULT_DRAW[category] : undefined) ?? 32;
