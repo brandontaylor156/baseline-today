@@ -10,6 +10,7 @@ import { provider } from "@/lib/provider";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { TENNIS_TAG } from "@/lib/supabase/public";
 import { runDailySync } from "@/lib/sync/daily";
+import { computeDrawAudit } from "@/lib/sync/draw-audit";
 import { computeFactors } from "@/lib/sync/factors";
 import { computeForecast } from "@/lib/sync/forecast";
 import { computeFragility } from "@/lib/sync/fragility";
@@ -77,7 +78,12 @@ export async function GET(request: Request) {
   // The rest of the season simulated (about 20 seconds): daily until the Finals.
   const season = await computeSeasonOutlook(db, now).catch((err: Error) => `error: ${err.message}`);
   // Rankings rebuilt from results (about 40 seconds): Fridays, incrementally.
-  const rebuilt = now.getUTCDay() === 5 ? await computeRebuiltRankings(db, now).catch((err: Error) => `error: ${err.message}`) : "weekly";
+  const rebuilt =
+    now.getUTCDay() === 5
+      ? await computeRebuiltRankings(db, now)
+          .then(async (r) => ({ ...r, drawAudit: await computeDrawAudit(db, now) }))
+          .catch((err: Error) => `error: ${err.message}`)
+      : "weekly";
   // "If a major started today" (a few seconds): daily, from today's ratings.
   const forecast = await computeForecast(db, now).catch((err: Error) => `error: ${err.message}`);
   // All-time records (expensive): recomputed once a day into stat_cache.

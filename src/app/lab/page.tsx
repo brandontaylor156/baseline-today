@@ -53,6 +53,11 @@ const TOOLS = [
     text: "Hand, backhand and height for 1,900 players from Wikidata and Wikipedia, joined to every match: tall players beat their ratings, lefties don’t.",
   },
   {
+    href: "/lab/draw-audit",
+    title: "Are the draws fair?",
+    text: "Every draw we hold, tested against thousands of rule-following redraws: did the top seeds get easier first-round opponents than chance? No single draw stands out.",
+  },
+  {
     href: "/lab/forecast",
     title: "If a Grand Slam started today",
     text: "Hundreds of 128-player draws made with real seeding rules, each solved exactly: every player's chance on hard, clay and grass, updated daily.",

@@ -119,6 +119,9 @@ set by set) ·
   Wikidata (CC0), with gaps filled from each player’s Wikipedia infobox, joined to every match since
   2016. Tall players beat their ratings (+9 per 10 cm, ATP; +21 on grass); no left-handed edge beyond
   the ratings; one-handed backhands slightly under (not significant).
+- **Are the draws fair?** A permutation audit of 615 real draws: were the top seeds’ first-round
+  opponents weaker than rule-following redraws give (pre-event ratings), with a Benjamini–Hochberg
+  correction. No single draw survives; across all, a slight tilt (6.8% vs 5%, −3.8 points).
 - **Career comparables:** each player's last two years matched against every earlier player at the
   same age (birth dates for 1,600+ draw-only players from Wikidata), with a range for the next two
   years. Backtested from 2021 with only past data: the range holds 58% of outcomes against a 60% aim,
