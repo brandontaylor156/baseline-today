@@ -409,3 +409,38 @@ test("status page shows each background job and data freshness, linked from the 
   await expect(page.getByText("ATP rankings")).toBeVisible();
   await expect(page.getByText(/^(Healthy|Behind|Failing|Not run yet)$/).first()).toBeVisible();
 });
+
+test("guest pick'em: picks without an account are kept in the browser", async ({ page }) => {
+  await page.goto("/pickem");
+  const first = page.locator('section[aria-labelledby="open-heading"] li button').first();
+  test.skip((await first.count()) === 0, "no open matches right now");
+  await first.click();
+  await expect(first).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText("You’ve made 1 pick as a guest")).toBeVisible();
+  await page.reload();
+  await expect(page.locator('section[aria-labelledby="open-heading"] li button[aria-pressed="true"]')).toHaveCount(1);
+});
+
+test("sample league shows the strategy bots to signed-out visitors", async ({ page }) => {
+  await page.goto("/leagues");
+  await expect(page.getByRole("heading", { name: "Sample league: the bots" })).toBeVisible();
+  for (const bot of ["Favorite Fran", "Coin Flip Cal", "Alphabet Al", "Underdog Uma"]) {
+    await expect(page.getByText(bot, { exact: true })).toBeVisible();
+  }
+});
+
+test("demo watch party replays a real result with bots, calls and chat", async ({ page }) => {
+  await page.goto("/pickem");
+  await page.getByRole("link", { name: "Try a watch party →" }).click();
+  await expect(page.getByText("Watch party", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Play the match" }).click();
+  await expect(page.getByText("Here we go! 🎾")).toBeVisible();
+  await page.getByText("Who wins the match?").locator("..").getByRole("button").first().click();
+  await page.getByRole("button", { name: "10×" }).click();
+  await page.getByLabel("Message").fill("hello");
+  await page.getByRole("button", { name: "Send" }).click();
+  await expect(page.getByText(/Model has .* right now|Good match, that/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Replay" })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByText("Match over.")).toBeVisible();
+  await expect(page.getByText("In the room")).toBeVisible();
+});

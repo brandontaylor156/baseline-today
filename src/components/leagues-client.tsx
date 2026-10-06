@@ -7,6 +7,7 @@ import { loadClient, signInWithGoogle, useUser } from "./use-user";
 
 type League = { id: string; name: string; invite_code: string; owner_id: string };
 type Row = { nickname: string; is_me: boolean; correct: number; settled: number; bracket_points: number };
+export type SampleRow = { nickname: string; strategy: string; correct: number; settled: number };
 
 const NICK_HELP = "2–24 letters, numbers, spaces, dots, dashes or underscores.";
 
@@ -19,7 +20,7 @@ function errorText(message: string): string {
 }
 
 /** Create, join and follow private leagues (members see nicknames only). */
-export function LeaguesClient({ seasonStart }: { seasonStart: string }) {
+export function LeaguesClient({ seasonStart, sample }: { seasonStart: string; sample: SampleRow[] }) {
   const user = useUser();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -94,12 +95,15 @@ export function LeaguesClient({ seasonStart }: { seasonStart: string }) {
   if (user === undefined) return null;
   if (!user) {
     return (
-      <p className="rounded-xl border border-border bg-surface p-4 text-sm">
-        <button type="button" onClick={() => signInWithGoogle(`${pathname}${code ? `?join=${encodeURIComponent(code)}` : ""}`)} className="font-medium text-accent hover:underline">
-          Sign in with Google
-        </button>{" "}
-        to create or join a league{code ? ` (code ${code})` : ""}.
-      </p>
+      <div className="space-y-6">
+        <p className="rounded-xl border border-border bg-surface p-4 text-sm">
+          <button type="button" onClick={() => signInWithGoogle(`${pathname}${code ? `?join=${encodeURIComponent(code)}` : ""}`)} className="font-medium text-accent hover:underline">
+            Sign in with Google
+          </button>{" "}
+          to create or join a league{code ? ` (code ${code})` : ""}.
+        </p>
+        <SampleLeague rows={sample} />
+      </div>
     );
   }
 
@@ -144,7 +148,12 @@ export function LeaguesClient({ seasonStart }: { seasonStart: string }) {
       </div>
       <p className="text-xs text-muted">Nicknames: {NICK_HELP} League members see each other’s nicknames and records, nothing else.</p>
 
-      {leagues?.length === 0 && <p className="text-sm text-muted">You’re not in any leagues yet.</p>}
+      {leagues?.length === 0 && (
+        <>
+          <p className="text-sm text-muted">You’re not in any leagues yet. Here’s what one looks like:</p>
+          <SampleLeague rows={sample} />
+        </>
+      )}
       {leagues?.map((l) => (
         <section key={l.id} aria-label={l.name} className="space-y-2">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -203,5 +212,58 @@ export function LeaguesClient({ seasonStart }: { seasonStart: string }) {
         </section>
       ))}
     </div>
+  );
+}
+
+/** Four bots with fixed strategies, scored on this season's real results: what a league looks like. */
+function SampleLeague({ rows }: { rows: SampleRow[] }) {
+  if (rows.length === 0 || rows[0].settled === 0) return null;
+  return (
+    <section aria-labelledby="sample-heading" className="space-y-2">
+      <div>
+        <h2 id="sample-heading" className="text-base font-semibold">
+          Sample league: the bots
+        </h2>
+        <p className="text-sm text-muted">
+          Four bots with simple strategies, scored on every result this season that our model predicted. Can you beat Fran?
+        </p>
+      </div>
+      <div className="overflow-hidden rounded-xl border border-border bg-surface">
+        <table className="w-full text-sm">
+          <caption className="sr-only">Sample league standings this season</caption>
+          <thead className="border-b border-border text-left text-xs text-muted">
+            <tr>
+              <th scope="col" className="w-10 px-3 py-2 text-right font-medium">
+                #
+              </th>
+              <th scope="col" className="w-full px-2 py-2 font-medium">
+                Member
+              </th>
+              <th scope="col" className="whitespace-nowrap px-2 py-2 text-right font-medium">
+                Pick’em
+              </th>
+              <th scope="col" className="whitespace-nowrap px-3 py-2 text-right font-medium">
+                Right
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {rows.map((r, i) => (
+              <tr key={r.nickname}>
+                <td className="px-3 py-2 text-right tabular-nums">{i + 1}</td>
+                <td className="max-w-0 px-2 py-2">
+                  <span className="block truncate">{r.nickname}</span>
+                  <span className="block truncate text-xs text-muted">{r.strategy}</span>
+                </td>
+                <td className="whitespace-nowrap px-2 py-2 text-right tabular-nums">
+                  {r.correct.toLocaleString("en-US")}/{r.settled.toLocaleString("en-US")}
+                </td>
+                <td className="px-3 py-2 text-right tabular-nums">{Math.round((100 * r.correct) / r.settled)}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }

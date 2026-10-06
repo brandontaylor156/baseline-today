@@ -1049,6 +1049,15 @@ export type Database = {
       }
       player_favorite_count: { Args: { p_player_id: number }; Returns: number }
       ranking_dates: { Args: { p_tour: string }; Returns: string[] }
+      sample_league_standings: {
+        Args: { p_season: number }
+        Returns: {
+          correct: number
+          nickname: string
+          settled: number
+          strategy: string
+        }[]
+      }
       save_push_subscription: {
         Args: { p_auth: string; p_endpoint: string; p_p256dh: string }
         Returns: undefined

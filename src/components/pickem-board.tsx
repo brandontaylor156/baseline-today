@@ -22,6 +22,27 @@ type Row = { name: string; is_me: boolean; correct: number; settled: number; mod
 
 const pct = (p: number) => `${Math.round(p * 100)}%`;
 
+// Guest picks: signed-out visitors can pick too. They live in this browser until sign-in, when
+// the ones still open move into the account.
+const GUEST_KEY = "pickem:guest";
+function readGuest(): Map<number, 1 | 2> {
+  try {
+    const raw = JSON.parse(localStorage.getItem(GUEST_KEY) ?? "{}") as Record<string, number>;
+    return new Map(Object.entries(raw).filter(([, v]) => v === 1 || v === 2).map(([k, v]) => [Number(k), v as 1 | 2]));
+  } catch {
+    return new Map();
+  }
+}
+function writeGuest(picks: Map<number, 1 | 2>) {
+  try {
+    if (picks.size === 0) localStorage.removeItem(GUEST_KEY);
+    else localStorage.setItem(GUEST_KEY, JSON.stringify(Object.fromEntries(picks)));
+  } catch {
+    // Storage blocked (private mode): guest picks last for this visit only.
+  }
+}
+type GuestRecord = { correct: number; settled: number; model: number };
+
 /** Pick buttons for open matches, your record, and your leaderboard name. */
 export function PickemBoard({ matches, weekStart, seasonStart }: { matches: PickemMatch[]; weekStart: string; seasonStart: string }) {
   const user = useUser();
@@ -32,11 +53,55 @@ export function PickemBoard({ matches, weekStart, seasonStart }: { matches: Pick
   const [mine, setMine] = useState<{ week: Row | null; season: Row | null } | null>(null);
   const [stats, setStats] = useState<PickStats | null>(null);
 
+  const [guest, setGuest] = useState<Map<number, 1 | 2>>(new Map());
+  const [guestRecord, setGuestRecord] = useState<GuestRecord | null>(null);
+  const [moved, setMoved] = useState<number | null>(null);
+
+  // Signed out: load guest picks and settle the finished ones against real results.
+  useEffect(() => {
+    if (user !== null) return;
+    let cancelled = false;
+    (async () => {
+      const stored = readGuest();
+      if (cancelled) return;
+      setGuest(stored);
+      if (stored.size === 0) return;
+      const supabase = await loadClient();
+      const { data } = await supabase
+        .from("matches")
+        .select("id, winner_side, pre_match_p1, result_detail")
+        .in("id", [...stored.keys()])
+        .eq("status", "final")
+        .eq("confirmed", true);
+      if (cancelled) return;
+      const settled = (data ?? []).filter((m) => (m.winner_side === 1 || m.winner_side === 2) && m.result_detail !== "walkover");
+      setGuestRecord({
+        settled: settled.length,
+        correct: settled.filter((m) => stored.get(m.id) === m.winner_side).length,
+        model: settled.filter((m) => m.pre_match_p1 !== null && (m.pre_match_p1 >= 0.5) === (m.winner_side === 1)).length,
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
     (async () => {
       const supabase = await loadClient();
+      // Just signed in: move guest picks into the account (finished matches are refused).
+      const pending = readGuest();
+      if (pending.size > 0) {
+        let n = 0;
+        for (const [match_id, side] of pending) {
+          const { error } = await supabase.from("picks").insert({ match_id, side });
+          if (!error) n++;
+        }
+        writeGuest(new Map());
+        if (!cancelled && n > 0) setMoved(n);
+      }
       const ids = matches.map((m) => m.id);
       const [{ data }, week, season, history] = await Promise.all([
         ids.length ? supabase.from("picks").select("match_id, side").in("match_id", ids) : Promise.resolve({ data: [] }),
@@ -59,7 +124,15 @@ export function PickemBoard({ matches, weekStart, seasonStart }: { matches: Pick
   }, [user, matches, weekStart, seasonStart]);
 
   async function pick(matchId: number, side: 1 | 2) {
-    if (!user) return signInWithGoogle(pathname);
+    if (user === undefined) return;
+    if (!user) {
+      const next = new Map(guest);
+      if (next.get(matchId) === side) next.delete(matchId);
+      else next.set(matchId, side);
+      setGuest(next);
+      writeGuest(next);
+      return;
+    }
     setBusy(matchId);
     setError(null);
     const supabase = await loadClient();
@@ -89,11 +162,26 @@ export function PickemBoard({ matches, weekStart, seasonStart }: { matches: Pick
       {user && stats && <Badges stats={stats} />}
       {user && <LeaderboardName />}
       {user === null && (
-        <p className="rounded-xl border border-border bg-surface p-4 text-sm">
-          <button type="button" onClick={() => signInWithGoogle(pathname)} className="font-medium text-accent hover:underline">
-            Sign in with Google
-          </button>{" "}
-          to make picks. Your picks are private; only a leaderboard name you choose is ever shown to others.
+        <div className="space-y-1 rounded-xl border border-border bg-surface p-4 text-sm">
+          <p>
+            {guest.size === 0 ? "Try it: tap a player to pick them. " : `You’ve made ${guest.size} ${guest.size === 1 ? "pick" : "picks"} as a guest, saved in this browser only. `}
+            <button type="button" onClick={() => signInWithGoogle(pathname)} className="font-medium text-accent hover:underline">
+              Sign in with Google
+            </button>{" "}
+            to keep your picks{guest.size > 0 ? " (open ones move to your account)" : ""} and join the leaderboard. Your picks are private; only
+            a leaderboard name you choose is ever shown to others.
+          </p>
+          {guestRecord && guestRecord.settled > 0 && (
+            <p className="text-muted">
+              Your guest record: <span className="font-semibold text-foreground tabular-nums">{guestRecord.correct}–{guestRecord.settled - guestRecord.correct}</span>
+              {" · "}model on the same matches: {guestRecord.model}–{guestRecord.settled - guestRecord.model}
+            </p>
+          )}
+        </div>
+      )}
+      {moved !== null && (
+        <p role="status" className="rounded-lg border border-border bg-surface-muted px-3 py-2 text-sm">
+          Moved {moved} guest {moved === 1 ? "pick" : "picks"} into your account.
         </p>
       )}
       {error && (
@@ -118,14 +206,14 @@ export function PickemBoard({ matches, weekStart, seasonStart }: { matches: Pick
               <div className="grid grid-cols-2 gap-2">
                 {([1, 2] as const).map((side) => {
                   const p = side === 1 ? m.p1 : m.p2;
-                  const on = picks.get(m.id) === side;
+                  const on = (user ? picks : guest).get(m.id) === side;
                   return (
                     <button
                       key={side}
                       type="button"
                       disabled={busy === m.id || user === undefined}
                       onClick={() => pick(m.id, side)}
-                      aria-pressed={user ? on : undefined}
+                      aria-pressed={user === undefined ? undefined : on}
                       className={`flex min-w-0 items-center gap-1.5 rounded-lg border px-3 py-2 text-left disabled:opacity-60 ${
                         on ? "border-accent bg-accent-soft font-medium" : "border-border hover:bg-surface-muted"
                       }`}

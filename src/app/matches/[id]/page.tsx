@@ -130,6 +130,14 @@ export default async function MatchPage({ params }: PageProps<"/matches/[id]">) 
       </section>
 
       {match.status !== "final" && <StartParty matchId={match.id} />}
+      {match.status === "final" && !match.resultDetail && match.sets.length > 0 && (
+        <p className="text-sm">
+          <Link href={`/party/demo?match=${match.id}`} className="font-medium text-accent hover:underline">
+            Replay this match as a watch party →
+          </Link>{" "}
+          <span className="text-muted">Point-by-point demo with win chances, calls and chat.</span>
+        </p>
+      )}
 
       {m.recap && (
         <section aria-labelledby="recap-heading" className="space-y-2">
