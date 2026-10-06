@@ -47,3 +47,20 @@ describe("runLab", () => {
     expect(out.ratings.find((r) => r.key === "A")!.matches).toBe(1);
   });
 });
+
+describe("titles denied", () => {
+  it("credits a dominant player's rivals with the titles they'd have had without them", () => {
+    // A wins three events in a row; then a fourth draw where A is the big favourite over B.
+    const ms: LabMatch[] = [];
+    let id = 1;
+    for (let t = 0; t < 4; t++) {
+      const d = `2020-0${t + 1}-06`;
+      ms.push(m(id++, 50 + t, d, 1, "A", "C", 1), m(id++, 50 + t, d, 1, "B", "D", 1), m(id++, 50 + t, d, 2, "A", "B", 1));
+    }
+    const out = runLab(ms, { atp: 1 });
+    const bByA = out.denied.find((d) => d.player === "A" && d.other === "B");
+    expect(bByA).toBeDefined();
+    expect(bByA!.gain).toBeGreaterThan(0.1);
+    expect(out.denied.every((d) => d.gain >= 0.02)).toBe(true);
+  });
+});

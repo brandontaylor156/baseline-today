@@ -84,3 +84,9 @@ export function winChances(node: Node, p: (a: string, b: string) => number): Map
   }
   return out;
 }
+
+/** The same bracket with one entrant's slot taken by someone else (for "what if they weren't there"). */
+export function replaceLeaf(node: Node, key: string, by: string): Node {
+  if ("leaf" in node) return node.leaf === key ? { leaf: by } : node;
+  return { left: replaceLeaf(node.left, key, by), right: replaceLeaf(node.right, key, by), winner: node.winner };
+}

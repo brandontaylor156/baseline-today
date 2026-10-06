@@ -60,6 +60,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     page("/lab/aging", "weekly", 0.5),
     page("/lab/explorer", "weekly", 0.5),
     page("/lab/similar", "weekly", 0.5),
+    page("/lab/in-the-way", "weekly", 0.6),
+    page("/lab/in-the-way?tour=wta", "weekly", 0.6),
     ...rankings.flat().slice(0, 100).map((r) => page(`/lab/similar?p=${r.player.id}`, "weekly", 0.3)),
     page("/play", "daily", 0.6),
     page("/tools/betting", "weekly", 0.4),

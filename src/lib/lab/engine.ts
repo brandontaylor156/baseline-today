@@ -4,7 +4,7 @@
 
 import { bestOfFive, calibrate, newRating, updateRatings, winProbability, type Rating, type Surface } from "@/lib/model/elo";
 
-import { reconstruct, winChances } from "./bracket";
+import { entrants, reconstruct, replaceLeaf, winChances } from "./bracket";
 
 export interface LabMatch {
   id: number;
@@ -31,6 +31,18 @@ export interface TitleChanceRow {
   rating: number;
 }
 
+/** Expected titles `other` gained, summed over draws, when `player` is replaced by a typical entrant. */
+export interface DeniedRow {
+  tour: "atp" | "wta";
+  player: string;
+  other: string;
+  gain: number;
+}
+
+/** Contenders whose absence is simulated: at least this pre-tournament title chance. */
+const CONTENDER = 0.05;
+const REPLACEMENT = "__replacement__";
+
 export interface RatingWeekRow {
   key: string;
   tour: "atp" | "wta";
@@ -48,8 +60,12 @@ const monday = (date: string) => {
   return d.toISOString().slice(0, 10);
 };
 
-export function runLab(matches: LabMatch[], calibration: Record<string, number>): { titles: TitleChanceRow[]; ratings: RatingWeekRow[]; drawsTried: number; drawsBuilt: number } {
+export function runLab(
+  matches: LabMatch[],
+  calibration: Record<string, number>,
+): { titles: TitleChanceRow[]; ratings: RatingWeekRow[]; denied: DeniedRow[]; drawsTried: number; drawsBuilt: number } {
   const titles: TitleChanceRow[] = [];
+  const denied = new Map<string, DeniedRow>();
   const weeks = new Map<string, RatingWeekRow>();
   let drawsTried = 0;
   let drawsBuilt = 0;
@@ -72,12 +88,37 @@ export function runLab(matches: LabMatch[], calibration: Record<string, number>)
       if (tree && "winner" in tree) {
         drawsBuilt++;
         const { surface, bestOf } = list[0];
+        // A typical entrant of this draw: the median rating on every scale.
+        const field = entrants(tree).map(get);
+        const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];
+        const typical: Rating = {
+          overall: median(field.map((r) => r.overall)),
+          surface: { hard: median(field.map((r) => r.surface.hard)), clay: median(field.map((r) => r.surface.clay)), grass: median(field.map((r) => r.surface.grass)) },
+          matches: 100,
+          surfaceMatches: { hard: 100, clay: 100, grass: 100 },
+        };
+        const rating = (k: string) => (k === REPLACEMENT ? typical : get(k));
         const p = (a: string, b: string) => {
-          const q = calibrate(winProbability(get(a), get(b), surface), c);
+          const q = calibrate(winProbability(rating(a), rating(b), surface), c);
           return bestOf === 5 ? bestOfFive(q) : q;
         };
-        for (const [key, chance] of winChances(tree, p)) {
+        const base = winChances(tree, p);
+        for (const [key, chance] of base) {
           titles.push({ tournamentId, key, chance, champion: key === tree.winner, rating: Math.round(get(key).overall) });
+        }
+        // What if each contender hadn't been there: who gains their share?
+        for (const [player, chance] of base) {
+          if (chance < CONTENDER) continue;
+          const without = winChances(replaceLeaf(tree, player, REPLACEMENT), p);
+          for (const [other, before] of base) {
+            if (other === player) continue;
+            const gain = (without.get(other) ?? 0) - before;
+            if (gain <= 0.0005) continue;
+            const k = `${player}|${other}`;
+            const row = denied.get(k) ?? { tour, player, other, gain: 0 };
+            row.gain += gain;
+            denied.set(k, row);
+          }
         }
       }
       // Then play the tournament: ratings move after each match, round by round.
@@ -96,5 +137,5 @@ export function runLab(matches: LabMatch[], calibration: Record<string, number>)
       }
     }
   }
-  return { titles, ratings: [...weeks.values()], drawsTried, drawsBuilt };
+  return { titles, ratings: [...weeks.values()], denied: [...denied.values()].filter((d) => d.gain >= 0.02), drawsTried, drawsBuilt };
 }

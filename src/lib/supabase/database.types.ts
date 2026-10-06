@@ -75,6 +75,12 @@ export type Database = {
           },
         ]
       }
+      lab_denied: {
+        Row: { gain: number; other_id: number | null; other_key: string; player_id: number | null; player_key: string; tour: string }
+        Insert: { gain: number; other_id?: number | null; other_key: string; player_id?: number | null; player_key: string; tour: string }
+        Update: { gain?: number; other_id?: number | null; other_key?: string; player_id?: number | null; player_key?: string; tour?: string }
+        Relationships: []
+      }
       lab_ratings: {
         Row: { clay: number; grass: number; hard: number; matches: number; overall: number; player_id: number | null; player_key: string; tour: string; week: string }
         Insert: { clay: number; grass: number; hard: number; matches: number; overall: number; player_id?: number | null; player_key: string; tour: string; week: string }
@@ -1089,6 +1095,14 @@ export type Database = {
       lab_aging: {
         Args: { p_tour: string }
         Returns: { age: number; delta: number; players: number }[]
+      }
+      lab_denied_pairs: {
+        Args: { p_limit?: number; p_tour: string }
+        Returns: { gain: number; other: string; other_country: string | null; other_id: number; player: string; player_country: string | null; player_id: number }[]
+      }
+      lab_denied_totals: {
+        Args: { p_tour: string }
+        Returns: { cost_by_others: number; cost_others: number; country: string | null; name: string; player_id: number }[]
       }
       lab_luck: {
         Args: { p_since?: number; p_tour: string }

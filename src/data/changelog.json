@@ -1,5 +1,19 @@
 [
  {
+  "hash": "32a0d81",
+  "date": "2026-10-06",
+  "subject": "Research lab: every draw rebuilt and replayed, results explorer, time machine",
+  "bullets": [
+   "Engine: replays all 52,000+ results through the Elo model and, at each tournament's start, rebuilds its bracket from the results alone (1,119 of 1,181 draws) and computes every entrant's exact title chance from the ratings of that week; weekly ratings for every player (lab tables, recomputed Mondays; npm run lab:compute)",
+   "/lab/luck: expected vs actual titles per player, the most improbable champions (Vacherot, Shanghai 2025) and the biggest favourites who lost",
+   "/lab/explorer: any player's matches filtered by opponent, surface, seasons, round, event, result, favourite/underdog, deciding sets, tiebreaks; splits, wins above the model's expectation, shareable URLs and CSV export",
+   "/lab/time-machine: two players at any point in their careers on any surface; peak ratings since 2015",
+   "/lab/aging: aging curves by the delta method (same players, against the field, 2015-16 burn-in) and projections for today's young players",
+   "/lab/similar: players whose results profiles look most alike, with shared traits and the biggest difference (profiles cached daily)",
+   "Faster recent-results and track-record queries (tournaments first, then their matches) so builds no longer hit the statement timeout"
+  ]
+ },
+ {
   "hash": "9e24fea",
   "date": "2026-10-06",
   "subject": "Daily games: Guess the player and Upset of the day; steadier builds",

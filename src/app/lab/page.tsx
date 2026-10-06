@@ -18,6 +18,11 @@ const TOOLS = [
     text: "Every draw since 2015 rebuilt from its results and replayed with the ratings of that week. Who won more titles than their chances said, and the most improbable champions.",
   },
   {
+    href: "/lab/in-the-way",
+    title: "Who stood in whose way",
+    text: "Every draw replayed without each contender: how many titles Alcaraz cost Sinner, Djokovic cost Medvedev, Swiatek cost Sabalenka, and who cost the whole field the most.",
+  },
+  {
     href: "/lab/explorer",
     title: "Results explorer",
     text: "Any player’s matches filtered by opponent, surface, season, round, event, favourite or underdog, deciding sets and tiebreaks, with splits and CSV export.",

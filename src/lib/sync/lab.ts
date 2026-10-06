@@ -66,7 +66,7 @@ export async function computeLab(db: AdminClient) {
   const started = Date.now();
   const [matches, { data: model }] = await Promise.all([loadLabMatches(db), db.from("sync_state").select("details").eq("key", "model").maybeSingle()]);
   const calibration = ((model?.details ?? {}) as { calibration?: Record<string, number> }).calibration ?? {};
-  const { titles, ratings, drawsTried, drawsBuilt } = runLab(matches, calibration);
+  const { titles, ratings, denied, drawsTried, drawsBuilt } = runLab(matches, calibration);
 
   // Only finished draws: a tournament in progress gets its row once it's over.
   const finals = new Set(titles.filter((t) => t.champion).map((t) => t.tournamentId));
@@ -92,5 +92,21 @@ export async function computeLab(db: AdminClient) {
     const { error } = await db.from("lab_ratings").upsert(ratingRows.slice(i, i + BATCH), { onConflict: "player_key,week" });
     if (error) throw new Error(`lab: ratings: ${error.message}`);
   }
-  return { matches: matches.length, drawsTried, drawsBuilt, titleRows: titleRows.length, ratingRows: ratingRows.length, seconds: Math.round((Date.now() - started) / 1000) };
+  // Pairs are recomputed whole: clear, then write.
+  const { error: clearErr } = await db.from("lab_denied").delete().gte("gain", 0);
+  if (clearErr) throw new Error(`lab: clear denied: ${clearErr.message}`);
+  const deniedRows = denied.map((d) => ({ tour: d.tour, player_key: d.player, other_key: d.other, player_id: idOf(d.player), other_id: idOf(d.other), gain: Math.round(d.gain * 1000) / 1000 }));
+  for (let i = 0; i < deniedRows.length; i += BATCH) {
+    const { error } = await db.from("lab_denied").upsert(deniedRows.slice(i, i + BATCH), { onConflict: "player_key,other_key" });
+    if (error) throw new Error(`lab: denied: ${error.message}`);
+  }
+  return {
+    matches: matches.length,
+    drawsTried,
+    drawsBuilt,
+    titleRows: titleRows.length,
+    ratingRows: ratingRows.length,
+    deniedRows: deniedRows.length,
+    seconds: Math.round((Date.now() - started) / 1000),
+  };
 }

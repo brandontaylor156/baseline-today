@@ -667,4 +667,9 @@ test("research lab: luck, time machine, aging and the explorer", async ({ page, 
   await page.goto("/lab/similar?p=4");
   await expect(page.getByRole("heading", { name: "Most similar" })).toBeVisible();
   await expect(page.locator('section[aria-labelledby="sim-heading"] li')).toHaveCount(8);
+
+  await page.goto("/lab/in-the-way");
+  await expect(page.getByRole("heading", { name: "The biggest obstacles" })).toBeVisible();
+  await page.locator('section[aria-labelledby="pairs-heading"] a').first().click();
+  await expect(page.getByText("Titles they cost others")).toBeVisible();
 });
