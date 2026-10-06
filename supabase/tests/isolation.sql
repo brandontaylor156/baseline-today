@@ -15,6 +15,7 @@ declare
   league_code text;
   party_code text;
   party uuid;
+  league uuid;
 begin
   -- Setup as the owner (bypasses RLS).
   insert into auth.users (id, aud, role, email, raw_user_meta_data)
@@ -266,6 +267,7 @@ begin
   checks := checks + 1;
 
   league_code := public.create_league('Isolation League', 'Alice');
+  select id into league from public.leagues where invite_code = league_code;
   select count(*) into n from public.leagues;
   if n <> 1 then raise exception 'FAIL: A cannot see own league (%)', n; end if;
   checks := checks + 1;
@@ -279,6 +281,10 @@ begin
 
   select count(*) into n from public.leagues;
   if n <> 0 then raise exception 'FAIL: B sees a league before joining'; end if;
+  checks := checks + 1;
+
+  select count(*) into n from public.league_standings(league, current_date - 365);
+  if n <> 0 then raise exception 'FAIL: B read a league''s standings before joining (%)', n; end if;
   checks := checks + 1;
 
   perform public.join_league(lower(league_code), 'Bob');
@@ -326,6 +332,10 @@ begin
   if n <> 0 then raise exception 'FAIL: B sees a party before joining'; end if;
   checks := checks + 1;
 
+  -- The private realtime channel (chat, reactions, score) admits members only.
+  if public.is_party_member(party) then raise exception 'FAIL: outsider passes the party channel check'; end if;
+  checks := checks + 1;
+
   denied := false;
   begin
     insert into public.party_calls (party_id, call_key, side) values (party, 'set-1', 1);
@@ -363,6 +373,25 @@ begin
   set local role authenticated;
   select count(*) into n from public.parties;
   if n <> 0 then raise exception 'FAIL: a removed guest still sees the party'; end if;
+  checks := checks + 1;
+
+  select count(*) into n from public.party_calls;
+  if n <> 0 then raise exception 'FAIL: a removed guest still sees party calls (%)', n; end if;
+  if public.is_party_member(party) then raise exception 'FAIL: a removed guest passes the party channel check'; end if;
+  checks := checks + 1;
+  reset role;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', user_a, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  if not public.is_party_member(party) then raise exception 'FAIL: host fails the party channel check'; end if;
+  checks := checks + 1;
+  reset role;
+
+  -- Sample league: anyone can read it; it only aggregates public results.
+  perform set_config('request.jwt.claims', '{"role":"anon"}', true);
+  set local role anon;
+  select count(*) into n from public.sample_league_standings(extract(year from current_date)::int);
+  if n <> 4 then raise exception 'FAIL: anon should see the 4 sample league bots (%)', n; end if;
   checks := checks + 1;
   reset role;
 
