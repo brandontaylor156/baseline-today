@@ -123,7 +123,7 @@ export function PartyRoom(props: RoomProps) {
               </div>
             )}
             {/* Reactions float over the scoreboard for a few seconds. */}
-            <div aria-live="polite" className="pointer-events-none absolute right-3 top-2 flex flex-col items-end gap-1">
+            <div aria-live="polite" className="pointer-events-none absolute left-1/2 top-1 flex -translate-x-1/2 gap-1">
               {props.bursts.map((b) => (
                 <span key={b.id} className="animate-bounce text-xl" title={b.nick}>
                   {b.emoji}

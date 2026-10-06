@@ -45,7 +45,12 @@ export async function RankingsView({ tour, date }: { tour: Tour; date?: string }
         </div>
       </div>
 
-      <Movers rows={rows} />
+      <section aria-labelledby="movers-heading">
+        <h2 id="movers-heading" className="sr-only">
+          Biggest movers this week
+        </h2>
+        <Movers rows={rows} />
+      </section>
 
       {rows.length === 0 ? (
         <p className="rounded-lg border border-border bg-surface p-6 text-center text-muted">

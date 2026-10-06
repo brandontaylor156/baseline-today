@@ -42,6 +42,13 @@ function jobDetail(key: string, details: Details): string | null {
   return null;
 }
 
+/** Results shown under a tournament but taken from another draw page (server-only audit). */
+async function strayResults(): Promise<number | null> {
+  if (!process.env.SUPABASE_SECRET_KEY) return null;
+  const { data, error } = await createAdminClient().rpc("stray_wiki_results");
+  return error ? null : data.reduce((sum, r) => sum + Number(r.results), 0);
+}
+
 /** Freshness of every background job and of the data they write, read fresh on each visit. */
 export async function getSiteStatus(now = new Date()): Promise<SiteStatus> {
   const db = createPublicClient({ cached: false });
@@ -55,8 +62,7 @@ export async function getSiteStatus(now = new Date()): Promise<SiteStatus> {
       .order("updated_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
-    // Results shown under a tournament but taken from another draw page (server-only audit).
-    createAdminClient().rpc("stray_wiki_results"),
+    strayResults(),
   ]);
   if (state.error) throw new Error(`status: ${state.error.message}`);
 
@@ -81,7 +87,7 @@ export async function getSiteStatus(now = new Date()): Promise<SiteStatus> {
     jobs,
     rankingDates: (daily?.tours ?? []).filter((t) => t.rankingDate).map((t) => ({ tour: t.tour, date: t.rankingDate! })),
     latestResultAt: latest.data?.updated_at ?? null,
-    strayResults: stray.error ? null : stray.data.reduce((sum, r) => sum + Number(r.results), 0),
+    strayResults: stray,
     modelMatches: model?.summary ? Object.values(model.summary).reduce((sum, t) => sum + t.matches, 0) : null,
   };
 }

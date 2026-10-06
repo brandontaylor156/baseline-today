@@ -24,7 +24,7 @@ type Row = { name: string; is_me: boolean; correct: number; settled: number; mod
 function Leaderboard({ title, rows }: { title: string; rows: Row[] }) {
   return (
     <div className="rounded-xl border border-border bg-surface p-4">
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{title}</h3>
+      <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{title}</h2>
       {rows.length === 0 ? (
         <p className="text-sm text-muted">No named players with settled picks yet.</p>
       ) : (
