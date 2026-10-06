@@ -21,7 +21,8 @@
     "model:backtest": "tsx --env-file=.env.local --conditions=react-server scripts/model-backtest.mts",
     "sync:model": "tsx --env-file=.env.local --conditions=react-server scripts/sync-model.mts",
     "bluesky:preview": "tsx --env-file=.env.local --conditions=react-server scripts/bluesky-preview.mts",
-    "bluesky:profile": "tsx --env-file=.env.local --conditions=react-server scripts/bluesky-profile.mts"
+    "bluesky:profile": "tsx --env-file=.env.local --conditions=react-server scripts/bluesky-profile.mts",
+    "search": "node scripts/search-console.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
