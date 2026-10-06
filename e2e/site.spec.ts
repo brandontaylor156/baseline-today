@@ -500,12 +500,18 @@ test("open data downloads, RSS feed, IndexNow key and the case study", async ({ 
   await expect(page.getByRole("heading", { level: 1, name: "Open tennis data" })).toBeVisible();
   const ratings = await request.get("/data/ratings.csv");
   expect(ratings.headers()["content-type"]).toContain("text/csv");
-  const head = (await ratings.text()).split("\r\n")[0];
-  expect(head).toBe("tour,player,country,elo,elo_hard,elo_clay,elo_grass,matches");
+  expect(ratings.headers()["content-disposition"]).toContain("attachment");
+  const [header, first] = (await ratings.text()).split("\r\n");
+  expect(header).toBe("tour,player,country,elo,elo_hard,elo_clay,elo_grass,matches,source,license");
+  expect(first).toContain("CC BY-SA 4.0");
+  // Credit travels with the data: every row names its Wikipedia page and the license.
   const json = await (await request.get(`/data/results-${new Date().getUTCFullYear()}.json`)).json();
   expect(json.license).toContain("CC BY-SA 4.0");
+  expect(json.attribution).toContain("Wikipedia contributors");
   expect(json.count).toBeGreaterThan(100);
   expect(Object.keys(json.data[0])).toContain("model_winner_chance");
+  expect(json.data[0].source).toMatch(/^https:\/\/[a-z]+\.wikipedia\.org\//);
+  expect(json.data[0].license).toContain("CC BY-SA 4.0");
   expect((await request.get("/data/rankings.csv")).status()).toBe(404);
 
   const feed = await request.get("/feed.xml");

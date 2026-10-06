@@ -10,8 +10,9 @@ export interface SeasonMatch extends StatMatch {
   p2: { key: string; id: number | null; name: string; country: string | null };
   /** Calibrated model probability that player 1 wins, before the match. */
   preMatchP1: number | null;
-  /** Where the result came from ("wikipedia", "balldontlie"). */
+  /** Where the result came from ("wikipedia", "balldontlie"), and the draw page for Wikipedia. */
   provider?: string;
+  sourceUrl?: string | null;
 }
 
 export interface LeaderRow {

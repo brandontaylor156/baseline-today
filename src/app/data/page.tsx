@@ -20,6 +20,14 @@ export default function DataPage() {
           Every ATP and WTA singles result we track since {FIRST_SEASON}, and our model’s Elo ratings, free to download as CSV or
           JSON. No sign-up and no API key. Files update daily.
         </p>
+        <p className="rounded-xl border border-border bg-surface p-4 text-sm">
+          <strong>License:</strong> the results come from Wikipedia’s draw pages, written by Wikipedia contributors and licensed{" "}
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/" className="underline underline-offset-2">
+            CC BY-SA 4.0
+          </a>
+          . These downloads, and the ratings computed from them, are shared under the same license. Every row carries its source
+          and the license, so the credit travels with the data.
+        </p>
       </header>
 
       <section aria-labelledby="results-heading" className="space-y-3">
@@ -43,7 +51,7 @@ export default function DataPage() {
         <p className="text-sm text-muted">
           Columns: <code className="text-xs">{RESULT_COLUMNS.join(", ")}</code>. The score is from the winner’s side;{" "}
           <code className="text-xs">model_winner_chance</code> is our model’s pre-match chance for the eventual winner (blank where it
-          had no prediction).
+          had no prediction); <code className="text-xs">source</code> is the Wikipedia draw page the result was read from.
         </p>
       </section>
 
@@ -74,17 +82,22 @@ export default function DataPage() {
           License and credit
         </h2>
         <p>
-          Results come from the singles draw pages of the English{" "}
-          <a href="https://en.wikipedia.org/" className="underline underline-offset-2">
+          Results come from the singles draw pages of{" "}
+          <a href="https://www.wikipedia.org/" className="underline underline-offset-2">
             Wikipedia
-          </a>
-          , written by its volunteer editors. This data, and the ratings computed from it, are shared under{" "}
+          </a>{" "}
+          (the English edition, and the Italian one for about 1% of results), written by Wikipedia contributors under{" "}
           <a href="https://creativecommons.org/licenses/by-sa/4.0/" className="underline underline-offset-2">
             CC BY-SA 4.0
           </a>
-          : you can use it for anything, including commercially, if you credit “Wikipedia and Baseline Today” with a link and share
-          what you build from the data under the same license.
+          . We compile them and share these files under the same license, CC BY-SA 4.0. You can use the data for anything,
+          including commercially, as long as you credit it and share what you make from the data under CC BY-SA 4.0 too.
         </p>
+        <p>Suggested credit:</p>
+        <blockquote className="rounded-lg border border-border bg-surface-muted px-3 py-2 text-sm">
+          Tennis results from Wikipedia draw pages (Wikipedia contributors, CC BY-SA 4.0), compiled by Baseline Today
+          (baseline-today.vercel.app/data), CC BY-SA 4.0.
+        </blockquote>
         <p className="text-muted">
           Rankings aren’t included: they come from a data provider whose terms don’t allow redistribution. Results can contain errors
           from the source pages; they’re checked automatically but not by hand. Not affiliated with the ATP or WTA.

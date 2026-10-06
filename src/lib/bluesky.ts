@@ -30,6 +30,11 @@ async function xrpc<T>(method: string, body: BodyInit, session?: Session, conten
   return (await res.json()) as T;
 }
 
+/** Profile text: the account says plainly that it's automated, who runs it, and what it posts. */
+export const BOT_DISPLAY_NAME = "Baseline Today (bot)";
+export const BOT_DESCRIPTION =
+  "🤖 Automated account. Posts the day's biggest tennis upset and a weekly recap from baseline-today.vercel.app, generated from results on Wikipedia draw pages. Run by the site's developer; replies are read by a human.";
+
 async function login(): Promise<Session> {
   return xrpc<Session>("com.atproto.server.createSession", JSON.stringify({ identifier: process.env.BLUESKY_HANDLE, password: process.env.BLUESKY_APP_PASSWORD }));
 }
@@ -139,6 +144,35 @@ export async function botPosts(db: AdminClient, now = new Date()): Promise<BotPo
   return posts;
 }
 
+/**
+ * Makes sure the profile is labelled as automated (keeps the avatar, banner and anything else set
+ * in the app). Returns true if it had to update it.
+ */
+export async function ensureBotProfile(session: Session): Promise<boolean> {
+  const res = await fetch(`${PDS}/com.atproto.repo.getRecord?repo=${encodeURIComponent(session.did)}&collection=app.bsky.actor.profile&rkey=self`, {
+    headers: { Authorization: `Bearer ${session.accessJwt}` },
+  });
+  const current = res.ok ? (((await res.json()) as { value?: Record<string, unknown> }).value ?? {}) : {};
+  if (current.displayName === BOT_DISPLAY_NAME && current.description === BOT_DESCRIPTION) return false;
+  await xrpc(
+    "com.atproto.repo.putRecord",
+    JSON.stringify({
+      repo: session.did,
+      collection: "app.bsky.actor.profile",
+      rkey: "self",
+      record: { ...current, $type: "app.bsky.actor.profile", displayName: BOT_DISPLAY_NAME, description: BOT_DESCRIPTION },
+    }),
+    session,
+  );
+  return true;
+}
+
+/** Logs in and labels the profile; used at setup so the account is marked before its first post. */
+export async function setUpBotProfile(): Promise<string> {
+  if (!blueskyEnabled()) return "off: set BLUESKY_HANDLE and BLUESKY_APP_PASSWORD";
+  return (await ensureBotProfile(await login())) ? "profile updated" : "profile already labelled";
+}
+
 /** Posts anything new (each post once, remembered in sync_state). Returns what happened. */
 export async function runBluesky(db: AdminClient, now = new Date()): Promise<string> {
   if (!blueskyEnabled()) return "off";
@@ -147,6 +181,8 @@ export async function runBluesky(db: AdminClient, now = new Date()): Promise<str
   const fresh = (await botPosts(db, now)).filter((p) => !posted.has(p.key));
   if (fresh.length === 0) return "nothing new";
   const session = await login();
+  // Never post from an account that doesn't say it's automated.
+  await ensureBotProfile(session);
   for (const post of fresh) {
     await publish(session, post);
     posted.add(post.key);

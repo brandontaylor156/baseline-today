@@ -20,7 +20,8 @@
     "audit:draws": "tsx --env-file=.env.local --conditions=react-server scripts/audit-draw-levels.mts",
     "model:backtest": "tsx --env-file=.env.local --conditions=react-server scripts/model-backtest.mts",
     "sync:model": "tsx --env-file=.env.local --conditions=react-server scripts/sync-model.mts",
-    "bluesky:preview": "tsx --env-file=.env.local --conditions=react-server scripts/bluesky-preview.mts"
+    "bluesky:preview": "tsx --env-file=.env.local --conditions=react-server scripts/bluesky-preview.mts",
+    "bluesky:profile": "tsx --env-file=.env.local --conditions=react-server scripts/bluesky-profile.mts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",

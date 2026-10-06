@@ -44,6 +44,18 @@ export const RESULT_COLUMNS = [
   "walkover",
   "retired",
   "model_winner_chance",
+  "source",
+  "license",
 ];
 
-export const RATING_COLUMNS = ["tour", "player", "country", "elo", "elo_hard", "elo_clay", "elo_grass", "matches"];
+export const RATING_COLUMNS = ["tour", "player", "country", "elo", "elo_hard", "elo_clay", "elo_grass", "matches", "source", "license"];
+
+/** Attribution carried in every row and file, so it survives any download or copy. */
+export const LICENSE_NAME = "CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)";
+export const CREDIT = {
+  results:
+    "Match results from Wikipedia draw pages by Wikipedia contributors (https://www.wikipedia.org), licensed CC BY-SA 4.0. Compiled by Baseline Today (https://baseline-today.vercel.app/data); this file is shared under the same license, CC BY-SA 4.0. The source column links each result's draw page.",
+  ratings:
+    "Elo ratings computed by Baseline Today (https://baseline-today.vercel.app/data) from match results on Wikipedia draw pages by Wikipedia contributors (https://www.wikipedia.org), licensed CC BY-SA 4.0. This file is shared under the same license, CC BY-SA 4.0.",
+};
+export const RATINGS_SOURCE = "Baseline Today, computed from Wikipedia results (https://baseline-today.vercel.app/data)";

@@ -34,11 +34,11 @@ export default async function CreditsPage() {
           Match results
         </h2>
         <p className="text-sm text-muted">
-          Finished match results come from the singles draw pages of the English{" "}
-          <a href="https://en.wikipedia.org/" className="underline underline-offset-2">
+          Finished match results come from the singles draw pages of{" "}
+          <a href="https://www.wikipedia.org/" className="underline underline-offset-2">
             Wikipedia
-          </a>
-          , written by its volunteer editors and available under the{" "}
+          </a>{" "}
+          (mostly the English edition, a few from the Italian one), written by its volunteer editors and available under the{" "}
           <a href="https://creativecommons.org/licenses/by-sa/4.0/" className="underline underline-offset-2">
             Creative Commons Attribution-ShareAlike 4.0
           </a>{" "}

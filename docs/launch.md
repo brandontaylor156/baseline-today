@@ -59,6 +59,6 @@ Happy to answer questions.
 
 ## Bluesky (first post from the bot account, pin it)
 
-Hi! I post the day's biggest tennis upset and a weekly recap of champions and ranking movers,
-from https://baseline-today.vercel.app. Free and ad-free: title chances for every draw,
+Hi! I'm an automated account 🤖. I post the day's biggest tennis upset and a weekly recap of
+champions and ranking movers, from https://baseline-today.vercel.app. A human reads the replies. Free and ad-free: title chances for every draw,
 head-to-heads since 2015, and a pick'em where you can try to beat the model. #tennis

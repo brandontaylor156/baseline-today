@@ -40,7 +40,7 @@ if (names.includes("BLUESKY_HANDLE") || names.includes("BLUESKY_APP_PASSWORD")) 
     console.error(`✗ Bluesky login failed (HTTP ${res?.status ?? "no response"}). Check the handle and that the password is an app password.`);
     process.exit(1);
   }
-  console.log("✓ Bluesky login works");
+  console.log("✓ Bluesky login works (the bot labels its profile as automated: npm run bluesky:profile)");
   env.BLUESKY_HANDLE = env.BLUESKY_HANDLE.replace(/^@/, "");
 }
 

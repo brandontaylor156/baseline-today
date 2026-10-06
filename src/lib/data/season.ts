@@ -11,6 +11,7 @@ import { roundRank } from "@/lib/wiki/rows";
 type Row = {
   id: number;
   provider: string;
+  source_url: string | null;
   tour: Tour;
   season: number | null;
   round: string | null;
@@ -37,7 +38,7 @@ export const getSeasonMatches = cache(async (tour: Tour, season: number): Promis
     const { data, error } = await db
       .from("matches")
       .select(
-        `id, provider, tour, season, round, winner_side, result_detail, set_scores, pre_match_p1, player1_id, player2_id,
+        `id, provider, source_url, tour, season, round, winner_side, result_detail, set_scores, pre_match_p1, player1_id, player2_id,
          player1_name, player2_name, player1_country, player2_country,
          tournaments!inner(id, name, start_date, surface, category),
          p1:players!matches_player1_id_fkey(id, full_name, country_code),
@@ -85,6 +86,7 @@ export const getSeasonMatches = cache(async (tour: Tour, season: number): Promis
         p2: side(r.p2, r.player2_id, r.player2_name, r.player2_country),
         preMatchP1: r.pre_match_p1,
         provider: r.provider,
+        sourceUrl: r.source_url,
       });
     }
     if (!data || data.length < 1000) break;
