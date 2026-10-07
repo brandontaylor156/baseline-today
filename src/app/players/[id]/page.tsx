@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { JsonLd } from "@/components/json-ld";
+import { ChallengerRecord } from "@/components/challenger-record";
 import { FavoriteButton } from "@/components/favorite-button";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { PlayerResults } from "@/components/player-results";
@@ -11,6 +12,7 @@ import { PlayerTimeline } from "@/components/player-timeline";
 import { RankChart } from "@/components/rank-chart";
 import { RatingArc } from "@/components/rating-arc";
 import { WikiCredit } from "@/components/wiki-credit";
+import { getChallengerRecord } from "@/lib/data/challengers";
 import { getRatingWeeks } from "@/lib/data/lab";
 import { getPlayerResults } from "@/lib/data/results";
 import { getSeasonMatches } from "@/lib/data/season";
@@ -54,13 +56,14 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
   if (!player) notFound();
 
   const year = new Date().getUTCFullYear();
-  const [results, tourDates, stats, seasonMatches, ratingWeeks, { data: traits }] = await Promise.all([
+  const [results, tourDates, stats, seasonMatches, ratingWeeks, { data: traits }, challengers] = await Promise.all([
     getPlayerResults(player.id),
     getRankingDates(player.tour),
     getPlayerStats(player.id, year),
     getSeasonMatches(player.tour, year),
     getRatingWeeks(player.id),
     createPublicClient().from("player_traits").select("hand, backhand, height_cm, source, article, wikidata_id").eq("player_key", `id:${player.id}`).maybeSingle(),
+    player.tour === "atp" ? getChallengerRecord(player.id) : Promise.resolve(null),
   ]);
   // Where the provider leaves gaps: hand, backhand and height as Wikidata (or the Wikipedia infobox) records them.
   const traitPlays = !formatPlays(player.plays) && traits?.hand ? `${traits.hand === "left" ? "Left" : "Right"}-handed` : null;
@@ -255,6 +258,8 @@ export default async function PlayerPage({ params }: PageProps<"/players/[id]">)
           <WikiCredit sources={results.sources} className="mt-3" />
         </section>
       )}
+
+      {challengers && <ChallengerRecord seasons={challengers.seasons} recent={challengers.recent} />}
 
       <p className="text-xs text-muted">
         Best tracked rank counts only the ranking snapshots stored since this site began recording. Season record counts
