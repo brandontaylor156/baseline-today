@@ -39,6 +39,7 @@ export const getChallengerRecord = cache(async (playerId: number): Promise<{ sea
   const { data } = await db
     .from("challenger_matches")
     .select("round, round_rank, player1_name, player2_name, winner_side, set_scores, result_detail, challenger_events!inner(name, season, start_date, draw_title)")
+    .eq("challenger_events.circuit", "challenger")
     .or(`player1_name.in.(${list}),player2_name.in.(${list})`)
     .limit(1000);
   type R = {

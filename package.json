@@ -44,6 +44,8 @@
     "network": "tsx --env-file=.env.local --conditions=react-server scripts/network.mts",
     "sync:challengers": "tsx --env-file=.env.local --conditions=react-server scripts/sync-challengers.mts",
     "breakthrough": "tsx --env-file=.env.local --conditions=react-server scripts/breakthrough.mts",
+    "sync:juniors": "tsx --env-file=.env.local --conditions=react-server scripts/sync-juniors.mts",
+    "juniors": "tsx --env-file=.env.local --conditions=react-server scripts/juniors.mts",
     "traits": "tsx --env-file=.env.local --conditions=react-server scripts/traits.mts",
     "sync:traits": "tsx --env-file=.env.local --conditions=react-server scripts/sync-traits.mts",
     "sync:people": "tsx --env-file=.env.local --conditions=react-server scripts/sync-people.mts"

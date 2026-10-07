@@ -804,9 +804,9 @@ export type Database = {
         ]
       }
       challenger_events: {
-        Row: { article: string | null; checked_at: string; draw_title: string; end_date: string | null; id: number; location: string | null; matches: number; name: string; season: number; start_date: string | null; surface: string | null }
-        Insert: { article?: string | null; checked_at?: string; draw_title: string; end_date?: string | null; id?: number; location?: string | null; matches?: number; name: string; season: number; start_date?: string | null; surface?: string | null }
-        Update: { article?: string | null; checked_at?: string; draw_title?: string; end_date?: string | null; id?: number; location?: string | null; matches?: number; name?: string; season?: number; start_date?: string | null; surface?: string | null }
+        Row: { article: string | null; checked_at: string; circuit: string; draw_title: string; end_date: string | null; id: number; location: string | null; matches: number; name: string; season: number; start_date: string | null; surface: string | null }
+        Insert: { article?: string | null; checked_at?: string; circuit?: string; draw_title: string; end_date?: string | null; id?: number; location?: string | null; matches?: number; name: string; season: number; start_date?: string | null; surface?: string | null }
+        Update: { article?: string | null; checked_at?: string; circuit?: string; draw_title?: string; end_date?: string | null; id?: number; location?: string | null; matches?: number; name?: string; season?: number; start_date?: string | null; surface?: string | null }
         Relationships: []
       }
       challenger_matches: {

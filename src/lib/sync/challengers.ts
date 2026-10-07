@@ -66,6 +66,55 @@ export const field = (wikitext: string, name: string) =>
 /** Hard, Clay, Grass or Carpet from an infobox surface field. */
 const surfaceOf = (raw: string) => (/clay/i.test(raw) ? "Clay" : /grass/i.test(raw) ? "Grass" : /carpet/i.test(raw) ? "Carpet" : /hard/i.test(raw) ? "Hard" : null);
 
+
+/** Imports one draw page: the event (dated from `box`, its article's infobox, when given) and its results. */
+async function importDraw(db: AdminClient, title: string, season: number, circuit: string, box: string): Promise<number | null> {
+  const page = (await latestRevisions([title]).catch(() => new Map())).get(title);
+  if (!page) return null;
+  const matches = parseDraw(page.content, normalizeName).filter((m) => m.winner !== null && isPlausibleResult(m, 3));
+  const dates = eventDates(field(box, "date") || field(box, "dates"), season);
+  const { data: ev, error } = await db
+    .from("challenger_events")
+    .upsert(
+      {
+        season,
+        circuit,
+        draw_title: title,
+        article: eventArticle(title),
+        name: eventArticle(title).replace(/^\d{4}\s+/, ""),
+        start_date: dates?.start ?? null,
+        end_date: dates?.end ?? null,
+        surface: surfaceOf(field(box, "surface")),
+        location: field(box, "location") || null,
+        matches: matches.length,
+        checked_at: new Date().toISOString(),
+      },
+      { onConflict: "draw_title" },
+    )
+    .select("id")
+    .single();
+  if (error || !ev) throw new Error(`challengers: event: ${error?.message}`);
+  const rows = matches.map((m) => ({
+    event_id: ev.id,
+    round: m.round,
+    round_rank: roundRank(m.round),
+    player1_name: m.p1.name,
+    player2_name: m.p2.name,
+    player1_country: m.p1.country,
+    player2_country: m.p2.country,
+    winner_side: m.winner,
+    set_scores: m.sets as unknown as Json,
+    result_detail: m.detail,
+  }));
+  // Unique per round and pairing; a page can list the same pairing twice only by mistake.
+  const unique = [...new Map(rows.map((r) => [`${r.round}|${r.player1_name}|${r.player2_name}`, r])).values()];
+  if (unique.length) {
+    const { error: e } = await db.from("challenger_matches").upsert(unique, { onConflict: "event_id,round,player1_name,player2_name" });
+    if (e) throw new Error(`challengers: matches: ${e.message}`);
+  }
+  return unique.length;
+}
+
 /**
  * Imports ATP Challenger singles results for the given seasons from Wikipedia. Past seasons: each
  * draw page once. The current season: events not yet over, again.
@@ -75,57 +124,43 @@ export async function importChallengers(db: AdminClient, seasons: number[], now 
   let results = 0;
   for (const season of seasons) {
     const titles = await drawTitles(season);
-    const { data: known } = await db.from("challenger_events").select("draw_title, end_date").eq("season", season).limit(1000);
+    const { data: known } = await db.from("challenger_events").select("draw_title, end_date").eq("season", season).eq("circuit", "challenger").limit(1000);
     const done = new Map((known ?? []).map((k) => [k.draw_title, k.end_date]));
-    const todo = titles.filter((t) => !done.has(t) || !done.get(t) || done.get(t)! >= new Date(now.getTime() - 10 * 86_400_000).toISOString().slice(0, 10));
+    const recent = new Date(now.getTime() - 10 * 86_400_000).toISOString().slice(0, 10);
+    const todo = titles.filter((t) => !done.has(t) || !done.get(t) || done.get(t)! >= recent);
     const boxes = await infoboxes(todo.map(eventArticle));
     for (const title of todo) {
-      const page = (await latestRevisions([title]).catch(() => new Map())).get(title);
-      if (!page) continue;
-      const matches = parseDraw(page.content, normalizeName).filter((m) => m.winner !== null && isPlausibleResult(m, 3));
-      const box = boxes.get(eventArticle(title)) ?? "";
-      const dates = eventDates(field(box, "date") || field(box, "dates"), season);
-      const { data: ev, error } = await db
-        .from("challenger_events")
-        .upsert(
-          {
-            season,
-            draw_title: title,
-            article: eventArticle(title),
-            name: eventArticle(title).replace(/^\d{4}\s+/, ""),
-            start_date: dates?.start ?? null,
-            end_date: dates?.end ?? null,
-            surface: surfaceOf(field(box, "surface")),
-            location: field(box, "location") || null,
-            matches: matches.length,
-            checked_at: new Date().toISOString(),
-          },
-          { onConflict: "draw_title" },
-        )
-        .select("id")
-        .single();
-      if (error || !ev) throw new Error(`challengers: event: ${error?.message}`);
-      const rows = matches.map((m) => ({
-        event_id: ev.id,
-        round: m.round,
-        round_rank: roundRank(m.round),
-        player1_name: m.p1.name,
-        player2_name: m.p2.name,
-        player1_country: m.p1.country,
-        player2_country: m.p2.country,
-        winner_side: m.winner,
-        set_scores: m.sets as unknown as Json,
-        result_detail: m.detail,
-      }));
-      // Unique per round and pairing; a page can list the same pairing twice only by mistake.
-      const unique = [...new Map(rows.map((r) => [`${r.round}|${r.player1_name}|${r.player2_name}`, r])).values()];
-      if (unique.length) {
-        const { error: e } = await db.from("challenger_matches").upsert(unique, { onConflict: "event_id,round,player1_name,player2_name" });
-        if (e) throw new Error(`challengers: matches: ${e.message}`);
-      }
+      const n = await importDraw(db, title, season, "challenger", boxes.get(eventArticle(title)) ?? "");
+      if (n === null) continue;
       events++;
-      results += unique.length;
+      results += n;
     }
   }
   return `${events} events, ${results} results`;
+}
+
+const SLAMS = ["Australian Open", "French Open", "Wimbledon Championships", "US Open"];
+
+/** Junior Grand Slam singles draws (boys and girls) for the given seasons, each page once. */
+export async function importJuniors(db: AdminClient, seasons: number[]): Promise<string> {
+  let events = 0;
+  let results = 0;
+  const { data: known } = await db.from("challenger_events").select("draw_title").neq("circuit", "challenger").limit(1000);
+  const done = new Set((known ?? []).map((k) => k.draw_title));
+  for (const season of seasons) {
+    for (const slam of SLAMS) {
+      for (const [who, circuit] of [
+        ["Boys", "junior-boys"],
+        ["Girls", "junior-girls"],
+      ] as const) {
+        const title = `${season} ${slam} – ${who}' singles`;
+        if (done.has(title)) continue;
+        const n = await importDraw(db, title, season, circuit, "");
+        if (n === null) continue;
+        events++;
+        results += n;
+      }
+    }
+  }
+  return `${events} junior draws, ${results} results`;
 }

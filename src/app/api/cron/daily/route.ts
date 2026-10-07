@@ -11,13 +11,14 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { TENNIS_TAG } from "@/lib/supabase/public";
 import { runDailySync } from "@/lib/sync/daily";
 import { computeBreakthrough } from "@/lib/sync/breakthrough";
-import { importChallengers } from "@/lib/sync/challengers";
+import { importChallengers, importJuniors } from "@/lib/sync/challengers";
 import { syncConditions } from "@/lib/sync/conditions";
 import { computeConditions } from "@/lib/sync/conditions-analysis";
 import { computeDrawAudit } from "@/lib/sync/draw-audit";
 import { computeFactors } from "@/lib/sync/factors";
 import { computeForecast } from "@/lib/sync/forecast";
 import { computeFragility } from "@/lib/sync/fragility";
+import { computeJuniors } from "@/lib/sync/juniors";
 import { freshPages } from "@/lib/sync/fresh-pages";
 import { computeLab } from "@/lib/sync/lab";
 import { syncPeople } from "@/lib/sync/people";
@@ -61,6 +62,13 @@ export async function GET(request: Request) {
   }
   // Research lab (rebuilds every draw; about a minute): Mondays, after the week's events finish.
   const lab = now.getUTCDay() === 1 ? await computeLab(db).catch((err: Error) => `error: ${err.message}`) : "weekly";
+  // Junior Slam draws and the junior-to-pro study (about a minute): Mondays too.
+  const juniors =
+    now.getUTCDay() === 1
+      ? await importJuniors(db, [now.getUTCFullYear()])
+          .then(async (sync) => ({ sync, study: await computeJuniors(db, now) }))
+          .catch((err: Error) => `error: ${err.message}`)
+      : "weekly";
   // What decides matches (about 30 seconds): Wednesdays, a quiet day for the other weekly jobs.
   const factors =
     now.getUTCDay() === 3
@@ -124,5 +132,5 @@ export async function GET(request: Request) {
     .catch((err: Error) => `error: ${err.message}`);
   // Bluesky: the upset of the day and, on Mondays, last week's recap (off until the account is set).
   const bluesky = await runBluesky(db, now).catch((err: Error) => `error: ${err.message}`);
-  return Response.json({ ...result, records, lab, factors, scorelines: scorelineCheck, projections, season, rebuilt, saturday, sunday, forecast, digest, indexnow, bluesky }, { status: result.status === "error" ? 500 : 200 });
+  return Response.json({ ...result, records, lab, juniors, factors, scorelines: scorelineCheck, projections, season, rebuilt, saturday, sunday, forecast, digest, indexnow, bluesky }, { status: result.status === "error" ? 500 : 200 });
 }

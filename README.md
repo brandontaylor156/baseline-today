@@ -86,6 +86,10 @@ set by set) ·
   one margin-of-victory Elo. A logistic model trained on 2017–2022 season starts predicts 10+
   tour-level wins in the next two seasons; on held-out 2023–2024: AUC 0.918 (rating alone 0.886),
   calibrated by bin. First breakthroughs and players on the way back, separately.
+- **From junior Slams to the pros:** every boys’ and girls’ Grand Slam singles draw since 2015
+  from Wikipedia, each junior followed into the pros by the same Wikipedia names. Champions made
+  it (10+ tour-level wins, WTA 125 and Challengers excluded) 63% (boys) and 76% (girls) of the
+  time; first-round losers 5% and 4%.
 - **Season simulator:** the rest of the season played out 2,000 times (entries from each player's
   habits, seeded draws with byes, every match, points won and last year's points dropped, then the
   Finals): chances of qualifying, year-end No. 1 and the top 10, daily. Backtested from three 2025

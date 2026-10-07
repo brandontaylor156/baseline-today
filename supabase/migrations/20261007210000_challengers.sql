@@ -37,3 +37,7 @@ drop policy if exists "challenger_events readable" on public.challenger_events;
 create policy "challenger_events readable" on public.challenger_events for select to anon, authenticated using (true);
 drop policy if exists "challenger_matches readable" on public.challenger_matches;
 create policy "challenger_matches readable" on public.challenger_matches for select to anon, authenticated using (true);
+
+-- Junior Grand Slam singles draws live here too: 'challenger', 'junior-boys' or 'junior-girls'.
+alter table public.challenger_events add column if not exists circuit text not null default 'challenger';
+create index if not exists challenger_events_circuit on public.challenger_events (circuit, season);

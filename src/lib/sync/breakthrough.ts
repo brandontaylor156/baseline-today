@@ -72,6 +72,7 @@ export async function computeBreakthrough(db: AdminClient, now = new Date()) {
       .from("challenger_matches")
       .select("id, round, round_rank, player1_name, player2_name, winner_side, set_scores, result_detail, challenger_events!inner(start_date, surface)")
       .not("challenger_events.start_date", "is", null)
+      .eq("challenger_events.circuit", "challenger")
       .in("winner_side", [1, 2])
       .order("id")
       .range(from, from + 999);
